@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Application xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GoodBuy.App">
+	<Application.Resources>
+
+        <ResourceDictionary>
+            <Style x:Key="headerLocationButton" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="Firebrick"/>
+                <Setter Property="TextColor" Value="#FFF"/>
+                <Setter Property="FontAttributes" Value="Italic, Bold"/>
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="HeightRequest" Value="35"/>
+            </Style>
+        </ResourceDictionary>
+
+    </Application.Resources>
+</Application>
