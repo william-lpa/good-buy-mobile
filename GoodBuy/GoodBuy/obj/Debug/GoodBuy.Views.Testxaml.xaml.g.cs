@@ -11,7 +11,7 @@
 namespace GoodBuy.Views {
     
     
-    [global::Xamarin.Forms.Xaml.XamlFilePathAttribute("C:\\Worskpace\\GoodBuy\\GoodBuy\\GoodBuy\\GoodBuy\\Views\\Testxaml.xaml")]
+    [global::Xamarin.Forms.Xaml.XamlFilePathAttribute("C:\\Worskpace\\good-buy\\GoodBuy\\GoodBuy\\Views\\Testxaml.xaml")]
     public partial class Testxaml : global::Xamarin.Forms.ContentPage {
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Xamarin.Forms.Build.Tasks.XamlG", "0.0.0.0")]

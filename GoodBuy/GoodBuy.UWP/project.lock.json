@@ -22921,16 +22921,16 @@
   },
   "project": {
     "restore": {
-      "projectUniqueName": "C:\\Worskpace\\GoodBuy\\GoodBuy\\GoodBuy\\GoodBuy.UWP\\GoodBuy.UWP.csproj",
+      "projectUniqueName": "C:\\Worskpace\\good-buy\\GoodBuy\\GoodBuy.UWP\\GoodBuy.UWP.csproj",
       "projectName": "GoodBuy.UWP",
-      "projectPath": "C:\\Worskpace\\GoodBuy\\GoodBuy\\GoodBuy\\GoodBuy.UWP\\GoodBuy.UWP.csproj",
-      "projectJsonPath": "C:\\Worskpace\\GoodBuy\\GoodBuy\\GoodBuy\\GoodBuy.UWP\\project.json",
+      "projectPath": "C:\\Worskpace\\good-buy\\GoodBuy\\GoodBuy.UWP\\GoodBuy.UWP.csproj",
+      "projectJsonPath": "C:\\Worskpace\\good-buy\\GoodBuy\\GoodBuy.UWP\\project.json",
       "projectStyle": "ProjectJson",
       "frameworks": {
         "uap10.0": {
           "projectReferences": {
-            "C:\\Worskpace\\GoodBuy\\GoodBuy\\GoodBuy\\GoodBuy\\GoodBuy.csproj": {
-              "projectPath": "C:\\Worskpace\\GoodBuy\\GoodBuy\\GoodBuy\\GoodBuy\\GoodBuy.csproj"
+            "C:\\Worskpace\\good-buy\\GoodBuy\\GoodBuy\\GoodBuy.csproj": {
+              "projectPath": "C:\\Worskpace\\good-buy\\GoodBuy\\GoodBuy\\GoodBuy.csproj"
             }
           }
         }

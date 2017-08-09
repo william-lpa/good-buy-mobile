@@ -2798,8 +2798,6 @@ containing a value of this type.
         public static final int toolbar=0x7f030039;
     }
     public static final class string {
-        public static final int ApplicationName=0x7f080027;
-        public static final int Hello=0x7f080026;
         public static final int abc_action_bar_home_description=0x7f08000f;
         public static final int abc_action_bar_home_description_format=0x7f080010;
         public static final int abc_action_bar_home_subtitle_description_format=0x7f080011;
@@ -2838,7 +2836,7 @@ containing a value of this type.
         public static final int mr_system_route_name=0x7f08000d;
         public static final int mr_user_route_category_name=0x7f08000e;
         public static final int status_bar_notification_info_overflow=0x7f080022;
-        public static final int title_activity_webview=0x7f080028;
+        public static final int title_activity_webview=0x7f080026;
     }
     public static final class style {
         public static final int AlertDialog_AppCompat=0x7f0a00a1;

@@ -11,7 +11,7 @@
 namespace GoodBuy {
     
     
-    [global::Xamarin.Forms.Xaml.XamlFilePathAttribute("C:\\Worskpace\\GoodBuy\\GoodBuy\\GoodBuy\\GoodBuy\\Views\\LoginPage.xaml")]
+    [global::Xamarin.Forms.Xaml.XamlFilePathAttribute("C:\\Worskpace\\good-buy\\GoodBuy\\GoodBuy\\Views\\LoginPage.xaml")]
     public partial class LoginPage : global::Xamarin.Forms.ContentPage {
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Xamarin.Forms.Build.Tasks.XamlG", "0.0.0.0")]
