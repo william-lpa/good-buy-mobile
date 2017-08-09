@@ -1,13 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.WindowsAzure.MobileServices;
+using Newtonsoft.Json;
 
 namespace GoodBuy.Model
 {
-    public class Person
+    [DataTable("Person")]
+    public class Person : BaseEntity
     {
-        public string UserId { get; set; }
+        //[Version]
+        //public string Version { get; set; } // don't change this, is important for Azure
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("email")]
+        public string Email { get; set; }
+
+        [JsonProperty("age")]
+        public int Age { get; set; }
+
+        [JsonProperty("male")]
+        public bool Male { get; set; }
     }
 }

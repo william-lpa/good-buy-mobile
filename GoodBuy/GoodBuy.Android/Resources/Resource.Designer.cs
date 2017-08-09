@@ -31,8 +31,6 @@ namespace GoodBuy.Droid
 			global::Xamarin.Auth.Resource.Drawable.ic_arrow_back = global::GoodBuy.Droid.Resource.Drawable.ic_arrow_back;
 			global::Xamarin.Auth.Resource.Id.webview = global::GoodBuy.Droid.Resource.Id.webview;
 			global::Xamarin.Auth.Resource.Layout.activity_webview = global::GoodBuy.Droid.Resource.Layout.activity_webview;
-			global::Xamarin.Auth.Resource.String.ApplicationName = global::GoodBuy.Droid.Resource.String.ApplicationName;
-			global::Xamarin.Auth.Resource.String.Hello = global::GoodBuy.Droid.Resource.String.Hello;
 			global::Xamarin.Auth.Resource.String.title_activity_webview = global::GoodBuy.Droid.Resource.String.title_activity_webview;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.actionBarSize = global::GoodBuy.Droid.Resource.Attribute.actionBarSize;
 		}
@@ -2960,12 +2958,6 @@ namespace GoodBuy.Droid
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f080027
-			public const int ApplicationName = 2131230759;
-			
-			// aapt resource value: 0x7f080026
-			public const int Hello = 2131230758;
-			
 			// aapt resource value: 0x7f08000f
 			public const int abc_action_bar_home_description = 2131230735;
 			
@@ -3080,8 +3072,8 @@ namespace GoodBuy.Droid
 			// aapt resource value: 0x7f080022
 			public const int status_bar_notification_info_overflow = 2131230754;
 			
-			// aapt resource value: 0x7f080028
-			public const int title_activity_webview = 2131230760;
+			// aapt resource value: 0x7f080026
+			public const int title_activity_webview = 2131230758;
 			
 			static String()
 			{

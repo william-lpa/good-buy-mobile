@@ -2,7 +2,6 @@
 using GoodBuy.Service;
 using Xamarin.Forms;
 using Microsoft.WindowsAzure.MobileServices;
-using GoodBuy.Authentication;
 
 namespace GoodBuy.ViewModels
 {
@@ -11,6 +10,7 @@ namespace GoodBuy.ViewModels
         private readonly AzureService azureService;
         public Command FacebookLoginCommand { get; }
         public Command GoogleLoginCommand { get; }
+        
 
         public LoginPageViewModel()
         {
@@ -21,7 +21,13 @@ namespace GoodBuy.ViewModels
 
         private void ExecuteGoogleLogin()
         {
-            ExecuteLogin(MobileServiceAuthenticationProvider.Google);
+            try
+            {
+                ExecuteLogin(MobileServiceAuthenticationProvider.Google);
+            }
+            catch (Exception err)
+            {
+            }
         }
 
         private void ExecuteFacebookLogin()
