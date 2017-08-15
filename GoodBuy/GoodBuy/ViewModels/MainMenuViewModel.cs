@@ -1,12 +1,24 @@
-﻿namespace GoodBuy.ViewModels
+﻿using GoodBuy.Service;
+using System;
+using Xamarin.Forms;
+
+namespace GoodBuy.ViewModels
 {
     class MainMenuViewModel : BaseViewModel
     {
         public string Token { get; }
-        public MainMenuViewModel(object token)
+        public Command NovaOfertaCommand { get; }
+        private readonly AzureService azure;
+        public MainMenuViewModel(string token, AzureService azureService)
         {
-            Token = token?.ToString();
+            azure = azureService;
+            Token = token;
+            NovaOfertaCommand = new Command(ExecuteCadastrarNovaOferta);
         }
 
+        private async void ExecuteCadastrarNovaOferta(object obj)
+        {
+            await PushModalAsync<NovaOfertaViewModel>(azure);
+        }
     }
 }

@@ -41,25 +41,38 @@
     <Compile Include="Authentication\IAuthentication.cs" />
     <Compile Include="Log\Log.cs" />
     <Compile Include="Log\MessageDisplayer.cs" />
-    <Compile Include="Model\BaseEntity.cs" />
-    <Compile Include="Model\IEntity.cs" />
+    <Compile Include="Models\Abstraction\BaseEntity.cs" />
+    <Compile Include="Models\Categoria.cs" />
+    <Compile Include="Models\Estabelecimento.cs" />
+    <Compile Include="Models\HistoricoOferta.cs" />
+    <Compile Include="Models\Abstraction\IEntity.cs" />
+    <Compile Include="Models\Many to Many\CarteiraProduto.cs" />
+    <Compile Include="Models\Many to Many\Oferta.cs" />
+    <Compile Include="Models\Marca.cs" />
+    <Compile Include="Models\Produto.cs" />
+    <Compile Include="Models\Sabor.cs" />
+    <Compile Include="Models\UnidadeMedida.cs" />
     <Compile Include="Service\EntityService.cs" />
     <Compile Include="Service\Interfaces\ICrudOperation.cs" />
     <Compile Include="Service\Interfaces\IEntityService.cs" />
+    <Compile Include="Validation\Interfaces\IValidationRule.cs" />
+    <Compile Include="Validation\RequiredObjectRule.cs" />
+    <Compile Include="Validation\ValidatableObject.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\LoginPageViewModel.cs" />
     <Compile Include="ViewModels\MainMenuViewModel.cs" />
+    <Compile Include="ViewModels\NovaOfertaViewModel.cs" />
     <Compile Include="Views\LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\Person.cs" />
+    <Compile Include="Models\Person.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\AzureService.cs" />
     <Compile Include="Views\MainMenu.xaml.cs">
       <DependentUpon>MainMenu.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Testxaml.xaml.cs">
-      <DependentUpon>Testxaml.xaml</DependentUpon>
+    <Compile Include="Views\NovaOferta.xaml.cs">
+      <DependentUpon>NovaOferta.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -132,12 +145,18 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Views\Testxaml.xaml">
+    <Content Include="Resources\Menu\product.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\NovaOferta.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Controls\" />
+    <Folder Include="Models\Logical\" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\packages\Xamarin.Forms.2.3.4.247\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.targets" Condition="Exists('..\..\packages\Xamarin.Forms.2.3.4.247\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace GoodBuy.Service.Interfaces
 {
-    interface IEntityService : ICrudOperation
+    public interface IEntityService : ICrudOperation
     {
         IMobileServiceClient Client { get; }
         IMobileServiceSyncTable<IEntity> SyncTableModel { get; }
         Task SyncDataBase();
-        Task<IList<IEntity>> GetEntites(int currentPage = 0, int pageSize = 15);
+        Task<IList<IEntity>> GetEntites(int currentPage = 0, int pageSize = 200);
         Task<IEntity> GetById(string id);
+        Task<IEnumerable<IEntity>> GetByIds(string[] id);
     }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace GoodBuy.Views
@@ -15,6 +9,8 @@ namespace GoodBuy.Views
         public MainMenu()
         {
             InitializeComponent();
+
+            batata.Image = (FileImageSource)ImageSource.FromFile(@"product.png");
         }
     }
 }

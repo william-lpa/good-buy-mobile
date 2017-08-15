@@ -10,11 +10,11 @@ namespace GoodBuy.ViewModels
         private readonly AzureService azureService;
         public Command FacebookLoginCommand { get; }
         public Command GoogleLoginCommand { get; }
-        
 
-        public LoginPageViewModel()
+
+        public LoginPageViewModel(AzureService azure)
         {
-            azureService = new AzureService();
+            azureService = azure;
             FacebookLoginCommand = new Command(ExecuteFacebookLogin);
             GoogleLoginCommand = new Command(ExecuteGoogleLogin);
         }
@@ -27,19 +27,34 @@ namespace GoodBuy.ViewModels
             }
             catch (Exception err)
             {
+                Log.Log.Instance.AddLog(err);
             }
         }
 
         private void ExecuteFacebookLogin()
         {
-            ExecuteLogin(MobileServiceAuthenticationProvider.Facebook);
+            try
+            {
+                ExecuteLogin(MobileServiceAuthenticationProvider.Facebook);
+            }
+            catch (Exception err)
+            {
+                Log.Log.Instance.AddLog(err);
+            }
         }
         private async void ExecuteLogin(MobileServiceAuthenticationProvider provider)
         {
-            var user = await azureService.LoginAsync(provider);
+            try
+            {
+                var user = await azureService.LoginAsync(provider);
 
-            Device.BeginInvokeOnMainThread(async () => await App.Current.MainPage.DisplayAlert("Logado", $"Logado com sucesso!", "OK"));
-            await PushAsync<MainMenuViewModel>(user.UserId ?? "error");
+                Device.BeginInvokeOnMainThread(async () => await App.Current.MainPage.DisplayAlert("Logado", $"Logado com sucesso!", "OK"));
+                await PushAsync<MainMenuViewModel>(""?? "error",azureService);
+            }
+            catch (Exception err)
+            {
+                Log.Log.Instance.AddLog(err);
+            }
         }
     }
 }

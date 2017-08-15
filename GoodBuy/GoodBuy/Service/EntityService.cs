@@ -15,7 +15,6 @@ namespace GoodBuy.Service
         public IMobileServiceSyncTable<IEntity> SyncTableModel { get; }
 
         public IMobileServiceClient Client { get; }
-
         public EntityService(IMobileServiceClient client, IMobileServiceSyncTable<IEntity> syncTable)
         {
             SyncTableModel = syncTable;
@@ -26,6 +25,7 @@ namespace GoodBuy.Service
         {
             try
             {
+                entidade.Id = Guid.NewGuid().ToString();
                 await SyncTableModel.InsertAsync(entidade);
                 await Client.SyncContext.PushAsync();
             }
@@ -59,7 +59,7 @@ namespace GoodBuy.Service
                 return null;
             }
         }
-        public async Task<IList<IEntity>> GetEntites(int currentPage = 0, int pageSize = 15)
+        public async Task<IList<IEntity>> GetEntites(int currentPage = 0, int pageSize = 200)
         {
             try
             {
@@ -95,6 +95,20 @@ namespace GoodBuy.Service
             catch (Exception err)
             {
                 Log.Log.Instance.AddLog(err);
+            }
+        }
+
+        public async Task<IEnumerable<IEntity>> GetByIds(string[] id)
+        {
+            try
+            {
+                await SyncDataBase();
+                return (await SyncTableModel.Where(x => id.Contains(x.Id)).ToListAsync());
+            }
+            catch (Exception err)
+            {
+                Log.Log.Instance.AddLog(err);
+                return null;
             }
         }
     }
