@@ -9,7 +9,12 @@ namespace GoodBuy.Models
     public class Categoria : BaseEntity
     {
         [JsonProperty("nome")]
-        public string Nome { get; set; }
+        public string Nome { get; private set; }
+
+        public Categoria(string nome)
+        {
+            Nome = nome;
+        }
 
         [JsonIgnore]
         public IEnumerable<Produto> Produtos { get; set; }

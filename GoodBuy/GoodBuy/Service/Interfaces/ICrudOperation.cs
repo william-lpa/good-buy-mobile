@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 
 namespace GoodBuy.Service.Interfaces
 {
-    public interface ICrudOperation
+    public interface ICrudOperation<TModel> where TModel : IEntity
     {
-        Task CreateEntity(IEntity entidade);
-        Task DeleteEntity(IEntity entidade);
-        Task UpdateEntity(IEntity entidade);        
+        Task<string> CreateEntity(TModel entidade);
+        Task DeleteEntity(TModel entidade);
+        Task UpdateEntity(TModel entidade);
     }
 }

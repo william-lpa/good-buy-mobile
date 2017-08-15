@@ -11,9 +11,13 @@ namespace GoodBuy.Models
     public class Marca : BaseEntity
     {
         [JsonProperty("nome")]
-        public string Nome { get; set; }
+        public string Nome { get; private set; }
         [JsonIgnore]
         public IEnumerable<Produto> Produtos { get; set; }
+        public Marca(string nome)
+        {
+            Nome = nome;
+        }
 
         public async override void LoadRelationalEntitiesCollections(AzureService entityService)
         {

@@ -7,34 +7,39 @@ using Microsoft.WindowsAzure.MobileServices.Sync;
 using Microsoft.WindowsAzure.MobileServices;
 using System.Linq.Expressions;
 using System.Linq;
+using GoodBuy.Models;
 
 namespace GoodBuy.Service
 {
-    public class EntityService<TModel> : IEntityService where TModel : IEntity
+    public class EntityService<TModel> : IEntityService<TModel> where TModel : IEntity
     {
-        public IMobileServiceSyncTable<IEntity> SyncTableModel { get; }
+        private IMobileServiceSyncTable<Sabor> mobileServiceSyncTable;
+
+        public IMobileServiceSyncTable<TModel> SyncTableModel { get; }
 
         public IMobileServiceClient Client { get; }
-        public EntityService(IMobileServiceClient client, IMobileServiceSyncTable<IEntity> syncTable)
+        public EntityService(IMobileServiceClient client, IMobileServiceSyncTable<TModel> syncTable)
         {
             SyncTableModel = syncTable;
             Client = client;
         }
 
-        public async Task CreateEntity(IEntity entidade)
+        public async Task<string> CreateEntity(TModel entidade)
         {
             try
             {
                 entidade.Id = Guid.NewGuid().ToString();
                 await SyncTableModel.InsertAsync(entidade);
                 await Client.SyncContext.PushAsync();
+                return entidade.Id;
             }
             catch (Exception err)
             {
                 Log.Log.Instance.AddLog(err);
+                return null;
             }
         }
-        public async Task DeleteEntity(IEntity entidade)
+        public async Task DeleteEntity(TModel entidade)
         {
             try
             {
@@ -46,7 +51,7 @@ namespace GoodBuy.Service
                 Log.Log.Instance.AddLog(err);
             }
         }
-        public async Task<IEntity> GetById(string id)
+        public async Task<TModel> GetById(string id)
         {
             try
             {
@@ -56,10 +61,10 @@ namespace GoodBuy.Service
             catch (Exception err)
             {
                 Log.Log.Instance.AddLog(err);
-                return null;
+                return default(TModel);
             }
         }
-        public async Task<IList<IEntity>> GetEntites(int currentPage = 0, int pageSize = 200)
+        public async Task<IList<TModel>> GetEntities(int currentPage = 0, int pageSize = 200)
         {
             try
             {
@@ -85,7 +90,7 @@ namespace GoodBuy.Service
             }
         }
 
-        public async Task UpdateEntity(IEntity entidade)
+        public async Task UpdateEntity(TModel entidade)
         {
             try
             {
@@ -98,7 +103,7 @@ namespace GoodBuy.Service
             }
         }
 
-        public async Task<IEnumerable<IEntity>> GetByIds(string[] id)
+        public async Task<IEnumerable<TModel>> GetByIds(string[] id)
         {
             try
             {

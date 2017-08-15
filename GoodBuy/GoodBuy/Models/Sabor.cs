@@ -8,6 +8,11 @@ namespace GoodBuy.Models
     public class Sabor : BaseEntity
     {
         [JsonProperty("nome")]
-        public string Nome { get; set; }
+        public string Nome { get; private set; }
+
+        public Sabor(string nome)
+        {
+            Nome = nome;
+        }
     }
 }

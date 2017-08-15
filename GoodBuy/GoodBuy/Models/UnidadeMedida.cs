@@ -9,5 +9,11 @@ namespace GoodBuy.Models
     {
         [JsonProperty("nome")]
         public string Nome { get; set; }
+
+        public UnidadeMedida(string nome)
+        {
+            Nome = nome;
+        }
+
     }
 }
