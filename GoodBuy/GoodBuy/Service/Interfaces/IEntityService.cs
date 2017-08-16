@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GoodBuy.Service.Interfaces
 {
-    public interface IEntityService<TModel> : ICrudOperation<TModel> where TModel : IEntity
+    public interface IGenericRepository<TModel> : ICrudOperation<TModel> where TModel : IEntity
     {
         IMobileServiceClient Client { get; }
         IMobileServiceSyncTable<TModel> SyncTableModel { get; }

@@ -39,6 +39,8 @@ namespace GoodBuy.ViewModels
                 page.BindingContext = viewModel;
             await Application.Current.MainPage.Navigation.PushAsync(page);
         }
+        protected async Task PopModalAsync() => await Application.Current.MainPage.Navigation.PopModalAsync(true);
+
         protected async Task<TViewModel> PushModalAsync<TViewModel>(params object[] args) where TViewModel : BaseViewModel
         {
             var viewmodelType = typeof(TViewModel);

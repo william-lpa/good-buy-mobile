@@ -36,6 +36,10 @@ namespace GoodBuy.Models
             IdCategoria = idCategoria;
             QuantidadeMensuravel = quantidadeMensuravel;
         }
+        public Produto()
+        {
+
+        }
 
     }
 }

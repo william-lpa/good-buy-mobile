@@ -21,5 +21,10 @@ namespace GoodBuy.Models
         {
             Nome = nome;
         }
+
+        public Estabelecimento()
+        {
+
+        }
     }
 }

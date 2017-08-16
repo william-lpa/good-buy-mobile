@@ -17,14 +17,13 @@ namespace GoodBuy.Service
     {
         private const string appURL = "https://good-buy.azurewebsites.net";
         public MobileServiceClient Client { get; set; }
-        public Dictionary<string, IMobileServiceSyncTable<IEntity>> Tables { get; set; }
+        public Dictionary<string, object> Tables { get; set; }
         private IMobileServiceSyncTable<Person> localPeople;
-        private IMobileServiceSyncTable<Produto> produtos;
         private IMobileServiceTable<Person> serverPeople;
 
         public async Task<MobileServiceUser> LoginAsync(MobileServiceAuthenticationProvider provider)
         {
-            Tables = new Dictionary<string, IMobileServiceSyncTable<IEntity>>();
+            Tables = new Dictionary<string, object>();
 
             Client = new MobileServiceClient(appURL);
 
@@ -59,15 +58,16 @@ namespace GoodBuy.Service
             }
         }
 
-        public IMobileServiceSyncTable<TEntity> GetTable<TEntity>() where TEntity : class, IEntity
+        public IMobileServiceSyncTable<TEntity> GetTable<TEntity>() where TEntity : class, IEntity, new()
         {
             try
             {
                 var tableName = typeof(TEntity).Name;
 
                 if (!Tables.ContainsKey(tableName))
-                    Tables.Add(tableName, Client.GetSyncTable<TEntity>() as IMobileServiceSyncTable<IEntity>);
-
+                {
+                    Tables.Add(tableName, Client.GetSyncTable<TEntity>() as object);
+                }
                 return Tables[tableName] as IMobileServiceSyncTable<TEntity>;
             }
             catch (Exception err)
@@ -90,8 +90,5 @@ namespace GoodBuy.Service
             store.DefineTable<CarteiraProduto>();
             store.DefineTable<Oferta>();
         }
-
-
-
     }
 }

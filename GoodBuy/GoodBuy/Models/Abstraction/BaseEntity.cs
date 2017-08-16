@@ -11,7 +11,7 @@ namespace GoodBuy.Model
 
         //public BaseEntity() => LoadRelationalEntitiesCollections() singleton no azure Service?
 
-        public virtual void LoadRelationalEntitiesCollections(AzureService entityService) { }
+        //public virtual void LoadRelationalEntitiesCollections(AzureService entityService) { }
 
 
 

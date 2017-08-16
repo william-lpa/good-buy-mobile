@@ -5,6 +5,6 @@ namespace GoodBuy.Model
     public interface IEntity
     {
         string Id { get; set; }
-        void LoadRelationalEntitiesCollections(AzureService entityService);
+        //void LoadRelationalEntitiesCollections(AzureService entityService);
     }
 }

@@ -11,14 +11,14 @@ using GoodBuy.Models;
 
 namespace GoodBuy.Service
 {
-    public class EntityService<TModel> : IEntityService<TModel> where TModel : IEntity
+    public class GenericRepository<TModel> : IGenericRepository<TModel> where TModel : IEntity
     {
         private IMobileServiceSyncTable<Sabor> mobileServiceSyncTable;
 
         public IMobileServiceSyncTable<TModel> SyncTableModel { get; }
 
         public IMobileServiceClient Client { get; }
-        public EntityService(IMobileServiceClient client, IMobileServiceSyncTable<TModel> syncTable)
+        public GenericRepository(IMobileServiceClient client, IMobileServiceSyncTable<TModel> syncTable)
         {
             SyncTableModel = syncTable;
             Client = client;

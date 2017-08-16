@@ -10,14 +10,17 @@ namespace GoodBuy.Models
     {
         [JsonProperty("nome")]
         public string Nome { get; private set; }
+        [JsonIgnore]
+        public IEnumerable<Produto> Produtos { get; set; }
 
         public Categoria(string nome)
         {
             Nome = nome;
         }
+        public Categoria()
+        {
 
-        [JsonIgnore]
-        public IEnumerable<Produto> Produtos { get; set; }
+        }
 
     }
 }

@@ -14,16 +14,21 @@ namespace GoodBuy.Models
         public string Nome { get; private set; }
         [JsonIgnore]
         public IEnumerable<Produto> Produtos { get; set; }
+
         public Marca(string nome)
         {
             Nome = nome;
         }
-
-        public async override void LoadRelationalEntitiesCollections(AzureService entityService)
+        public Marca()
         {
-            var produtos = new List<Produto>();
-            var idsProdutos = await entityService.GetTable<Many_to_Many.CarteiraProduto>().Where(x => x.IdMarca == Id).Select(x => x.IdProduto).ToListAsync();
-            produtos.AddRange(await entityService.GetTable<Produto>().Where(x => idsProdutos.Contains(x.Id)).ToListAsync());
+
         }
+
+        //public async override void LoadRelationalEntitiesCollections(AzureService entityService)
+        //{
+        //    var produtos = new List<Produto>();
+        //    var idsProdutos = await entityService.GetTable<Many_to_Many.CarteiraProduto>().Where(x => x.IdMarca == Id).Select(x => x.IdProduto).ToListAsync();
+        //    produtos.AddRange(await entityService.GetTable<Produto>().Where(x => idsProdutos.Contains(x.Id)).ToListAsync());
+        //}
     }
 }

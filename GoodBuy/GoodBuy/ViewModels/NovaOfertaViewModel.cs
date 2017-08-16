@@ -22,7 +22,6 @@ namespace GoodBuy.ViewModels
         private string categoria;
         private string estabelecimento;
         private decimal preco;
-        private IMobileServiceSyncTable<Produto> teste;
 
         public string Produto
         {
@@ -88,14 +87,40 @@ namespace GoodBuy.ViewModels
                 var idProduto = await CriarProduto(idSabor, idUnidadeMedida, idCategoria);
                 var idCarteiraProduto = await CriarCarteiraProduto(idProduto, idMarca);
                 var idEstabelecimento = await CriarEstabelecimento();
-                //await CriarOferta();
+                await CriarOferta(idCarteiraProduto, idEstabelecimento);
+                await PopModalAsync();
             }
             catch (Exception err)
             {
                 Log.Log.Instance.AddLog(err);
             }
-
         }
+
+        private async Task CriarOferta(string idCarteira, string idEstabelecimento)
+        {
+            var repository = GetEntityService<Oferta>(Estabelecimento);
+            if (idCarteira == null || Preco < 1)
+                return;
+
+            var ofertaExistente = (await repository?.SyncTableModel
+                                .Where(x => x.IdCarteiraProduto == idCarteira && x.IdEstabelecimento == idEstabelecimento)
+                                //.OrderByDescending( x => x.)dataCriacao azure;
+                                .Select(x => x).ToEnumerableAsync()).FirstOrDefault();
+            if (ofertaExistente != null)
+            {
+                if (ofertaExistente.PrecoAtual == Preco) { } //aplicar um "like"
+                else
+                {
+                    var historico = GetEntityService<HistoricoOferta>(Estabelecimento).CreateEntity(new HistoricoOferta(ofertaExistente));
+                    //ofertaExistente.datacreatedOnAzure = DateTime.Now;
+                    ofertaExistente.PrecoAtual = preco;
+                    await repository?.UpdateEntity(ofertaExistente);
+                }
+            }
+            else
+                await repository?.CreateEntity(new Oferta(idEstabelecimento, idCarteira, Preco));
+        }
+
         private async Task<string> CriarMarca()
         {
             var repository = GetEntityService<Marca>(Marca);
@@ -135,7 +160,7 @@ namespace GoodBuy.ViewModels
         {
             var repository = GetEntityService<Produto>(Produto);
             return
-                ((await repository?.SyncTableModel.Where(x => x.Nome == Sabor).Select(x => x.Id).ToEnumerableAsync()).FirstOrDefault()) ??
+                ((await repository?.SyncTableModel.Where(x => x.Nome == Produto).Select(x => x.Id).ToEnumerableAsync()).FirstOrDefault()) ??
                  await repository?.CreateEntity(new Produto(Produto, IdSabor, idUnidadeMedida, idCategoria, Quantidade));
         }
         private async Task<string> CriarCarteiraProduto(string idProduto, string idMarca)
@@ -147,11 +172,11 @@ namespace GoodBuy.ViewModels
                 ((await repository?.SyncTableModel.Where(x => x.IdMarca == idMarca && x.IdProduto == idProduto).Select(x => x.Id).ToEnumerableAsync()).FirstOrDefault()) ??
                  await repository?.CreateEntity(new CarteiraProduto(idProduto, idMarca));
         }
-        public EntityService<T> GetEntityService<T>(string nomeCampoInserindo) where T : class, IEntity
+        public GenericRepository<T> GetEntityService<T>(string nomeCampoInserindo) where T : class, IEntity, new()
         {
             if (nomeCampoInserindo == null)
                 return null;
-            return new EntityService<T>(azure.Client, azure.GetTable<T>());
+            return new GenericRepository<T>(azure.Client, azure.GetTable<T>());
         }
 
         //private ValidatableObject<string> marca;

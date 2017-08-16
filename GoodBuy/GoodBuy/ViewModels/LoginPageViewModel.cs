@@ -47,9 +47,8 @@ namespace GoodBuy.ViewModels
             try
             {
                 var user = await azureService.LoginAsync(provider);
-
                 Device.BeginInvokeOnMainThread(async () => await App.Current.MainPage.DisplayAlert("Logado", $"Logado com sucesso!", "OK"));
-                await PushAsync<MainMenuViewModel>(""?? "error",azureService);
+                await PushAsync<MainMenuViewModel>("" ?? "error", azureService);
             }
             catch (Exception err)
             {

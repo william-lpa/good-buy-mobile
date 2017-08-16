@@ -15,5 +15,9 @@ namespace GoodBuy.Models
             Nome = nome;
         }
 
+        public UnidadeMedida()
+        {
+
+        }
     }
 }
