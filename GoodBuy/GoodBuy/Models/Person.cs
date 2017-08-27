@@ -8,6 +8,8 @@ namespace GoodBuy.Model
     {
         //[Version]
         //public string Version { get; set; } // don't change this, is important for Azure
+        //[JsonProperty("id")]
+        //public string Id { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }

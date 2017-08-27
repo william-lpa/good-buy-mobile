@@ -10,6 +10,7 @@ using Gcm.Client;
 using Microsoft.WindowsAzure.MobileServices;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using GoodBuy.Service;
 
 [assembly: Permission(Name = "@PACKAGE_NAME@.permission.C2D_MESSAGE")]
 [assembly: UsesPermission(Name = "@PACKAGE_NAME@.permission.C2D_MESSAGE")]
@@ -31,7 +32,7 @@ namespace goodBuy.Droid
     [Service]
     public class GcmService : GcmServiceBase
     {
-        MobileServiceClient client = new MobileServiceClient("https://good-buy.azurewebsites.net");
+        public static MobileServiceClient Client { get; set; }
         public static string RegistrationID { get; private set; }
         public GcmService() : base(PushHandlerBroadcastReceiver.SENDER_IDS)
         { }
@@ -40,8 +41,7 @@ namespace goodBuy.Droid
         {
             Android.Util.Log.Verbose("PushHandlerBroadcastReceiver", "GCM Registered: " + registrationId);
             RegistrationID = registrationId;
-            var user = new GoodBuy.Droid.SocialAuthentication().LoginAsync(client, MobileServiceAuthenticationProvider.Facebook).Result;
-            var push = client.GetPush();
+            var push = Client.GetPush();
             MainActivity.CurrentActivity.RunOnUiThread(() => Register(push, null));
         }
         public async void Register(Microsoft.WindowsAzure.MobileServices.Push push, IEnumerable<string> tags)

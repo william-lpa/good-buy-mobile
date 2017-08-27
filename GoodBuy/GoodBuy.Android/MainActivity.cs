@@ -1,6 +1,5 @@
-﻿using System;
-
-using Android.App;
+﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Gcm.Client;
@@ -13,7 +12,8 @@ namespace goodBuy.Droid
     [Activity(Label = "GoodBuy", Icon = "@drawable/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
-        static MainActivity instance = null;
+        static MainActivity instance = null;        
+
         // Return the current activity instance.
         public static MainActivity CurrentActivity
         {
@@ -21,10 +21,17 @@ namespace goodBuy.Droid
             {
                 return instance;
             }
+
+        }
+        protected async override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+            await new SocialAuthentication().LoginAzureAsync();
         }
 
         protected override void OnCreate(Bundle bundle)
         {
+            Xamarin.Facebook.FacebookSdk.SdkInitialize(this);
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
@@ -38,31 +45,45 @@ namespace goodBuy.Droid
             LoadApplication(new App());
             instance = this;
 
+            //PackageInfo info = this.PackageManager.GetPackageInfo("goodbuy.app", PackageInfoFlags.Signatures);
+            //foreach (var item in info.Signatures)
+            //{
+            //    Java.Security.MessageDigest md = Java.Security.MessageDigest.GetInstance("SHA");
+            //    md.Update(item.ToByteArray());
+
+            //    string keyHash = Convert.ToBase64String(md.Digest());
+            //}
             try
             {
                 // Check to ensure everything's set up right
                 GcmClient.CheckDevice(this);
                 GcmClient.CheckManifest(this);
                 // Register for push notifications
-                System.Diagnostics.Debug.WriteLine("Registering...");
-                GcmClient.Register(this, PushHandlerBroadcastReceiver.SENDER_IDS);
             }
             catch (Java.Net.MalformedURLException)
             {
                 CreateAndShowDialog("There was an error creating the client. Verify the URL.", "Error");
             }
-            catch (Exception e)
+            catch (Java.Lang.Exception e)
+            {
+                CreateAndShowDialog(e.Message, "Error");
+            }
+            catch (System.Exception e)
             {
                 CreateAndShowDialog(e.Message, "Error");
             }
         }
-        private void CreateAndShowDialog(String message, String title)
+
+        private void CreateAndShowDialog(string message, string title)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.SetMessage(message);
             builder.SetTitle(title);
             builder.Create().Show();
         }
+
+
+
     }
 }
 

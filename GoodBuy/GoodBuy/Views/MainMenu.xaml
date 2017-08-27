@@ -15,7 +15,13 @@
             </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
-    <StackLayout Orientation="Vertical">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Deslogar"/>
+    </ContentPage.ToolbarItems>
+    <StackLayout>
+        <Label Text="Informar Oferta"/>
+        <Image x:Name="image" />
+    <StackLayout Orientation="Vertical">        
         <StackLayout Orientation="Horizontal" VerticalOptions="Start"  HorizontalOptions="Start" Grid.Row="3" Grid.Column="3">
             <Button Text="Informar Oferta" Command="{Binding NovaOfertaCommand}" Style="{StaticResource menuButton}"/>
             <Button x:Name="batata" Text="Suas Listas"  Style="{StaticResource menuButton}" Image =".\..\Resources\Menu\product.png"/>
@@ -24,5 +30,6 @@
         <StackLayout Orientation="Horizontal" VerticalOptions="Start"  HorizontalOptions="Start" Grid.Row="3" Grid.Column="3">
             <Button Text="Espaço Fornecedor"  Style="{StaticResource menuButton}"/>
         </StackLayout>
+    </StackLayout>
     </StackLayout>
 </ContentPage>

@@ -11,26 +11,23 @@ using GoodBuy.Models;
 
 namespace GoodBuy.Service
 {
-    public class GenericRepository<TModel> : IGenericRepository<TModel> where TModel : IEntity
+    public class GenericRepository<TModel> : IGenericRepository<TModel> where TModel : class, IEntity
     {
-        private IMobileServiceSyncTable<Sabor> mobileServiceSyncTable;
-
         public IMobileServiceSyncTable<TModel> SyncTableModel { get; }
-
         public IMobileServiceClient Client { get; }
-        public GenericRepository(IMobileServiceClient client, IMobileServiceSyncTable<TModel> syncTable)
-        {
-            SyncTableModel = syncTable;
-            Client = client;
-        }
+        public static bool IsFetching { get; private set; }
 
+        public GenericRepository(AzureService azureService)
+        {
+            Client = azureService.Client;
+            SyncTableModel = azureService.GetTable<TModel>();
+        }
         public async Task<string> CreateEntity(TModel entidade)
         {
             try
             {
                 entidade.Id = Guid.NewGuid().ToString();
                 await SyncTableModel.InsertAsync(entidade);
-                await Client.SyncContext.PushAsync();
                 return entidade.Id;
             }
             catch (Exception err)
@@ -44,7 +41,6 @@ namespace GoodBuy.Service
             try
             {
                 await SyncTableModel.DeleteAsync(entidade);
-                await SyncDataBase();
             }
             catch (Exception err)
             {
@@ -77,6 +73,17 @@ namespace GoodBuy.Service
                 return null;
             }
         }
+        public async Task PullUpdates()
+        {
+            try
+            {
+                await SyncTableModel.PullAsync(typeof(TModel).Name, SyncTableModel.CreateQuery());
+            }
+            catch (Exception err)
+            {
+                Log.Log.Instance.AddLog(err);
+            }
+        }
         public async Task SyncDataBase()
         {
             try
@@ -95,7 +102,6 @@ namespace GoodBuy.Service
             try
             {
                 await SyncTableModel.UpdateAsync(entidade);
-                await SyncDataBase();
             }
             catch (Exception err)
             {

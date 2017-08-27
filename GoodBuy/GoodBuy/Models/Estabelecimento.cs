@@ -8,14 +8,17 @@ namespace GoodBuy.Models
     [DataTable(nameof(Estabelecimento))]
     public class Estabelecimento : BaseEntity
     {
+        //[Version]
+        //public string Version { get; set; }
+
         [JsonProperty("nome")]
         public string Nome { get; set; }
 
-        [JsonIgnore]
-        public IEnumerable<Marca> Marcas { get; set; }
+        //[JsonIgnore]
+        //public IEnumerable<Marca> Marcas { get; set; }
 
-        [JsonIgnore]
-        public IEnumerable<Produto> Produtos { get; set; }
+        //[JsonIgnore]
+        //public IEnumerable<Produto> Produtos { get; set; }
 
         public Estabelecimento(string nome)
         {

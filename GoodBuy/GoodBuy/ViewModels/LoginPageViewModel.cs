@@ -11,7 +11,6 @@ namespace GoodBuy.ViewModels
         public Command FacebookLoginCommand { get; }
         public Command GoogleLoginCommand { get; }
 
-
         public LoginPageViewModel(AzureService azure)
         {
             azureService = azure;
@@ -47,7 +46,7 @@ namespace GoodBuy.ViewModels
             try
             {
                 var user = await azureService.LoginAsync(provider);
-                Device.BeginInvokeOnMainThread(async () => await App.Current.MainPage.DisplayAlert("Logado", $"Logado com sucesso!", "OK"));
+                //Device.BeginInvokeOnMainThread(async () => await App.Current.MainPage.DisplayAlert("Logado", $"Logado com sucesso!", "OK"));
                 await PushAsync<MainMenuViewModel>("" ?? "error", azureService);
             }
             catch (Exception err)
