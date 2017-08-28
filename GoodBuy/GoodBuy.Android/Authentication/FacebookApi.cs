@@ -42,13 +42,13 @@ namespace goodBuy.Droid.Authentication
 
         public void OnCancel()
         {
-            LoginResult = new LoginResultContent(null, "User has canceled the login", Result.Canceled);
+            LoginResult = new LoginResultContent(null, "User has canceled the login", GoodBuy.Models.Abstraction.Result.Canceled);
             //throw new NotImplementedException();
         }
 
         public void OnError(FacebookException error)
         {
-            LoginResult = new LoginResultContent(null, $"error:{error.ToString()}", Result.FirstUser);
+            LoginResult = new LoginResultContent(null, $"error:{error.ToString()}", GoodBuy.Models.Abstraction.Result.Error);
             //throw new NotImplementedException();
         }
 
@@ -69,7 +69,7 @@ namespace goodBuy.Droid.Authentication
             LoginResult = new LoginResultContent(user);
           
         }
-        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        protected override void OnActivityResult(int requestCode, Android.App.Result resultCode, Intent data)
         {
             base.OnActivityResult(requestCode, resultCode, data);
             callbackManager.OnActivityResult(requestCode, (int)resultCode, data);
