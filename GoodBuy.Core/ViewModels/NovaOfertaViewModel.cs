@@ -97,8 +97,8 @@ namespace GoodBuy.ViewModels
                 var idCategoria = await CriarCategoria();
                 var idMarca = await CriarMarca();
                 var idProduto = await CriarProduto(idSabor, idUnidadeMedida, idCategoria);
-                var idCarteiraProduto = await CriarCarteiraProduto(idProduto, idMarca);
                 var idEstabelecimento = await CriarEstabelecimento();
+                var idCarteiraProduto = await CriarCarteiraProduto(idProduto, idMarca);
                 await CriarOferta(idCarteiraProduto, idEstabelecimento);
                 await PopModalAsync();
             }

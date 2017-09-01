@@ -1,6 +1,8 @@
-﻿using GoodBuy.Authentication;
+﻿using Autofac;
+using GoodBuy.Authentication;
 using GoodBuy.Model;
 using GoodBuy.Models;
+using GoodBuy.Models.Abstraction;
 using GoodBuy.Models.Many_to_Many;
 using Microsoft.WindowsAzure.MobileServices;
 using Microsoft.WindowsAzure.MobileServices.SQLiteStore;
@@ -9,10 +11,11 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Xamarin.Forms;
+using Xamarin.Auth;
 
 namespace GoodBuy.Service
 {
@@ -20,46 +23,49 @@ namespace GoodBuy.Service
     {
         private const string appURL = "https://good-buy.azurewebsites.net";
         public MobileServiceClient Client { get; set; }
+        private static AccountStore storeAccount;
         public MobileServiceSQLiteStore Store { get; private set; }
         public Dictionary<string, object> Tables { get; private set; }
+        public LoginResultContent CurrentUser { get; private set; }
+        public bool LoginIn { get; private set; }
 
-        public async Task<MobileServiceUser> LoginAsync(MobileServiceAuthenticationProvider provider)
+        public AzureService() => Initialize();
+
+        public async Task LoginAsync(MobileServiceAuthenticationProvider provider)
         {
-            var auth = DependencyService.Get<IAuthentication>();
-
-            Client.CurrentUser = auth.RetrieveTokenFromSecureStore();
-            if (Client.CurrentUser != null)
+            try
             {
-                // User has previously been authenticated - try to Refresh the token
-                try
+                IAuthentication auth;
+                using (var scope = App.Container.BeginLifetimeScope())
+                    auth = scope.Resolve<IAuthentication>();
+
+                Task initialized = null;
+                if (!Client.SyncContext.IsInitialized)
+                    initialized = Client.SyncContext.InitializeAsync(Store, new MobileServiceSyncHandler());
+
+                // We need to ask for credentials at this point
+                var result = await auth.LoginClientFlowAsync(Client, provider);
+                Client.CurrentUser = result.azureUser;
+                CurrentUser = result.appUser;
+                if (initialized != null)
+                    await initialized;
+                
+                var table = Client.GetSyncTable<User>();
+                if (await table.LookupAsync(CurrentUser.User.Id) == null)
                 {
-                    var refreshed = await Client.RefreshUserAsync();
-                    if (refreshed != null)
-                    {
-                        auth.StoreTokenInSecureStore(refreshed);
-                        return refreshed;
-                    }
+                    await table.InsertAsync(CurrentUser.User);
+                    await Client.SyncContext.PushAsync();
                 }
-                catch (Exception refreshException)
+                if (Client.CurrentUser != null)
                 {
-                    Log.Log.Instance.AddLog($"Could not refresh token: {refreshException.Message}");
+                    StoreTokenInSecureStore(Client.CurrentUser.UserId, "azure", Client.CurrentUser.MobileServiceAuthenticationToken);
+                    StoreTokenInSecureStore(CurrentUser.User.Id, "facebook", CurrentUser.Token);
                 }
             }
-
-            if (Client.CurrentUser != null && !IsTokenExpired(Client.CurrentUser.MobileServiceAuthenticationToken))
+            catch (Exception err)
             {
-                // User has previously been authenticated, no refresh is required
-                return Client.CurrentUser;
+                Log.Log.Instance.AddLog(err);
             }
-
-            // We need to ask for credentials at this point
-            //auth.LoginClientFlow();
-            if (Client.CurrentUser != null)
-            {
-                auth.StoreTokenInSecureStore(Client.CurrentUser);
-            }
-            await Client.SyncContext.InitializeAsync(Store, new MobileServiceSyncHandler());
-            return Client.CurrentUser;
         }
         bool IsTokenExpired(string token)
         {
@@ -94,40 +100,60 @@ namespace GoodBuy.Service
         }
         public async Task LogoutAsync()
         {
+            IAuthentication auth;
+            using (var scope = App.Container.BeginLifetimeScope())
+                auth = scope.Resolve<IAuthentication>();
+
             if (Client.CurrentUser == null || Client.CurrentUser.MobileServiceAuthenticationToken == null)
                 return;
 
-            // Log out of the identity provider (if required)
-            
+            auth.LogOut();
             // Invalidate the token on the mobile backend
             var authUri = new Uri($"{Client.MobileAppUri}/.auth/logout");
             using (var httpClient = new HttpClient())
             {
                 httpClient.DefaultRequestHeaders.Add("X-ZUMO-AUTH", Client.CurrentUser.MobileServiceAuthenticationToken);
-                await httpClient.GetAsync(authUri);
+                var request = httpClient.GetAsync(authUri);
+
+                // Remove the token from the cache
+                RemoveTokenFromSecureStore();
+                // Remove the token from the MobileServiceClient
+                await Client.LogoutAsync();
+                await request;
             }
-            // Remove the token from the cache
-            //DependencyService.Get<IAuthentication>().RemoveTokenFromSecureStore();
-            // Remove the token from the MobileServiceClient
-            await Client.LogoutAsync();
         }
-
-        public AzureService() => Initialize();
-
-        private async void Initialize()
+        private void Initialize()
         {
             try
             {
+                //RemoveTokenFromSecureStore();
                 Client = new MobileServiceClient(appURL, new ExpiredAzureRequestInterceptors(this));
-                Tables = new Dictionary<string, object>();
-                var dbName = "goodBuy5.db";
+                var dbName = "goodBuy9.db";
                 Store = new MobileServiceSQLiteStore(Path.Combine(MobileServiceClient.DefaultDatabasePath, dbName));
                 DefineTables(Store);
+
+                Tables = new Dictionary<string, object>();
+                Task.Run(() => DoSSOLogin());
             }
             catch (Exception err)
             {
                 Log.Log.Instance.AddLog(err);
             }
+        }
+
+        public async void DoSSOLogin()
+        {
+            LoginIn = true;
+            Client.CurrentUser = RetrieveAzureTokenFromSecureStore("azure");
+            if (Client.CurrentUser != null && !IsTokenExpired(Client.CurrentUser.MobileServiceAuthenticationToken))
+            {
+                await Client.SyncContext.InitializeAsync(Store, new MobileServiceSyncHandler());
+                CurrentUser = await RetrieveFacebookUserFromSecureStore("facebook");
+            }
+            else
+                Client.CurrentUser = null;
+
+            LoginIn = false;
         }
 
         public IMobileServiceSyncTable<TEntity> GetTable<TEntity>() where TEntity : class, IEntity
@@ -161,6 +187,60 @@ namespace GoodBuy.Service
             store.DefineTable<UnidadeMedida>();
             store.DefineTable<CarteiraProduto>();
             store.DefineTable<Oferta>();
+            store.DefineTable<User>();
+        }
+
+        public void StoreTokenInSecureStore(string userId, string key, string token = "")
+        {
+            if (storeAccount == null)
+                storeAccount = AccountStore.Create();
+            var account = new Account(userId);
+            account.Properties.Add("token", token);
+            storeAccount.Save(account, key);
+        }
+
+        public async Task<LoginResultContent> RetrieveFacebookUserFromSecureStore(string key)
+        {
+            if (storeAccount == null)
+                storeAccount = AccountStore.Create();
+            var account = storeAccount.FindAccountsForService(key).FirstOrDefault();
+            string token = null;
+            if ((account?.Properties?.TryGetValue("token", out token)).GetValueOrDefault())
+            {
+                var user = await GetTable<User>().LookupAsync(account.Username);
+                return new LoginResultContent(user)
+                {
+                    Token = token,
+                    Result = Result.OK,
+                    Message = "Retrieved from Account Store"
+                };
+            }
+            return null;
+        }
+
+        public MobileServiceUser RetrieveAzureTokenFromSecureStore(string key)
+        {
+            if (storeAccount == null)
+                storeAccount = AccountStore.Create();
+            var account = storeAccount.FindAccountsForService(key).FirstOrDefault();
+            string token = null;
+            if ((account?.Properties?.TryGetValue("token", out token)).GetValueOrDefault())
+            {
+                return new MobileServiceUser(account.Username)
+                {
+                    MobileServiceAuthenticationToken = token
+                };
+            }
+            return null;
+        }
+        public void RemoveTokenFromSecureStore()
+        {
+            if (storeAccount == null)
+                storeAccount = AccountStore.Create();
+            var azure = storeAccount.FindAccountsForService("azure").FirstOrDefault();
+            var facebook = storeAccount.FindAccountsForService("facebook").FirstOrDefault();
+            storeAccount?.Delete(azure, nameof(azure));
+            storeAccount?.Delete(facebook, nameof(facebook));
         }
     }
 }

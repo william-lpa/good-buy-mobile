@@ -6,10 +6,10 @@ namespace GoodBuy.Authentication
 {
     public interface IAuthentication
     {
-        void LoginClientFlow(MobileServiceClient client, MobileServiceAuthenticationProvider provider);
-        LoginResultContent LoginResult { get; }
-        MobileServiceUser RetrieveTokenFromSecureStore();
-        void StoreTokenInSecureStore(MobileServiceUser user);
-        void RemoveTokenFromSecureStore();
+        Task<(MobileServiceUser azureUser, LoginResultContent appUser)> LoginClientFlowAsync(MobileServiceClient client, MobileServiceAuthenticationProvider provider);
+        Task<MobileServiceUser> LoginAzureAsync(MobileServiceClient client, MobileServiceAuthenticationProvider provider);
+        void LogOut();
+        LoginResultContent LoginResult { get; set; }
+        bool SignIn { get; set; }
     }
 }

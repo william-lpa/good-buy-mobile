@@ -2,6 +2,9 @@
 using GoodBuy.Service;
 using Xamarin.Forms;
 using Microsoft.WindowsAzure.MobileServices;
+using System.Threading.Tasks;
+using Autofac;
+using GoodBuy.Core.ViewModels;
 
 namespace GoodBuy.ViewModels
 {
@@ -16,6 +19,14 @@ namespace GoodBuy.ViewModels
             azureService = azure;
             FacebookLoginCommand = new Command(ExecuteFacebookLogin);
             GoogleLoginCommand = new Command(ExecuteGoogleLogin);
+        }
+
+        public async void TrySSO()
+        {
+            while (azureService.LoginIn) await Task.Delay(200);
+
+            if (azureService.CurrentUser != null)
+                await this.PushAsync<MainMenuViewModel>();
         }
 
         private void ExecuteGoogleLogin()
@@ -45,9 +56,9 @@ namespace GoodBuy.ViewModels
         {
             try
             {
-                var user = await azureService.LoginAsync(provider);
-                //Device.BeginInvokeOnMainThread(async () => await App.Current.MainPage.DisplayAlert("Logado", $"Logado com sucesso!", "OK"));
-                await PushAsync<MainMenuViewModel>("" ?? "error", azureService);
+                await PushAsync<LoadingPageViewModel>();
+                await azureService.LoginAsync(provider);
+                await PushAsync<MainMenuViewModel>();
             }
             catch (Exception err)
             {

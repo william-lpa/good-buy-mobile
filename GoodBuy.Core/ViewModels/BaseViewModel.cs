@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Autofac;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -34,12 +35,20 @@ namespace GoodBuy.ViewModels
             var viewTypeName = $"GoodBuy.Views.{viewModelTypeName.Substring(0, viewModelTypeName.Length - viewModelWordLength) }";
             var viewType = Type.GetType(viewTypeName);
             var page = Activator.CreateInstance(viewType) as Page;
-            var viewModel = Activator.CreateInstance(viewmodelType, args);
+            TViewModel viewModel = null;
+            using (var scope = App.Container.BeginLifetimeScope())
+            { viewModel = scope.Resolve<TViewModel>(); }
+            //var viewModel = Activator.CreateInstance(viewmodelType, args);
             if (page != null)
                 page.BindingContext = viewModel;
             await Application.Current.MainPage.Navigation.PushAsync(page);
+
         }
         protected async Task PopModalAsync() => await Application.Current.MainPage.Navigation.PopModalAsync(true);
+
+        protected async Task PopAsync() => await Application.Current.MainPage.Navigation.PopAsync(true);
+
+        protected async Task PopToRootAsync() => await Application.Current.MainPage.Navigation.PopToRootAsync(true);
 
         protected async Task<TViewModel> PushModalAsync<TViewModel>(params object[] args) where TViewModel : BaseViewModel
         {

@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GoodBuy.Views.MainMenu">
+             x:Class="GoodBuy.Views.MainMenu"
+             Title="Bem Vindo">
     <ContentPage.Resources>
         <ResourceDictionary>
             <Style x:Key="menuButton" TargetType="Button">
@@ -16,20 +17,25 @@
         </ResourceDictionary>
     </ContentPage.Resources>
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Deslogar"/>
+        <ToolbarItem Text="Deslogar" Command="{Binding SignOutCommand}"/>
     </ContentPage.ToolbarItems>
     <StackLayout>
-        <Label Text="Informar Oferta"/>
-        <Image x:Name="image" />
-    <StackLayout Orientation="Vertical">        
-        <StackLayout Orientation="Horizontal" VerticalOptions="Start"  HorizontalOptions="Start" Grid.Row="3" Grid.Column="3">
-            <Button Text="Informar Oferta" Command="{Binding NovaOfertaCommand}" Style="{StaticResource menuButton}"/>
-            <Button x:Name="batata" Text="Suas Listas"  Style="{StaticResource menuButton}" Image =".\..\Resources\Menu\product.png"/>
-            <Button Text="Ofertas do Dia"  Style="{StaticResource menuButton}"/>
+        <Label Text="{Binding UserName}"
+               FontAttributes="Bold"
+               TextColor="#4e6cab"
+               FontSize="Large"
+               HorizontalOptions="CenterAndExpand"
+               HorizontalTextAlignment="Center"/>
+        <Image Source="{Binding Profile}" />
+        <StackLayout Orientation="Vertical">
+            <StackLayout Orientation="Horizontal" VerticalOptions="Start"  HorizontalOptions="Start" Grid.Row="3" Grid.Column="3">
+                <Button Text="Informar Oferta" Command="{Binding NovaOfertaCommand}" Style="{StaticResource menuButton}"/>
+                <Button x:Name="batata" Text="Suas Listas"  Style="{StaticResource menuButton}" Image =".\..\Resources\Menu\product.png"/>
+                <Button Text="Ofertas do Dia"  Style="{StaticResource menuButton}"/>
+            </StackLayout>
+            <StackLayout Orientation="Horizontal" VerticalOptions="Start"  HorizontalOptions="Start" Grid.Row="3" Grid.Column="3">
+                <Button Text="Espaço Fornecedor"  Style="{StaticResource menuButton}"/>
+            </StackLayout>
         </StackLayout>
-        <StackLayout Orientation="Horizontal" VerticalOptions="Start"  HorizontalOptions="Start" Grid.Row="3" Grid.Column="3">
-            <Button Text="Espaço Fornecedor"  Style="{StaticResource menuButton}"/>
-        </StackLayout>
-    </StackLayout>
     </StackLayout>
 </ContentPage>

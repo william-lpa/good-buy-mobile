@@ -5,6 +5,8 @@ using Android.OS;
 using Gcm.Client;
 using goodBuy.Droid;
 using GoodBuy;
+using Autofac;
+using GoodBuy.Authentication;
 
 [assembly: Xamarin.Forms.Dependency(typeof(MainActivity))]
 namespace goodBuy.Droid
@@ -12,9 +14,7 @@ namespace goodBuy.Droid
     [Activity(Label = "GoodBuy", Icon = "@drawable/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
-        static MainActivity instance = null;        
-
-        // Return the current activity instance.
+        static MainActivity instance = null;
         public static MainActivity CurrentActivity
         {
             get
@@ -23,10 +23,13 @@ namespace goodBuy.Droid
             }
 
         }
-        protected async override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
             base.OnActivityResult(requestCode, resultCode, data);
-            await new SocialAuthentication().LoginAzureAsync();
+            using (var scope = App.Container.BeginLifetimeScope())
+                scope.Resolve<IAuthentication>().SignIn = false;
+
         }
 
         protected override void OnCreate(Bundle bundle)
@@ -42,7 +45,8 @@ namespace goodBuy.Droid
             Microsoft.WindowsAzure.MobileServices.CurrentPlatform.Init();
             SQLitePCL.Batteries.Init();
 
-            LoadApplication(new App());
+            var container = BuildDependencies();
+            LoadApplication(new App(container));
             instance = this;
 
             //PackageInfo info = this.PackageManager.GetPackageInfo("goodbuy.app", PackageInfoFlags.Signatures);
@@ -72,6 +76,15 @@ namespace goodBuy.Droid
             {
                 CreateAndShowDialog(e.Message, "Error");
             }
+        }
+
+        private ContainerBuilder BuildDependencies()
+        {
+            var container = new ContainerBuilder();
+
+            container.RegisterType<SocialAuthentication>().As<IAuthentication>().SingleInstance();
+
+            return container;
         }
 
         private void CreateAndShowDialog(string message, string title)
