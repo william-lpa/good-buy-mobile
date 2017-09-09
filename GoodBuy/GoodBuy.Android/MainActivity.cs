@@ -40,6 +40,9 @@ namespace goodBuy.Droid
 
             base.OnCreate(bundle);
 
+            //Android.Telephony.TelephonyManager tMgr = (Android.Telephony.TelephonyManager)this.GetSystemService(Android.Content.Context.TelephonyService);
+            //string mPhoneNumber = tMgr.Line1Number;
+
             global::Xamarin.Forms.Forms.Init(this, bundle);
 
             Microsoft.WindowsAzure.MobileServices.CurrentPlatform.Init();

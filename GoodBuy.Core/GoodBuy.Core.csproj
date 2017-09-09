@@ -11,10 +11,22 @@
     <PackageReference Include="Microsoft.Azure.Mobile.Client.SQLiteStore" Version="4.0.1" />
     <PackageReference Include="Microsoft.Bcl" Version="1.1.10" />
     <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.21" />
-    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.4.0" />
+    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="PCLCrypto" Version="2.0.147" />
+    <PackageReference Include="PInvoke.BCrypt" Version="0.5.97" />
+    <PackageReference Include="PInvoke.Kernel32" Version="0.5.97" />
+    <PackageReference Include="PInvoke.NCrypt" Version="0.5.97" />
+    <PackageReference Include="PInvoke.Windows.Core" Version="0.5.97" />
+    <PackageReference Include="SQLitePCLRaw.bundle_green" Version="1.1.8" />
+    <PackageReference Include="SQLitePCLRaw.core" Version="1.1.8" />
+    <PackageReference Include="System.ComponentModel" Version="4.3.0" />
+    <PackageReference Include="System.ComponentModel.Primitives" Version="4.3.0" />
+    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
     <PackageReference Include="Xamarin.Auth" Version="1.5.0.3" />
+    <PackageReference Include="Xamarin.Build.Download" Version="0.4.7" />
     <PackageReference Include="Xamarin.Forms" Version="2.4.0.266-pre1" />
   </ItemGroup>    
   <ItemGroup>

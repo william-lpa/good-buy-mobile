@@ -5,32 +5,37 @@ using Xamarin.Forms;
 
 namespace GoodBuy.ViewModels
 {
-    class MainMenuViewModel : BaseViewModel
+    public class MainMenuViewModel : BaseViewModel
     {
 
-        public Command NovaOfertaCommand { get; }
+        public ICommand NovaOfertaCommand { get; }
         public ICommand SignOutCommand { get; }
+        public ICommand ListarOfertasCommand { get; }
 
         public ImageSource Profile => ImageSource.FromUri(new Uri(azure.CurrentUser.User.Avatar));
-        public String UserName => azure.CurrentUser.User.FullName;
+        public string UserName => azure.CurrentUser.User.FullName;
 
         private readonly AzureService azure;
         public MainMenuViewModel(AzureService azureService)
         {
             azure = azureService;
             NovaOfertaCommand = new Command(ExecuteCadastrarNovaOferta);
+            ListarOfertasCommand = new Command(ExecuteListarOfertasCadastradas);
             SignOutCommand = new Command(ExecuteSignOut);
         }
-
+        private async void ExecuteListarOfertasCadastradas()
+        {
+            await PushAsync<OfertasPageViewModel>();
+        }
         private async void ExecuteSignOut()
         {
             await azure.LogoutAsync();
-            await PopToRootAsync();
+            await PushAsync<LoginPageViewModel>(resetNavigation: true);
         }
 
-        private async void ExecuteCadastrarNovaOferta(object obj)
+        private async void ExecuteCadastrarNovaOferta()
         {
-            await PushModalAsync<NovaOfertaViewModel>(azure);
+            await PushModalAsync<NovaOfertaViewModel>();
         }
     }
 }

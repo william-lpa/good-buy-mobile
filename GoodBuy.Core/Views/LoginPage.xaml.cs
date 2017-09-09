@@ -2,7 +2,7 @@
 using GoodBuy.ViewModels;
 using Xamarin.Forms;
 
-namespace GoodBuy
+namespace GoodBuy.Views
 {
     public partial class LoginPage : ContentPage
     {

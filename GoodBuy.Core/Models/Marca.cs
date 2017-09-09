@@ -11,7 +11,7 @@ namespace GoodBuy.Models
     public class Marca : BaseEntity
     {
         [JsonProperty("nome")]
-        public string Nome { get; private set; }
+        public string Nome { get; set; }
         [JsonIgnore]
         public IEnumerable<Produto> Produtos { get; set; }
 

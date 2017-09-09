@@ -2,15 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:installLocation="auto" package="goodbuy.app">
 	<uses-sdk android:minSdkVersion="15" />
 	<application android:label="goodBuy.Android">
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-    <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
-    
-    <activity android:name="com.facebook.FacebookActivity"
-        android:configChanges=
-                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-        android:label="@string/ApplicationName" />
-
-  </application>
+		<uses-permission android:name="android.permission.INTERNET" />
+		<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+		<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+		<uses-permission android:name="android.permission.READ_SMS" />
+		<meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id" />
+		<activity android:name="com.facebook.FacebookActivity" android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" android:label="@string/ApplicationName" />
+	</application>
 </manifest>

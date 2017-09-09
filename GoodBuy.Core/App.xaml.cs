@@ -2,11 +2,7 @@
 using GoodBuy.Core.ViewModels;
 using GoodBuy.Service;
 using GoodBuy.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+using GoodBuy.Views;
 using Xamarin.Forms;
 
 namespace GoodBuy
@@ -34,6 +30,7 @@ namespace GoodBuy
             container.RegisterType<LoginPageViewModel>();
             container.RegisterType<MainMenuViewModel>();
             container.RegisterType<NovaOfertaViewModel>();
+            container.RegisterType<OfertasPageViewModel>();
             container.RegisterType<LoadingPageViewModel>().SingleInstance();
             container.RegisterType<GenericRepository<Model.IEntity>>();
             return container;

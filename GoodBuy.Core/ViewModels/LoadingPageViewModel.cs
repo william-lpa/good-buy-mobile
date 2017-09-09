@@ -7,15 +7,11 @@ using System.Threading.Tasks;
 
 namespace GoodBuy.Core.ViewModels
 {
-    class LoadingPageViewModel : BaseViewModel
+    public class LoadingPageViewModel : BaseViewModel
     {
-        public LoadingPageViewModel(AzureService service)
+        public LoadingPageViewModel()
         {
-            while (service.CurrentUser != null)
-            {
-                Task.Delay(200).Wait();
-            }
-            new Action((async () => await PopAsync())).Invoke();
+            
         }
     }
 }

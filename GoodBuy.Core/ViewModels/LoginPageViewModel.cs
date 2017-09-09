@@ -8,7 +8,7 @@ using GoodBuy.Core.ViewModels;
 
 namespace GoodBuy.ViewModels
 {
-    class LoginPageViewModel : BaseViewModel
+    public class LoginPageViewModel : BaseViewModel
     {
         private readonly AzureService azureService;
         public Command FacebookLoginCommand { get; }
@@ -26,7 +26,7 @@ namespace GoodBuy.ViewModels
             while (azureService.LoginIn) await Task.Delay(200);
 
             if (azureService.CurrentUser != null)
-                await this.PushAsync<MainMenuViewModel>();
+                await this.PushAsync<MainMenuViewModel>(resetNavigation:true);
         }
 
         private void ExecuteGoogleLogin()
@@ -56,9 +56,9 @@ namespace GoodBuy.ViewModels
         {
             try
             {
-                await PushAsync<LoadingPageViewModel>();
+                await PushModalAsync<LoadingPageViewModel>();
                 await azureService.LoginAsync(provider);
-                await PushAsync<MainMenuViewModel>();
+                await PushAsync<MainMenuViewModel>(resetNavigation: true);
             }
             catch (Exception err)
             {

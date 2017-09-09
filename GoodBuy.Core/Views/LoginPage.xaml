@@ -1,20 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:GoodBuy"
-             x:Class="GoodBuy.LoginPage"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"             
+             x:Class="GoodBuy.Views.LoginPage"
              Title="Good-Buy"
              BackgroundColor="White">
     <StackLayout>
-        <Button Text="Últimas atualizações em Blumenau, SC!" Style="{StaticResource headerLocationButton}" />
-
-        <ListView ItemsSource="">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <TextCell Text="Produto" Detail="Marca" TextColor="Black" DetailColor="Gray" />
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+        <Button Text="Últimas atualizações em Blumenau, SC!" Style="{StaticResource headerLocationButton}" />        
         <Button Text="Logar com o Facebook" Command="{Binding FacebookLoginCommand}" BackgroundColor="#4e6cab" TextColor="#FFF"/>
         <Button Text="Logar com o Google" Command="{Binding GoogleLoginCommand}" BackgroundColor="#df4a32" TextColor="#FFF"/>
     </StackLayout>

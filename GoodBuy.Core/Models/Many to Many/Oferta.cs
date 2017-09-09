@@ -24,7 +24,10 @@ namespace GoodBuy.Models.Many_to_Many
         //[JsonProperty("dataAtualizacao")]
         //public DateTime DataAtualizacao { get; set; }
         [JsonProperty("confiabilidade")]
-        public float Confiabilidade { get; set; }        
+        public float Confiabilidade { get; set; }
+
+        [JsonProperty("createdAt")]
+        public DateTime CreatedAt { get; set; }
 
         [JsonIgnore]
         public IEnumerable<HistoricoOferta> OfertasAnteriores { get; set; }

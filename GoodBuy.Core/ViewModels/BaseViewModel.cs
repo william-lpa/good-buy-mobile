@@ -8,7 +8,7 @@ using Xamarin.Forms;
 
 namespace GoodBuy.ViewModels
 {
-    class BaseViewModel
+    public class BaseViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -27,7 +27,7 @@ namespace GoodBuy.ViewModels
             return true;
         }
 
-        protected async Task PushAsync<TViewModel>(params object[] args) where TViewModel : BaseViewModel
+        protected async Task PushAsync<TViewModel>(bool resetNavigation = false, params object[] args) where TViewModel : BaseViewModel
         {
             var viewmodelType = typeof(TViewModel);
             var viewModelTypeName = viewmodelType.Name;
@@ -41,7 +41,13 @@ namespace GoodBuy.ViewModels
             //var viewModel = Activator.CreateInstance(viewmodelType, args);
             if (page != null)
                 page.BindingContext = viewModel;
-            await Application.Current.MainPage.Navigation.PushAsync(page);
+            if (resetNavigation)
+            {
+                await Application.Current.MainPage.Navigation.PopToRootAsync();
+                Application.Current.MainPage = new NavigationPage(page);
+            }
+            else
+                await Application.Current.MainPage.Navigation.PushAsync(page);
 
         }
         protected async Task PopModalAsync() => await Application.Current.MainPage.Navigation.PopModalAsync(true);
@@ -58,7 +64,10 @@ namespace GoodBuy.ViewModels
             var viewTypeName = $"GoodBuy.Views.{viewModelTypeName.Substring(0, viewModelTypeName.Length - viewModelWordLength) }";
             var viewType = Type.GetType(viewTypeName);
             var page = Activator.CreateInstance(viewType) as Page;
-            var viewModel = Activator.CreateInstance(viewmodelType, args);
+            TViewModel viewModel = null;
+            using (var scope = App.Container.BeginLifetimeScope())
+            { viewModel = scope.Resolve<TViewModel>(); }
+            //var viewModel = Activator.CreateInstance(viewmodelType, args);
             if (page != null)
                 page.BindingContext = viewModel;
             await Application.Current.MainPage.Navigation.PushModalAsync(page);

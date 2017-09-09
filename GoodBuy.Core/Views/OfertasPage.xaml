@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GoodBuy.Views.OfertasPage"
+             Title="Ofertas recente do dia">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="ofertaOption" TargetType="Button">
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="WidthRequest" Value="120"/>
+                <Setter Property="HeightRequest" Value="30"/>
+                <Setter Property="BackgroundColor" Value="LightGray"/>
+                <Setter Property="Margin" Value="0,0,0,5"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <StackLayout>
+            <ListView x:Name="lvwOfertas" ItemsSource="{Binding Path=Ofertas}" HasUnevenRows="True">
+                <!--<ListView.ItemsSource>
+                    13
+                </ListView.ItemsSource>-->
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Spacing="5">
+                                <!--<Label x:Name="lbEstabelecimento" Text="{Binding Estabelecimento }" FontSize="Large"/>
+                            <Label x:Name="lbOfertaDescricao" Text="{Binding DescricaoOferta }" HorizontalOptions="CenterAndExpand"/>-->
+                                <StackLayout Orientation="Horizontal">
+                                    <BoxView BackgroundColor="Gray" WidthRequest="80" HeightRequest="80" HorizontalOptions="Start"/>
+                                    <StackLayout>
+                                        <Label
+                                            x:Name="lbEstabelecimento"
+                                            HorizontalOptions="StartAndExpand"
+                                            Text="{Binding Estabelecimento}"
+                                            FontSize="22"
+                                            FontAttributes="Bold"
+                                            TextColor="#4e6cab"/>
+                                        <Label x:Name="lbOfertaDescricao" Text="Sorvete Creme, Kibon, 2 litros" HorizontalOptions="CenterAndExpand"/>
+                                        <StackLayout Orientation="Horizontal">
+                                            <Label x:Name="lbPreco" Text="Preço última oferta R$" FontSize="Small" HorizontalOptions="Start"/>
+                                            <Label x:Name="lbPrecoValue" Text="{Binding ValorOferta}" FontSize="Small" HorizontalOptions="CenterAndExpand"/>
+                                        </StackLayout>
+                                    </StackLayout>
+                                </StackLayout>
+                                <StackLayout Orientation="Horizontal" Spacing="5">
+                                    <Label x:Name="lbAtualizadoEm" Text="Última atualização em:" FontSize="Small" HorizontalOptions="Start"/>
+                                    <Label x:Name="lbAtualizadoEmValue" Text="{Binding CreatedAt}" FontSize="Small" HorizontalOptions="StartAndExpand"/>
+                                </StackLayout>
+                                <StackLayout Orientation="Horizontal">
+                                    <Button Text="Adicionar a Lista" Style="{StaticResource ofertaOption}" HorizontalOptions="StartAndExpand"/>
+                                    <Button Text="Monitorar oferta" Style="{StaticResource ofertaOption}" FontSize="10" HorizontalOptions="End" />
+                                </StackLayout>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

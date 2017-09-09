@@ -11,7 +11,7 @@ using GoodBuy.Models.Many_to_Many;
 
 namespace GoodBuy.ViewModels
 {
-    class NovaOfertaViewModel : BaseViewModel
+    public class NovaOfertaViewModel : BaseViewModel
     {
         private readonly AzureService azure;
         private string produto;
@@ -74,13 +74,19 @@ namespace GoodBuy.ViewModels
 
         private async Task UpdateOfertasAsync()
         {
-            await (new GenericRepository<Sabor>(azure)).PullUpdates();
-            await (new GenericRepository<UnidadeMedida>(azure)).PullUpdates();
-            await (new GenericRepository<Categoria>(azure)).PullUpdates();
+            var g = System.Diagnostics.Stopwatch.StartNew();
+            var t1 = Task.Run(async () => await (new GenericRepository<Sabor>(azure)).PullUpdates());
+            var t2 = Task.Run(async () => await (new GenericRepository<UnidadeMedida>(azure)).PullUpdates());
+            var t3 = Task.Run(async () => await (new GenericRepository<Categoria>(azure)).PullUpdates());
             await (new GenericRepository<Produto>(azure)).PullUpdates();
             await (new GenericRepository<Marca>(azure)).PullUpdates();
-            await (new GenericRepository<Estabelecimento>(azure)).PullUpdates();
+            var t4 = Task.Run(async () => await (new GenericRepository<Estabelecimento>(azure)).PullUpdates());
+            await (new GenericRepository<CarteiraProduto>(azure)).PullUpdates();
             await (new GenericRepository<Oferta>(azure)).PullUpdates();
+            await (new GenericRepository<HistoricoOferta>(azure)).PullUpdates();
+            Task.WaitAll(new Task[] { t1, t2, t3, t4 });
+            g.Stop();
+            var teste = g.Elapsed.Seconds;
         }
 
         private bool VerificarCamposObrigatorios()

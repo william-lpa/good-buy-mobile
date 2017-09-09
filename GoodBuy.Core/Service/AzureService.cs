@@ -49,7 +49,7 @@ namespace GoodBuy.Service
                 CurrentUser = result.appUser;
                 if (initialized != null)
                     await initialized;
-                
+
                 var table = Client.GetSyncTable<User>();
                 if (await table.LookupAsync(CurrentUser.User.Id) == null)
                 {
@@ -119,6 +119,7 @@ namespace GoodBuy.Service
                 RemoveTokenFromSecureStore();
                 // Remove the token from the MobileServiceClient
                 await Client.LogoutAsync();
+                CurrentUser = null;
                 await request;
             }
         }
@@ -128,7 +129,7 @@ namespace GoodBuy.Service
             {
                 //RemoveTokenFromSecureStore();
                 Client = new MobileServiceClient(appURL, new ExpiredAzureRequestInterceptors(this));
-                var dbName = "goodBuy9.db";
+                var dbName = "goodBuy33.db";
                 Store = new MobileServiceSQLiteStore(Path.Combine(MobileServiceClient.DefaultDatabasePath, dbName));
                 DefineTables(Store);
 
