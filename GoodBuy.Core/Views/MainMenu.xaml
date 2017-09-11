@@ -19,14 +19,14 @@
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Deslogar" Command="{Binding SignOutCommand}"/>
     </ContentPage.ToolbarItems>
-    <StackLayout>
+    <StackLayout>        
         <Label Text="{Binding UserName}"
                FontAttributes="Bold"
                TextColor="#4e6cab"
                FontSize="Large"
                HorizontalOptions="CenterAndExpand"
                HorizontalTextAlignment="Center"/>
-        <Image Source="{Binding Profile}" />
+        <Image Source="{Binding Profile}" WidthRequest="180" HeightRequest="180" />
         <StackLayout Orientation="Vertical">
             <StackLayout Orientation="Horizontal" VerticalOptions="Start"  HorizontalOptions="Start" Grid.Row="3" Grid.Column="3">
                 <Button Text="Informar Oferta" Command="{Binding NovaOfertaCommand}" Style="{StaticResource menuButton}"/>

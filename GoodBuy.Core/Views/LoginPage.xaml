@@ -1,12 +1,64 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"             
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GoodBuy.Views.LoginPage"
-             Title="Good-Buy"
-             BackgroundColor="White">
+             Title="Bem Vindo">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="ofertaOption" TargetType="Button">
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="WidthRequest" Value="120"/>
+                <Setter Property="HeightRequest" Value="30"/>
+                <Setter Property="BackgroundColor" Value="LightGray"/>
+                <Setter Property="Margin" Value="0,0,0,5"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <StackLayout>
-        <Button Text="Últimas atualizações em Blumenau, SC!" Style="{StaticResource headerLocationButton}" />        
-        <Button Text="Logar com o Facebook" Command="{Binding FacebookLoginCommand}" BackgroundColor="#4e6cab" TextColor="#FFF"/>
-        <Button Text="Logar com o Google" Command="{Binding GoogleLoginCommand}" BackgroundColor="#df4a32" TextColor="#FFF"/>
+        <StackLayout >
+            <Button Text="Últimas atualizações em Blumenau, SC!" Style="{StaticResource headerLocationButton}" />
+            <ListView x:Name="lvwOfertas" HasUnevenRows="True" HeightRequest="290">
+                <ListView.ItemsSource>
+                    13
+                </ListView.ItemsSource>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout >
+                                <StackLayout Orientation="Horizontal">
+                                    <BoxView BackgroundColor="Gray" WidthRequest="80" HeightRequest="80" HorizontalOptions="Start"/>
+                                    <StackLayout>
+                                        <Label
+                                            x:Name="lbEstabelecimento"
+                                            HorizontalOptions="StartAndExpand"
+                                            Text="Angeloni"
+                                            FontSize="22"
+                                            FontAttributes="Bold"
+                                            TextColor="#4e6cab"/>
+                                        <Label x:Name="lbOfertaDescricao" Text="Sorvete Creme, Kibon, 2 litros" HorizontalOptions="CenterAndExpand"/>
+                                        <StackLayout Orientation="Horizontal">
+                                            <Label x:Name="lbPreco" Text="Preço última oferta R$" FontSize="Small" HorizontalOptions="Start"/>
+                                            <Label x:Name="lbPrecoValue" Text="R$ 20,99" FontSize="Small" HorizontalOptions="CenterAndExpand"/>
+                                        </StackLayout>
+                                    </StackLayout>
+                                </StackLayout>
+                                <StackLayout Orientation="Horizontal" Spacing="5">
+                                    <Label x:Name="lbAtualizadoEm" Text="Última atualização em:" FontSize="Small" HorizontalOptions="Start"/>
+                                    <Label x:Name="lbAtualizadoEmValue" Text="09/09/2017 22h33min" FontSize="Small" HorizontalOptions="StartAndExpand"/>
+                                </StackLayout>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackLayout>
+        <Label  Text="{Binding PhoneLabel}" FontSize="Medium"/>
+        <StackLayout Orientation="Horizontal">
+            <Entry Text="{Binding PhoneNumber}" Keyboard="Telephone" HorizontalOptions="FillAndExpand" />
+            <Button Text="Selecionar núm. na agenda" HorizontalOptions="End" FontSize="11" BackgroundColor="LightGray" TextColor="Black" Command="{Binding ContactListCommand}"/>
+        </StackLayout>
+        <Button Text="Logar com o Facebook" Command="{Binding FacebookLoginCommand}" HorizontalOptions="FillAndExpand" BackgroundColor="#4e6cab" TextColor="#FFF"/>
+        <Button Text="Logar com o perfil do dispositivo" Command="{Binding ContactListLoginCommand}"  HorizontalOptions="FillAndExpand" BackgroundColor="#df4a32" TextColor="#FFF"/>
     </StackLayout>
 </ContentPage>

@@ -2,8 +2,6 @@
 using GoodBuy.Authentication;
 using Microsoft.WindowsAzure.MobileServices;
 using Xamarin.Auth;
-using Xamarin.Forms;
-using System.Linq;
 using Android.Content;
 using GoodBuy.Log;
 using GoodBuy.Models.Abstraction;
@@ -25,7 +23,7 @@ namespace goodBuy.Droid
                 {
                     Intent facebookLogin = new Intent(MainActivity.CurrentActivity, typeof(Authentication.FacebookApi));
                     facebookLogin.PutExtra("LOGIN", true);
-                    MainActivity.CurrentActivity.StartActivityForResult(facebookLogin, 1);
+                    MainActivity.CurrentActivity.StartActivityForResult(facebookLogin, (int)ActivitiesRequestCode.RequestCodes.FACEBOOK_LOGIN);
                 }
                 while (SignIn) { await Task.Delay(500); }
                 var azureUser = await LoginAzureAsync(client, provider);

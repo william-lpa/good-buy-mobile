@@ -7,6 +7,7 @@ using goodBuy.Droid;
 using GoodBuy;
 using Autofac;
 using GoodBuy.Authentication;
+using GoodBuy.Service;
 
 [assembly: Xamarin.Forms.Dependency(typeof(MainActivity))]
 namespace goodBuy.Droid
@@ -27,9 +28,27 @@ namespace goodBuy.Droid
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
             base.OnActivityResult(requestCode, resultCode, data);
-            using (var scope = App.Container.BeginLifetimeScope())
-                scope.Resolve<IAuthentication>().SignIn = false;
 
+            var request = (ActivitiesRequestCode.RequestCodes)requestCode;
+
+            switch (request)
+            {
+                case ActivitiesRequestCode.RequestCodes.FACEBOOK_LOGIN:
+                    {
+                        using (var scope = App.Container.BeginLifetimeScope())
+                            scope.Resolve<IAuthentication>().SignIn = false;
+                    }
+                    break;
+                case ActivitiesRequestCode.RequestCodes.PICK_CONTACT:
+                    {
+                        if (data != null)
+                            using (var scope = App.Container.BeginLifetimeScope())
+                                scope.Resolve<IContactListService>().ResolveContact(data.Data);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
         protected override void OnCreate(Bundle bundle)
@@ -40,17 +59,14 @@ namespace goodBuy.Droid
 
             base.OnCreate(bundle);
 
-            //Android.Telephony.TelephonyManager tMgr = (Android.Telephony.TelephonyManager)this.GetSystemService(Android.Content.Context.TelephonyService);
-            //string mPhoneNumber = tMgr.Line1Number;
-
             global::Xamarin.Forms.Forms.Init(this, bundle);
 
             Microsoft.WindowsAzure.MobileServices.CurrentPlatform.Init();
             SQLitePCL.Batteries.Init();
 
             var container = BuildDependencies();
-            LoadApplication(new App(container));
             instance = this;
+            LoadApplication(new App(container));
 
             //PackageInfo info = this.PackageManager.GetPackageInfo("goodbuy.app", PackageInfoFlags.Signatures);
             //foreach (var item in info.Signatures)
@@ -86,6 +102,7 @@ namespace goodBuy.Droid
             var container = new ContainerBuilder();
 
             container.RegisterType<SocialAuthentication>().As<IAuthentication>().SingleInstance();
+            container.RegisterType<ContactList.ContactList>().As<IContactListService>().SingleInstance();
 
             return container;
         }

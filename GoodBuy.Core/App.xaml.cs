@@ -27,11 +27,12 @@ namespace GoodBuy
         private ContainerBuilder BuildDependencies(ContainerBuilder container)
         {
             container.RegisterType<AzureService>().SingleInstance();
-            container.RegisterType<LoginPageViewModel>();
+            container.RegisterType<LoginPageViewModel>().SingleInstance();
             container.RegisterType<MainMenuViewModel>();
             container.RegisterType<NovaOfertaViewModel>();
             container.RegisterType<OfertasPageViewModel>();
             container.RegisterType<LoadingPageViewModel>().SingleInstance();
+            container.RegisterType<ContactLoginPageViewModel>().SingleInstance();
             container.RegisterType<GenericRepository<Model.IEntity>>();
             return container;
         }

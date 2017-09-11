@@ -61,7 +61,7 @@ namespace goodBuy.Droid.Authentication
             //me/friends? para pegar os amigos
             var user = new User()
             {
-                Id = token.UserId,
+                FacebookId = token.UserId,
                 FullName = userConverted.Name,
                 Birthday = DateTime.ParseExact(userConverted.Birthday, "MM/dd/yyyy", CultureInfo.InvariantCulture),
                 Email = userConverted.Email,

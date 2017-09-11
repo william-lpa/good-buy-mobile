@@ -10,6 +10,6 @@ namespace GoodBuy.Authentication
         Task<MobileServiceUser> LoginAzureAsync(MobileServiceClient client, MobileServiceAuthenticationProvider provider);
         void LogOut();
         LoginResultContent LoginResult { get; set; }
-        bool SignIn { get; set; }
+        bool SignIn { get; set; }        
     }
 }

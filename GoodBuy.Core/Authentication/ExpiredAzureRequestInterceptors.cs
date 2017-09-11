@@ -23,7 +23,7 @@ namespace GoodBuy
             {
                 // The request resulted in a 401 Unauthorized.  We need to do a LoginAsync,
                 // which will do the Refresh if appropriate, or ask for credentials if not.
-                await service.LoginAsync(Microsoft.WindowsAzure.MobileServices.MobileServiceAuthenticationProvider.Facebook);
+                await service.LoginAsync(Microsoft.WindowsAzure.MobileServices.MobileServiceAuthenticationProvider.Facebook, null);
 
                 // Now, retry the request with the cloned request.  The only thing we have
                 // to do is replace the X-ZUMO-AUTH header with the new auth token.

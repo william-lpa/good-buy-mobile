@@ -31,7 +31,7 @@ namespace GoodBuy.Service
 
         public AzureService() => Initialize();
 
-        public async Task LoginAsync(MobileServiceAuthenticationProvider provider)
+        public async Task LoginAsync(MobileServiceAuthenticationProvider provider, User profileUser)
         {
             try
             {
@@ -39,27 +39,19 @@ namespace GoodBuy.Service
                 using (var scope = App.Container.BeginLifetimeScope())
                     auth = scope.Resolve<IAuthentication>();
 
-                Task initialized = null;
+                Task initializingSyncContext = null;
                 if (!Client.SyncContext.IsInitialized)
-                    initialized = Client.SyncContext.InitializeAsync(Store, new MobileServiceSyncHandler());
-
-                // We need to ask for credentials at this point
-                var result = await auth.LoginClientFlowAsync(Client, provider);
-                Client.CurrentUser = result.azureUser;
-                CurrentUser = result.appUser;
-                if (initialized != null)
-                    await initialized;
-
-                var table = Client.GetSyncTable<User>();
-                if (await table.LookupAsync(CurrentUser.User.Id) == null)
+                    initializingSyncContext = Client.SyncContext.InitializeAsync(Store, new MobileServiceSyncHandler());
+                if (provider == MobileServiceAuthenticationProvider.Facebook)
                 {
-                    await table.InsertAsync(CurrentUser.User);
-                    await Client.SyncContext.PushAsync();
+                    // We need to ask for credentials at this point
+                    await LoginWithFacebookAsync(initializingSyncContext, auth, profileUser);
                 }
-                if (Client.CurrentUser != null)
+                if (provider == MobileServiceAuthenticationProvider.Google)
                 {
-                    StoreTokenInSecureStore(Client.CurrentUser.UserId, "azure", Client.CurrentUser.MobileServiceAuthenticationToken);
-                    StoreTokenInSecureStore(CurrentUser.User.Id, "facebook", CurrentUser.Token);
+                    CurrentUser = new LoginResultContent(profileUser, "local user") { Token = profileUser.Id };
+                    await CreateUser(CurrentUser.User, initializingSyncContext);
+                    StoreTokenInSecureStore(CurrentUser.User.Id, "localUser", CurrentUser.Token);
                 }
             }
             catch (Exception err)
@@ -67,6 +59,34 @@ namespace GoodBuy.Service
                 Log.Log.Instance.AddLog(err);
             }
         }
+
+        private async Task CreateUser(User user, Task initializingSyncContext)
+        {
+            if (initializingSyncContext != null)
+                await initializingSyncContext;
+            var table = Client.GetSyncTable<User>();
+            if (await table.LookupAsync(CurrentUser.User.Id) == null)
+            {
+                await table.InsertAsync(CurrentUser.User);
+                await Client.SyncContext.PushAsync();
+            }
+        }
+
+        private async Task LoginWithFacebookAsync(Task initializingSyncContext, IAuthentication auth, User profileUser)
+        {
+            var result = await auth.LoginClientFlowAsync(Client, MobileServiceAuthenticationProvider.Facebook);
+            Client.CurrentUser = result.azureUser;
+            CurrentUser = result.appUser.Merge(profileUser);
+
+            await CreateUser(CurrentUser.User, initializingSyncContext);
+
+            if (Client.CurrentUser != null)
+            {
+                StoreTokenInSecureStore(Client.CurrentUser.UserId, "azure", Client.CurrentUser.MobileServiceAuthenticationToken);
+                StoreTokenInSecureStore(CurrentUser.User.Id, "facebook", CurrentUser.Token);
+            }
+        }
+
         bool IsTokenExpired(string token)
         {
             // Get just the JWT part of the token (without the signature).
@@ -104,24 +124,25 @@ namespace GoodBuy.Service
             using (var scope = App.Container.BeginLifetimeScope())
                 auth = scope.Resolve<IAuthentication>();
 
-            if (Client.CurrentUser == null || Client.CurrentUser.MobileServiceAuthenticationToken == null)
+            if (CurrentUser == null && Client.CurrentUser == null)
                 return;
 
-            auth.LogOut();
-            // Invalidate the token on the mobile backend
-            var authUri = new Uri($"{Client.MobileAppUri}/.auth/logout");
-            using (var httpClient = new HttpClient())
+            if (CurrentUser.User.FacebookId != null)
             {
-                httpClient.DefaultRequestHeaders.Add("X-ZUMO-AUTH", Client.CurrentUser.MobileServiceAuthenticationToken);
-                var request = httpClient.GetAsync(authUri);
-
-                // Remove the token from the cache
-                RemoveTokenFromSecureStore();
-                // Remove the token from the MobileServiceClient
-                await Client.LogoutAsync();
-                CurrentUser = null;
-                await request;
+                auth.LogOut();
+                // Invalidate the token on the mobile backend
+                var authUri = new Uri($"{Client.MobileAppUri}/.auth/logout");
+                using (var httpClient = new HttpClient())
+                {
+                    httpClient.DefaultRequestHeaders.Add("X-ZUMO-AUTH", Client.CurrentUser.MobileServiceAuthenticationToken);
+                    await httpClient.GetAsync(authUri);
+                }
             }
+            // Remove the token from the cache
+            RemoveTokenFromSecureStore();
+            // Remove the token from the MobileServiceClient
+            await Client.LogoutAsync();
+            CurrentUser = null;
         }
         private void Initialize()
         {
@@ -129,7 +150,7 @@ namespace GoodBuy.Service
             {
                 //RemoveTokenFromSecureStore();
                 Client = new MobileServiceClient(appURL, new ExpiredAzureRequestInterceptors(this));
-                var dbName = "goodBuy33.db";
+                var dbName = "goodBuy35.db";
                 Store = new MobileServiceSQLiteStore(Path.Combine(MobileServiceClient.DefaultDatabasePath, dbName));
                 DefineTables(Store);
 
@@ -149,10 +170,13 @@ namespace GoodBuy.Service
             if (Client.CurrentUser != null && !IsTokenExpired(Client.CurrentUser.MobileServiceAuthenticationToken))
             {
                 await Client.SyncContext.InitializeAsync(Store, new MobileServiceSyncHandler());
-                CurrentUser = await RetrieveFacebookUserFromSecureStore("facebook");
+                CurrentUser = await RetrieveUserFromSecureStore("facebook");
             }
             else
-                Client.CurrentUser = null;
+            {
+                await Client.SyncContext.InitializeAsync(Store, new MobileServiceSyncHandler());
+                CurrentUser = await RetrieveUserFromSecureStore("localUser");
+            }
 
             LoginIn = false;
         }
@@ -200,7 +224,7 @@ namespace GoodBuy.Service
             storeAccount.Save(account, key);
         }
 
-        public async Task<LoginResultContent> RetrieveFacebookUserFromSecureStore(string key)
+        public async Task<LoginResultContent> RetrieveUserFromSecureStore(string key)
         {
             if (storeAccount == null)
                 storeAccount = AccountStore.Create();
@@ -240,8 +264,14 @@ namespace GoodBuy.Service
                 storeAccount = AccountStore.Create();
             var azure = storeAccount.FindAccountsForService("azure").FirstOrDefault();
             var facebook = storeAccount.FindAccountsForService("facebook").FirstOrDefault();
-            storeAccount?.Delete(azure, nameof(azure));
-            storeAccount?.Delete(facebook, nameof(facebook));
+            var localUser = storeAccount.FindAccountsForService("localUser").FirstOrDefault();
+            if (azure != null)
+                storeAccount?.Delete(azure, nameof(azure));
+            if (facebook != null)
+                storeAccount?.Delete(facebook, nameof(facebook));
+            if (localUser != null)
+                storeAccount?.Delete(localUser, nameof(localUser));
         }
     }
 }
+

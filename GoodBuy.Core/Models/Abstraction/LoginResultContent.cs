@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace GoodBuy.Models.Abstraction
 {
     public enum Result { OK = 1, Canceled = 2, Error = 3 }
@@ -13,6 +15,24 @@ namespace GoodBuy.Models.Abstraction
             User = user;
             Message = message;
             Result = result;
+        }
+
+        internal LoginResultContent Merge(User profileUser)
+        {
+            if (profileUser != null)
+            {
+
+                User.Id = profileUser?.Id;
+                if (string.IsNullOrEmpty(User.Email))
+                    User.Email = profileUser.Email;
+
+                if (string.IsNullOrEmpty(User.FullName))
+                    User.FullName = profileUser.FullName;
+
+                if (string.IsNullOrEmpty(User.Avatar))
+                    User.Avatar = profileUser.Avatar;
+            }
+            return this;
         }
     }
 }

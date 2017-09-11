@@ -1,5 +1,6 @@
 ﻿using GoodBuy.Service;
 using System;
+using System.IO;
 using System.Windows.Input;
 using Xamarin.Forms;
 
@@ -12,8 +13,19 @@ namespace GoodBuy.ViewModels
         public ICommand SignOutCommand { get; }
         public ICommand ListarOfertasCommand { get; }
 
-        public ImageSource Profile => ImageSource.FromUri(new Uri(azure.CurrentUser.User.Avatar));
-        public string UserName => azure.CurrentUser.User.FullName;
+        public ImageSource Profile
+        {
+            get
+            {
+                if (azure?.CurrentUser?.User.FacebookId != null)
+                    return ImageSource.FromUri(new Uri(azure?.CurrentUser?.User?.Avatar));
+
+                if (azure?.CurrentUser?.User?.Avatar != null)
+                    return ImageSource.FromStream(() => new MemoryStream(Convert.FromBase64String(azure?.CurrentUser?.User?.Avatar)));
+                return null;
+            }
+        }
+        public string UserName => azure.CurrentUser?.User?.FullName;
 
         private readonly AzureService azure;
         public MainMenuViewModel(AzureService azureService)

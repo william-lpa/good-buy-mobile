@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GoodBuy.Views.LoadingPage">
+             x:Class="GoodBuy.Views.LoadingPage"
+             Title="Bem Vindo">    
     <ContentPage.Content>
         <StackLayout VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
             <ActivityIndicator Color="#4e6cab" IsRunning="true" />

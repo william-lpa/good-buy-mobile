@@ -8,7 +8,7 @@ using Xamarin.Forms;
 
 namespace GoodBuy.ViewModels
 {
-    public class BaseViewModel
+    public class BaseViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -27,7 +27,7 @@ namespace GoodBuy.ViewModels
             return true;
         }
 
-        protected async Task PushAsync<TViewModel>(bool resetNavigation = false, params object[] args) where TViewModel : BaseViewModel
+        protected async Task PushAsync<TViewModel>(bool resetNavigation = false, params NamedParameter[] args) where TViewModel : BaseViewModel
         {
             var viewmodelType = typeof(TViewModel);
             var viewModelTypeName = viewmodelType.Name;
@@ -37,7 +37,9 @@ namespace GoodBuy.ViewModels
             var page = Activator.CreateInstance(viewType) as Page;
             TViewModel viewModel = null;
             using (var scope = App.Container.BeginLifetimeScope())
-            { viewModel = scope.Resolve<TViewModel>(); }
+            {
+                viewModel = scope.Resolve<TViewModel>(args);
+            }
             //var viewModel = Activator.CreateInstance(viewmodelType, args);
             if (page != null)
                 page.BindingContext = viewModel;
