@@ -37,14 +37,12 @@ namespace goodBuy.Droid.Authentication
         {
             using (var scope = App.Container.BeginLifetimeScope())
                 scope.Resolve<SocialAuthentication>().LoginResult = new LoginResultContent(null, "User has canceled the login", GoodBuy.Models.Abstraction.Result.Canceled);
-            //throw new NotImplementedException();
         }
 
         public void OnError(FacebookException error)
         {
             using (var scope = App.Container.BeginLifetimeScope())
                 scope.Resolve<SocialAuthentication>().LoginResult = new LoginResultContent(null, $"error:{error.ToString()}", GoodBuy.Models.Abstraction.Result.Error);
-            //throw new NotImplementedException();
         }
 
         public void OnSuccess(Java.Lang.Object result)

@@ -1,10 +1,17 @@
 ﻿using GoodBuy.Service;
+using Microsoft.WindowsAzure.MobileServices;
+using System;
 
 namespace GoodBuy.Model
 {
     public interface IEntity
     {
+        [Version]
+        string Version { get; set; }
         string Id { get; set; }
-        //void LoadRelationalEntitiesCollections(AzureService entityService);
+        DateTime CreatedAt { get; set; }
+        DateTime UpdatedAt { get; set; }
+        bool Deleted { get; set; }
+
     }
 }

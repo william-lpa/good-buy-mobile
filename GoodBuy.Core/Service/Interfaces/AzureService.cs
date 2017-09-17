@@ -150,7 +150,7 @@ namespace GoodBuy.Service
             {
                 //RemoveTokenFromSecureStore();
                 Client = new MobileServiceClient(appURL, new ExpiredAzureRequestInterceptors(this));
-                var dbName = "goodBuy35.db";
+                var dbName = "goodBuy57.db";
                 Store = new MobileServiceSQLiteStore(Path.Combine(MobileServiceClient.DefaultDatabasePath, dbName));
                 DefineTables(Store);
 
@@ -169,7 +169,7 @@ namespace GoodBuy.Service
             Client.CurrentUser = RetrieveAzureTokenFromSecureStore("azure");
             if (Client.CurrentUser != null && !IsTokenExpired(Client.CurrentUser.MobileServiceAuthenticationToken))
             {
-                await Client.SyncContext.InitializeAsync(Store, new MobileServiceSyncHandler());
+                await Client.SyncContext.InitializeAsync(Store, new MobileServiceSyncHandler());                
                 CurrentUser = await RetrieveUserFromSecureStore("facebook");
             }
             else

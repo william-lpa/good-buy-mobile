@@ -6,7 +6,7 @@
     <ContentPage.Content>
         <StackLayout VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
             <ActivityIndicator Color="#4e6cab" IsRunning="true" />
-            <Label Text="Carregando..." />
+            <Label Text="{Binding Operation}"/>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

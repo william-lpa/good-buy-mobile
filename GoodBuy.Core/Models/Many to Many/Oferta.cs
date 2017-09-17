@@ -21,13 +21,11 @@ namespace GoodBuy.Models.Many_to_Many
 
         [JsonProperty("precoAtual")]
         public decimal PrecoAtual { get; set; }
-        //[JsonProperty("dataAtualizacao")]
-        //public DateTime DataAtualizacao { get; set; }
-        [JsonProperty("confiabilidade")]
-        public float Confiabilidade { get; set; }
-
-        [JsonProperty("createdAt")]
-        public DateTime CreatedAt { get; set; }
+        
+        [JsonProperty("likes")]
+        public float Likes { get; set; }
+        [JsonProperty("avaliacoes")]
+        public int Avaliacoes { get; set; }
 
         [JsonIgnore]
         public IEnumerable<HistoricoOferta> OfertasAnteriores { get; set; }
@@ -38,6 +36,7 @@ namespace GoodBuy.Models.Many_to_Many
             IdCarteiraProduto = idCarteira;
             PrecoAtual = preco;
         }
+
         public Oferta()
         {
 

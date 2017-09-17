@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using GoodBuy.Core.ViewModels;
 using GoodBuy.Service;
 using GoodBuy.ViewModels;
 using GoodBuy.Views;
@@ -33,6 +32,11 @@ namespace GoodBuy
             container.RegisterType<OfertasPageViewModel>();
             container.RegisterType<LoadingPageViewModel>().SingleInstance();
             container.RegisterType<ContactLoginPageViewModel>().SingleInstance();
+            container.RegisterType<GruposOfertasPageViewModel>().SingleInstance();
+            container.RegisterType<NovoGrupoOfertaPageViewModel>().SingleInstance();
+            container.RegisterType<GrupoOfertaService>().SingleInstance();
+            container.RegisterType<OfertasService>().SingleInstance();
+            container.RegisterType<SyncronizedAccessService>().SingleInstance();
             container.RegisterType<GenericRepository<Model.IEntity>>();
             return container;
         }

@@ -45,7 +45,7 @@ namespace GoodBuy.ViewModels
                 page.BindingContext = viewModel;
             if (resetNavigation)
             {
-                await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    await Application.Current.MainPage.Navigation.PopToRootAsync();
                 Application.Current.MainPage = new NavigationPage(page);
             }
             else
@@ -58,7 +58,7 @@ namespace GoodBuy.ViewModels
 
         protected async Task PopToRootAsync() => await Application.Current.MainPage.Navigation.PopToRootAsync(true);
 
-        protected async Task<TViewModel> PushModalAsync<TViewModel>(params object[] args) where TViewModel : BaseViewModel
+        protected async Task<TViewModel> PushModalAsync<TViewModel>(params NamedParameter[] args) where TViewModel : BaseViewModel
         {
             var viewmodelType = typeof(TViewModel);
             var viewModelTypeName = viewmodelType.Name;
@@ -68,7 +68,7 @@ namespace GoodBuy.ViewModels
             var page = Activator.CreateInstance(viewType) as Page;
             TViewModel viewModel = null;
             using (var scope = App.Container.BeginLifetimeScope())
-            { viewModel = scope.Resolve<TViewModel>(); }
+            { viewModel = scope.Resolve<TViewModel>(args); }
             //var viewModel = Activator.CreateInstance(viewmodelType, args);
             if (page != null)
                 page.BindingContext = viewModel;

@@ -4,9 +4,9 @@ using Xamarin.Forms;
 using Microsoft.WindowsAzure.MobileServices;
 using System.Threading.Tasks;
 using Autofac;
-using GoodBuy.Core.ViewModels;
-using System.Windows.Input;
 using GoodBuy.Models;
+using System.Collections.ObjectModel;
+using GoodBuy.Models.Logical;
 
 namespace GoodBuy.ViewModels
 {
@@ -16,6 +16,7 @@ namespace GoodBuy.ViewModels
         public Command FacebookLoginCommand { get; }
         public Command ContactListLoginCommand { get; }
         public Command ContactListCommand { get; }
+        public ObservableCollection<OfertaDto> UltimasOfertas { get; }
         private User profileUserContact;
         private string phoneNumber;
         private string phoneLabel;
@@ -38,12 +39,22 @@ namespace GoodBuy.ViewModels
             set { SetProperty(ref phoneLabel, value); }
         }
 
-        public LoginPageViewModel(AzureService azure)
+        public LoginPageViewModel(AzureService azure, OfertasService service)
         {
             azureService = azure;
+            UltimasOfertas = new ObservableCollection<OfertaDto>();
             FacebookLoginCommand = new Command(ExecuteFacebookLogin, CanExecuteLogin);
             ContactListLoginCommand = new Command(ExecuteLocalProfileLogin, CanExecuteLogin);
             ContactListCommand = new Command(ExecuteOpenContactList);
+            InitializeCollection(service);
+        }
+
+        private async void InitializeCollection(OfertasService service)
+        {
+            foreach (var item in await service.ObterUltimasTresOfertasFromServer())
+            {
+                UltimasOfertas.Add(item);
+            }
         }
 
         private void ContactPicked(User user)
@@ -68,6 +79,7 @@ namespace GoodBuy.ViewModels
                 await this.PushAsync<MainMenuViewModel>(resetNavigation: true);
             else
             {
+
                 using (var scope = App.Container.BeginLifetimeScope())
                     ContactPicked(profileUserContact = scope.Resolve<IContactListService>().PickProfileUser());
             }
@@ -106,7 +118,7 @@ namespace GoodBuy.ViewModels
             try
             {
                 VerifyNumberManualChange();
-                await PushModalAsync<LoadingPageViewModel>();
+                await PushModalAsync<LoadingPageViewModel>(new NamedParameter("operation", Operation.Login));
                 await azureService.LoginAsync(MobileServiceAuthenticationProvider.Facebook, profileUserContact);
                 await PushAsync<MainMenuViewModel>(resetNavigation: true);
             }

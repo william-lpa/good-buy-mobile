@@ -19,7 +19,7 @@
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Deslogar" Command="{Binding SignOutCommand}"/>
     </ContentPage.ToolbarItems>
-    <StackLayout>        
+    <StackLayout>
         <Label Text="{Binding UserName}"
                FontAttributes="Bold"
                TextColor="#4e6cab"
@@ -35,6 +35,7 @@
             </StackLayout>
             <StackLayout Orientation="Horizontal" VerticalOptions="Start"  HorizontalOptions="Start" Grid.Row="3" Grid.Column="3">
                 <Button Text="Espaço Fornecedor"  Style="{StaticResource menuButton}"/>
+                <Button Text="Grupos de Ofertas" Command="{Binding ListarGrupoOfertasCommand}"  Style="{StaticResource menuButton}"/>
             </StackLayout>
         </StackLayout>
     </StackLayout>
