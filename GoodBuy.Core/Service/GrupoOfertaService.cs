@@ -13,53 +13,73 @@ namespace GoodBuy.Service
     {
         private readonly IGenericRepository<GrupoOferta> grupoRepository;
         private readonly IGenericRepository<ParticipanteGrupo> participantesRepository;
+        private readonly IGenericRepository<User> userRepository;
         private readonly AzureService azureService;
-        private Dictionary<string, GrupoOferta> cacheGrupo;
-        private Dictionary<string, ParticipanteGrupo> cacheParticipantes;
-        private const int MINUTES_TO_REFRESH = 10;
-        private DateTime LastRefresh;
 
-        public GrupoOfertaService(AzureService azureService)
+        public GrupoOfertaService(AzureService azureService, SyncronizedAccessService syncronizedAccessService)
         {
             this.azureService = azureService;
-            grupoRepository = new GenericRepository<GrupoOferta>(azureService);
-            participantesRepository = new GenericRepository<ParticipanteGrupo>(azureService);
-            cacheGrupo = new Dictionary<string, GrupoOferta>();
-            cacheParticipantes = new Dictionary<string, ParticipanteGrupo>();
-            LastRefresh = DateTime.Now;
+            grupoRepository = syncronizedAccessService.GrupoOfertaRepository;
+            participantesRepository = syncronizedAccessService.ParticipanteGrupoRepository;
+            userRepository = syncronizedAccessService.UserRepository;
         }
-
-        private void ObterGruposDeOfertaUsuarioLogado()
+        public async Task<IEnumerable<GrupoOferta>> CarregarGrupoDeOfertasUsuarioLogado()
         {
             Task.WaitAll(new Task[] { Task.Run(() => participantesRepository.SyncDataBase()), Task.Run(() => participantesRepository.SyncDataBase()) });
-            Task.WaitAll(new Task[]
-            {
-                Task.Run(async () =>  cacheParticipantes = ((await participantesRepository.SyncTableModel.ToListAsync()).ToDictionary(key => key.Id, value => value))),
-                Task.Run(async () => cacheGrupo = ((await grupoRepository.SyncTableModel.ToListAsync()).ToDictionary(key => key.Id, value => value))),
-            });
-            LastRefresh = DateTime.Now;
+            Dictionary<string, GrupoOferta> grupos = (await grupoRepository.GetEntities()).ToDictionary(key => key.Id, value => value);
+            var retorno = (await participantesRepository.GetEntities()).Where(x => x.IdUser == azureService.CurrentUser.User.Id).Select(x => grupos[x.IdGrupoOferta]).OrderBy(x => x.Name);
+            return retorno.ToArray();
         }
 
-        public IEnumerable<GrupoOferta> CarregarGrupoDeOfertasUsuarioLogado()
+        public async Task CadastrarNovoGrupoUsuario(GrupoOferta grupoOferta)
         {
-            if ((LastRefresh - DateTime.Now).TotalMinutes > MINUTES_TO_REFRESH)
-            {
-                ObterGruposDeOfertaUsuarioLogado();
-            }
-            return cacheParticipantes.Values.Where(x => x.IdUser == azureService.CurrentUser.User.Id).Select(x => cacheGrupo[x.IdGrupoOferta]).OrderBy(x => x.Name);
-        }
-
-        public void CadastrarNovoGrupoUsuario(GrupoOferta grupoOferta)
-        {
+            var idOferta = await grupoRepository.CreateEntity(grupoOferta, true);
             foreach (var participante in grupoOferta?.Participantes)
             {
-                new ParticipanteGrupo(participante.IdUser, participante.IdGrupoOferta);//confirmar
-                participantesRepository.CreateEntity(participante);
-                cacheParticipantes.Add(participante.Id, participante);
+                participante.IdGrupoOferta = idOferta;//confirmar
+                await participantesRepository.CreateEntity(participante);
             }
+        }
 
-            grupoRepository.CreateEntity(grupoOferta);
-            cacheGrupo.Add(grupoOferta.Id, grupoOferta);
+        public async Task AtualizarNovoGrupoUsuario(GrupoOferta grupoOferta)
+        {
+            await grupoRepository.UpdateEntity(grupoOferta);
+
+            foreach (var participante in grupoOferta?.Participantes)
+            {
+                if (participante.IdGrupoOferta == null) //novo participante
+                {
+                    participante.IdGrupoOferta = grupoOferta.Id;
+                    await participantesRepository.CreateEntity(participante);
+                }
+            }
+        }
+
+        public async Task ExcluirGrupoOferta(GrupoOferta grupoOferta)
+        {
+            if (grupoOferta == null)
+                return;
+
+            grupoOferta.Participantes = await participantesRepository.SyncTableModel.Where(x => x.IdGrupoOferta == grupoOferta.Id).ToListAsync();
+
+            foreach (var participante in grupoOferta?.Participantes)
+            {
+                await participantesRepository.SyncTableModel.DeleteAsync(participante);
+            }
+            await grupoRepository.DeleteEntity(grupoOferta);
+        }
+
+        internal async Task<GrupoOferta> CarregarGrupoOfertaPorId(string id)
+        {
+            return await grupoRepository.GetById(id);
+        }
+
+        internal async Task<IEnumerable<ParticipanteGrupo>> CarregarParticipantesPorIdGrupoOferta(string id)
+        {
+            var participantes = await participantesRepository.SyncTableModel.Where(x => x.IdGrupoOferta == id).ToListAsync();
+            participantes.ForEach(async x => x.User = await userRepository.GetById(x.IdUser));
+            return participantes;
+
         }
     }
 }

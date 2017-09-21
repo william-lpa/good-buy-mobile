@@ -2,6 +2,8 @@
 using Microsoft.WindowsAzure.MobileServices;
 using Newtonsoft.Json;
 using System;
+using System.IO;
+using Xamarin.Forms;
 
 namespace GoodBuy.Models
 {
@@ -34,6 +36,23 @@ namespace GoodBuy.Models
             male = Male;
             location = Location;
             // initialize out parameters
+
         }
+
+        [JsonIgnore]
+        public string UserDescription => $"{Email} - {Id}";
+
+        [JsonIgnore]
+        public ImageSource AvatarDisplay
+        {
+            get
+            {
+                if (FacebookId != null)
+                    return ImageSource.FromUri(new Uri(Avatar));
+                else
+                    return ImageSource.FromStream(() => new MemoryStream(Convert.FromBase64String(Avatar ?? "")));
+            }
+        }
+
     }
 }

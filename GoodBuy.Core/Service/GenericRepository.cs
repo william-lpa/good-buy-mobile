@@ -27,7 +27,7 @@ namespace GoodBuy.Service
             SyncTableModel = azureService.GetTable<TModel>();
             LastRefresh = DateTime.Now;
         }
-        public async Task<string> CreateEntity(TModel entidade)
+        public async Task<string> CreateEntity(TModel entidade, bool forceSync = false)
         {
             try
             {
@@ -35,6 +35,8 @@ namespace GoodBuy.Service
                 await SyncTableModel.InsertAsync(entidade);
                 Cache.Add(entidade.Id, entidade);
                 await NeedsRefresh();
+                if (forceSync)
+                    await SyncDataBase(DateTime.Now);
                 return entidade.Id;
             }
             catch (Exception err)
@@ -65,7 +67,8 @@ namespace GoodBuy.Service
                 if (!Cache.ContainsKey(id))
                 {
                     var entity = await (SyncTableModel.LookupAsync(id));
-                    Cache.Add(entity.Id, entity);
+                    if (entity != null)
+                        Cache.Add(entity.Id, entity);
                     return entity;
                 }
                 return Cache[id];

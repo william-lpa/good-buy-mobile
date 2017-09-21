@@ -2,10 +2,11 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GoodBuy.Views.NovoGrupoOfertaPage"
-             HeightRequest="200">
+             HeightRequest="200"
+             Title="Grupo de Oferta">
     <ContentPage.Resources>
         <ResourceDictionary>
-            <Style x:Key="labelLogin" TargetType="Label">
+            <Style x:Key="labelCadastro" TargetType="Label">
                 <Setter Property="FontSize" Value="16"/>
                 <Setter Property="TextColor" Value="#4e6cab"/>
                 <Setter Property="Margin" Value="0,0,0,0"/>
@@ -14,16 +15,33 @@
     </ContentPage.Resources>
     <StackLayout Spacing="10">
         <StackLayout Spacing="0">
-            <Label Text="Nome do grupo a ser criado" Style="{StaticResource labelLogin}" HorizontalOptions="StartAndExpand"/>
+            <Label Text="Nome do grupo a ser criado" Style="{StaticResource labelCadastro}" HorizontalOptions="StartAndExpand"/>
             <Entry Placeholder="Nome do grupo" Text="{Binding Name}"/>
         </StackLayout>
         <StackLayout Spacing="10">
-            <Label Text="Grupo Secreto" Style="{StaticResource labelLogin}" HorizontalOptions="StartAndExpand"/>
+            <Label Text="Grupo Secreto" Style="{StaticResource labelCadastro}" HorizontalOptions="StartAndExpand"/>
             <StackLayout Orientation="Horizontal">
                 <Label Text="Restrito"  HorizontalOptions="Start"/>
                 <Switch IsToggled="{Binding Private}" />
+                <Button Text="Excluir" Command="{Binding RemoverGrupoCommand}" IsVisible="{Binding EditingGroup}" HorizontalOptions="EndAndExpand" BackgroundColor="#4e6cab" TextColor="#FFF"/>
+                <Button Text="{Binding PrimaryAction}" Command="{Binding PersistGrupoOfertaCommand}" HorizontalOptions="EndAndExpand" BackgroundColor="#4e6cab" TextColor="#FFF"/>
             </StackLayout>
-        </StackLayout>        
-        <Button Text="Criar" Command="{Binding ProfileDeviceLoginCommand}" HorizontalOptions="FillAndExpand" BackgroundColor="#4e6cab" TextColor="#FFF"/>
+            <Label Text="Localizar participantes por e-mail" HorizontalOptions="StartAndExpand" VerticalOptions="Center" Style="{StaticResource labelCadastro}"/>
+            <StackLayout Orientation="Horizontal">
+                <SearchBar Placeholder="Localizar Participante" HorizontalOptions="Start" WidthRequest="280" />
+                <Button Text="Buscar contato na agenda" HorizontalOptions="CenterAndExpand" FontSize="Micro" BackgroundColor="LightGray" TextColor="Black" Command="{Binding SearchContact}"/>
+            </StackLayout>
+            <StackLayout Orientation="Horizontal">
+                <Label Text="Participantes:" HorizontalOptions="StartAndExpand" VerticalOptions="Center" Style="{StaticResource labelCadastro}"/>
+                <Button Text="Remover último participante adicionado" Command="{Binding RemoverUltimoParticipanteCommand}" FontAttributes="Italic, Bold" BackgroundColor="Transparent" TextColor="Red" FontSize="10" />
+            </StackLayout>
+        </StackLayout>
+        <ListView ItemsSource="{Binding Members}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ImageCell Text="{Binding User.FullName}" Detail="{Binding User.UserDescription}" ImageSource="{Binding User.AvatarDisplay}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </StackLayout>
 </ContentPage>

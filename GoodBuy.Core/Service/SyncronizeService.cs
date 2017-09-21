@@ -17,6 +17,9 @@ namespace GoodBuy.Service
         public IGenericRepository<UnidadeMedida> UnidadeMedidaRepository { get; }
         public IGenericRepository<Sabor> SaborRepository { get; }
         public IGenericRepository<Produto> ProdutoRepository { get; }
+        public IGenericRepository<GrupoOferta> GrupoOfertaRepository { get; }
+        public IGenericRepository<ParticipanteGrupo> ParticipanteGrupoRepository { get; }
+        public IGenericRepository<User> UserRepository { get; }
         private readonly AzureService azureService;
 
         public SyncronizedAccessService(AzureService azureService)
@@ -29,22 +32,28 @@ namespace GoodBuy.Service
             UnidadeMedidaRepository = new GenericRepository<UnidadeMedida>(azureService);
             ProdutoRepository = new GenericRepository<Produto>(azureService);
             SaborRepository = new GenericRepository<Sabor>(azureService);
+            GrupoOfertaRepository = new GenericRepository<GrupoOferta>(azureService);
+            ParticipanteGrupoRepository = new GenericRepository<ParticipanteGrupo>(azureService);
+            UserRepository = new GenericRepository<User>(azureService);
         }
 
         public async Task<bool> FirstUsage() => (await OfertaRepository.GetEntities(0, 1)).Count == 0;
 
 
-        public void SyncronizeFirstUse(DateTime? dateTimeOffset = null)
+        public void SyncronizeFirstUse()
         {
             Task.WaitAll(new Task[]
             {
-                        Task.Run(() => OfertaRepository.SyncDataBase(dateTimeOffset)),
-                        Task.Run(() => CarteiraProdutoRepository.SyncDataBase(dateTimeOffset)),
-                        Task.Run(() => ProdutoRepository.SyncDataBase(dateTimeOffset)),
-                        Task.Run(() => SaborRepository.SyncDataBase(dateTimeOffset)),
-                        Task.Run(() => MarcaRepository.SyncDataBase(dateTimeOffset)),
-                        Task.Run(() => EstabelecimentoRepository.SyncDataBase(dateTimeOffset)),
-                        Task.Run(() => UnidadeMedidaRepository.SyncDataBase(dateTimeOffset)),
+                        Task.Run(() => OfertaRepository.SyncDataBase()),
+                        Task.Run(() => CarteiraProdutoRepository.SyncDataBase()),
+                        Task.Run(() => ProdutoRepository.SyncDataBase()),
+                        Task.Run(() => SaborRepository.SyncDataBase()),
+                        Task.Run(() => MarcaRepository.SyncDataBase()),
+                        Task.Run(() => EstabelecimentoRepository.SyncDataBase()),
+                        Task.Run(() => UnidadeMedidaRepository.SyncDataBase()),
+                        Task.Run(() => GrupoOfertaRepository.SyncDataBase()),
+                        Task.Run(() => ParticipanteGrupoRepository.SyncDataBase()),
+                        Task.Run(() => UserRepository.SyncDataBase()),
             });
         }
     }

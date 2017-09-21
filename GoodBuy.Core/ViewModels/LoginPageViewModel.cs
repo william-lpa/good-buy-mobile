@@ -105,7 +105,7 @@ namespace GoodBuy.ViewModels
             try
             {
                 VerifyNumberManualChange();
-                await PushAsync<ContactLoginPageViewModel>(false, new NamedParameter(nameof(profileUserContact), profileUserContact));
+                await PushAsync<ContactLoginPageViewModel>(false, null, new NamedParameter(nameof(profileUserContact), profileUserContact));
             }
             catch (Exception err)
             {

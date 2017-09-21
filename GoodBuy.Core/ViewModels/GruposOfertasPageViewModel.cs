@@ -2,6 +2,10 @@
 using GoodBuy.Service;
 using System.Collections.ObjectModel;
 using Xamarin.Forms;
+using System;
+using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace GoodBuy.ViewModels
 {
@@ -10,33 +14,38 @@ namespace GoodBuy.ViewModels
         private readonly AzureService azureService;
         private readonly GrupoOfertaService grupoOfertaService;
         public Command NovoGrupoCommand { get; }
-        public Command ListarParticipantesCommand { get; }
-        public Command SairGrupoCommand { get; }
-        public ObservableCollection<GrupoOferta> GruposOfertasUsuario { get; }
+        public Command EditGroupCommand { get; }
+        public ObservableCollection<GrupoOferta> GruposOfertasUsuario { get; private set; }
 
         public GruposOfertasPageViewModel(AzureService azureService, GrupoOfertaService service)
         {
             this.azureService = azureService;
             grupoOfertaService = service;
-            ListarParticipantesCommand = new Command(ExecuteExibirParticipantesGruposCommand);
             NovoGrupoCommand = new Command(ExecuteCriarNovoGrupoOferta);
-            SairGrupoCommand = new Command(ExecuteSairNovoGrupoOferta);
-            GruposOfertasUsuario = new ObservableCollection<GrupoOferta>(service.CarregarGrupoDeOfertasUsuarioLogado());
+            EditGroupCommand = new Command<GrupoOferta>(ExecuteEditarGroupoOfertas);
+            GruposOfertasUsuario = new ObservableCollection<GrupoOferta>();
         }
 
-        private void ExecuteSairNovoGrupoOferta()
+        private async void ExecuteEditarGroupoOfertas(GrupoOferta grupoOferta)
         {
-
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("ID", grupoOferta.Id);
+            await PushAsync<NovoGrupoOfertaPageViewModel>(false, parameters);
         }
 
-        private void ExecuteCriarNovoGrupoOferta()
+        protected async override void Init(Dictionary<string, string> parameters = null)
         {
-
+            GruposOfertasUsuario.Clear();
+            var grupos = await grupoOfertaService.CarregarGrupoDeOfertasUsuarioLogado();
+            foreach (var grupo in grupos)
+            {
+                GruposOfertasUsuario.Add(grupo);
+            }
         }
 
-        private void ExecuteExibirParticipantesGruposCommand()
+        private async void ExecuteCriarNovoGrupoOferta()
         {
-
+            await PushAsync<NovoGrupoOfertaPageViewModel>();
         }
     }
 }

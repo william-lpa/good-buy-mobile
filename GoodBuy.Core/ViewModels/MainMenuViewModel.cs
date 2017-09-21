@@ -21,7 +21,7 @@ namespace GoodBuy.ViewModels
         {
             get
             {
-                if (azure?.CurrentUser?.User.FacebookId != null)
+                if (azure?.CurrentUser?.User?.FacebookId != null)
                     return ImageSource.FromUri(new Uri(azure?.CurrentUser?.User?.Avatar));
 
                 if (azure?.CurrentUser?.User?.Avatar != null)

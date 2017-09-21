@@ -16,10 +16,19 @@ namespace GoodBuy.Models
         [JsonIgnore]
         public IEnumerable<ParticipanteGrupo> Participantes { get; set; }
 
+        [JsonIgnore]
+        public string Privacity => Private ? "Grupo Privado" : "Grupo Público";
+        [JsonIgnore]
+        public string PrivacityImageGroup => Private ? "lock.png" : "unlock.png";
+
         public GrupoOferta(string name, bool restrict)
         {
             Name = name;
             Private = restrict;
+        }
+        public GrupoOferta()
+        {
+
         }
 
     }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Xamarin.Forms;
@@ -26,8 +27,9 @@ namespace GoodBuy.ViewModels
             OnPropertyChanged(propertyName);
             return true;
         }
+        protected virtual void Init(Dictionary<string, string> parameters = null) { }
 
-        protected async Task PushAsync<TViewModel>(bool resetNavigation = false, params NamedParameter[] args) where TViewModel : BaseViewModel
+        protected async Task PushAsync<TViewModel>(bool resetNavigation = false, Dictionary<string, string> parameters = null, params NamedParameter[] args) where TViewModel : BaseViewModel
         {
             var viewmodelType = typeof(TViewModel);
             var viewModelTypeName = viewmodelType.Name;
@@ -40,12 +42,15 @@ namespace GoodBuy.ViewModels
             {
                 viewModel = scope.Resolve<TViewModel>(args);
             }
+
+            viewModel.Init(parameters);
+
             //var viewModel = Activator.CreateInstance(viewmodelType, args);
             if (page != null)
                 page.BindingContext = viewModel;
             if (resetNavigation)
             {
-                    await Application.Current.MainPage.Navigation.PopToRootAsync();
+                await Application.Current.MainPage.Navigation.PopToRootAsync();
                 Application.Current.MainPage = new NavigationPage(page);
             }
             else
@@ -54,7 +59,27 @@ namespace GoodBuy.ViewModels
         }
         protected async Task PopModalAsync() => await Application.Current.MainPage.Navigation.PopModalAsync(true);
 
-        protected async Task PopAsync() => await Application.Current.MainPage.Navigation.PopAsync(true);
+        protected async Task PopAsync<TViewModel>() where TViewModel : BaseViewModel
+        {
+             await Application.Current.MainPage.Navigation.PopAsync(true);
+            var lastPage = GetNavigation().NavigationStack.LastOrDefault();
+            (lastPage.BindingContext as TViewModel).Init();
+
+        }
+
+        private INavigation GetNavigation()
+        {
+            var mainPage = Application.Current.MainPage;
+
+            if (mainPage is MasterDetailPage)
+                return ((MasterDetailPage)mainPage).Detail.Navigation;
+
+            if (mainPage is TabbedPage)
+                return mainPage.Navigation;
+
+            return mainPage.Navigation;
+        }
+
 
         protected async Task PopToRootAsync() => await Application.Current.MainPage.Navigation.PopToRootAsync(true);
 

@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GoodBuy.Views.GruposOfertasPage"
+             xmlns:controls="clr-namespace:GoodBuy.Core.Controls"
              Title="Seus grupos de compartilhamento">
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -23,30 +24,30 @@
     </ContentPage.Resources>
     <ContentPage.Content>
         <StackLayout>
-            <SearchBar Text="dddd" Placeholder="Pesquisar grupos" />
+            <SearchBar Placeholder="Pesquisar grupos na rede de ofertas" />
             <Button Text="Novo Grupo" HorizontalOptions="EndAndExpand" Command="{Binding NovoGrupoCommand}" Style="{StaticResource novoGrupo}"/>
-            <ListView x:Name="lvwGruposUsuarios" ItemsSource="{Binding Path=GruposOfertasUsuario}" HasUnevenRows="True">
+            <controls:CustomListView  
+                x:Name="lvwGruposUsuarios"
+                ItemsSource="{Binding Path=GruposOfertasUsuario}"
+                HasUnevenRows="True"
+                ItemTappedCommand="{Binding EditGroupCommand}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <StackLayout Orientation="Horizontal" Spacing="20">
+                            <StackLayout Orientation="Horizontal" Spacing="15">
                                 <BoxView BackgroundColor="Gray" WidthRequest="60" HeightRequest="60" HorizontalOptions="Start" VerticalOptions="Center"/>
                                 <StackLayout Orientation="Vertical">
-                                    <Label Text="{Binding GroupName}" TextColor="#4e6cab" />
+                                    <Label Text="{Binding Name}" TextColor="#4e6cab" />
                                     <StackLayout Orientation="Horizontal">
-                                        <Label Text="Grupo privado"/>
-                                        <Image/>
-                                    </StackLayout>
-                                    <StackLayout Orientation="Horizontal" Spacing="30">
-                                        <Button Text="Participantes" Command="{Binding ListarParticipantesCommand}" HorizontalOptions="Start" Style="{StaticResource participantes}" />
-                                        <Button Text="Sair" Command="{Binding SairGrupoCommand}" HorizontalOptions="End" Style="{StaticResource participantes}" />
+                                        <Label Text="{Binding Privacity}"/>
+                                        <Image Source="{Binding PrivacityImageGroup}"/>
                                     </StackLayout>
                                 </StackLayout>
                             </StackLayout>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
-            </ListView>
+            </controls:CustomListView>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
