@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GoodBuy.Views.NovoGrupoOfertaPage"
-             HeightRequest="200"
+             xmlns:controls="clr-namespace:GoodBuy.Core.Controls"
              Title="Grupo de Oferta">
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -28,7 +28,7 @@
             </StackLayout>
             <Label Text="Localizar participantes por e-mail" HorizontalOptions="StartAndExpand" VerticalOptions="Center" Style="{StaticResource labelCadastro}"/>
             <StackLayout Orientation="Horizontal">
-                <SearchBar Placeholder="Localizar Participante" HorizontalOptions="Start" WidthRequest="280" />
+                <controls:CustomSearchBar Placeholder="Localizar Participante" HorizontalOptions="Start" WidthRequest="280" SearchCommand="{Binding SearchUser}" TextChangedCommand="{Binding  SearchUser}" />
                 <Button Text="Buscar contato na agenda" HorizontalOptions="CenterAndExpand" FontSize="Micro" BackgroundColor="LightGray" TextColor="Black" Command="{Binding SearchContact}"/>
             </StackLayout>
             <StackLayout Orientation="Horizontal">
@@ -36,7 +36,7 @@
                 <Button Text="Remover último participante adicionado" Command="{Binding RemoverUltimoParticipanteCommand}" FontAttributes="Italic, Bold" BackgroundColor="Transparent" TextColor="Red" FontSize="10" />
             </StackLayout>
         </StackLayout>
-        <ListView ItemsSource="{Binding Members}">
+        <ListView ItemsSource="{Binding Members}" >
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ImageCell Text="{Binding User.FullName}" Detail="{Binding User.UserDescription}" ImageSource="{Binding User.AvatarDisplay}" />

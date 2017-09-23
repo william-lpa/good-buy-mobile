@@ -72,6 +72,8 @@ namespace GoodBuy.Service
 
         public async Task<IList<OfertaDto>> ObterUltimasTresOfertasFromServer()
         {
+            if (azureService.CurrentUser?.User != null)
+                return null;
             List<Oferta> ofertas = new List<Oferta>();
             var idCarteiraProduto = new List<CarteiraProduto>();
             var idMarcas = new List<Marca>();

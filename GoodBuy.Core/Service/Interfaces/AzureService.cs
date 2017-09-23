@@ -28,6 +28,7 @@ namespace GoodBuy.Service
         public Dictionary<string, object> Tables { get; private set; }
         public LoginResultContent CurrentUser { get; private set; }
         public bool LoginIn { get; private set; }
+        public UserService UserService { get; set; }
 
         public AzureService() => Initialize();
 
@@ -60,16 +61,18 @@ namespace GoodBuy.Service
             }
         }
 
+        private void LoginUser(User user)
+        {
+            using (var scope = App.Container.BeginLifetimeScope())
+                UserService = scope.Resolve<UserService>();
+            UserService.LogarUsuario(user);
+        }
         private async Task CreateUser(User user, Task initializingSyncContext)
         {
             if (initializingSyncContext != null)
                 await initializingSyncContext;
-            var table = Client.GetSyncTable<User>();
-            if (await table.LookupAsync(CurrentUser.User.Id) == null)
-            {
-                await table.InsertAsync(CurrentUser.User);
-                await Client.SyncContext.PushAsync();
-            }
+
+            LoginUser(user);
         }
 
         private async Task LoginWithFacebookAsync(Task initializingSyncContext, IAuthentication auth, User profileUser)
@@ -169,7 +172,7 @@ namespace GoodBuy.Service
             Client.CurrentUser = RetrieveAzureTokenFromSecureStore("azure");
             if (Client.CurrentUser != null && !IsTokenExpired(Client.CurrentUser.MobileServiceAuthenticationToken))
             {
-                await Client.SyncContext.InitializeAsync(Store, new MobileServiceSyncHandler());                
+                await Client.SyncContext.InitializeAsync(Store, new MobileServiceSyncHandler());
                 CurrentUser = await RetrieveUserFromSecureStore("facebook");
             }
             else
@@ -177,6 +180,8 @@ namespace GoodBuy.Service
                 await Client.SyncContext.InitializeAsync(Store, new MobileServiceSyncHandler());
                 CurrentUser = await RetrieveUserFromSecureStore("localUser");
             }
+            if (CurrentUser != null)
+                LoginUser(CurrentUser.User);
 
             LoginIn = false;
         }

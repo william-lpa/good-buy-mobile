@@ -15,6 +15,7 @@ namespace GoodBuy.ViewModels
     {
         private readonly AzureService azureService;
         private readonly GrupoOfertaService grupoOfertaService;
+        private readonly UserService userService;
         public GenericRepository<User> UserRepository { get; }
         private string name;
         public string Name
@@ -31,21 +32,27 @@ namespace GoodBuy.ViewModels
         public Command SearchContact { get; }
         public Command RemoverUltimoParticipanteCommand { get; }
         public Command RemoverGrupoCommand { get; }
+        public Command SearchUser { get; }
         public ObservableCollection<ParticipanteGrupo> Members { get; }
         public bool EditingGroup { get; set; }
         public string PrimaryAction => EditingGroup ? "Salvar" : "Criar";
+        public ObservableCollection<ParticipanteGrupo> CachedList { get; private set; }
+
         private GrupoOferta editGrupoOferta;
 
-        public NovoGrupoOfertaPageViewModel(AzureService azureService, GrupoOfertaService service)
+        public NovoGrupoOfertaPageViewModel(AzureService azureService, GrupoOfertaService service, UserService userService)
         {
             this.azureService = azureService;
             grupoOfertaService = service;
+            this.userService = userService;
             UserRepository = new GenericRepository<User>(azureService);
             PersistGrupoOfertaCommand = new Command(SalvarGrupoUsuario, PodeCriarGrupoOferta);
             SearchContact = new Command(ExecuteOpenContactList);
             RemoverGrupoCommand = new Command(ExcluirGrupoOferta);
             RemoverUltimoParticipanteCommand = new Command(ExecuteRemoverUltimoParticipante);
+            SearchUser = new Command<string>(ExecuteSearchUser);
             Members = new ObservableCollection<ParticipanteGrupo>();
+            CachedList = new ObservableCollection<ParticipanteGrupo>();
         }
 
         private async void ExcluirGrupoOferta()
@@ -92,6 +99,33 @@ namespace GoodBuy.ViewModels
                 AdicionarParticipante(participante);
             }
         }
+
+        private async void ExecuteSearchUser(string expression)
+        {
+            if (expression?.Length == 1 && CachedList.Count == 0)
+            {
+                CachedList = new ObservableCollection<ParticipanteGrupo>(Members);
+            }
+            Members.Clear();
+
+            if (string.IsNullOrEmpty(expression))
+            {
+                foreach (var item in CachedList)
+                {
+                    Members.Add(item);
+                }
+                CachedList.Clear();
+                return;
+            }
+
+            var users = await userService.LocalizarUsuariosPesquisados(expression);
+            if (users != null)
+                foreach (var user in users)
+                {
+                    AdicionarParticipante(new ParticipanteGrupo(user.Id) { User = user });
+                }
+        }
+
 
         private void ExecuteRemoverUltimoParticipante()
         {

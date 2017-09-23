@@ -39,14 +39,13 @@ namespace GoodBuy.ViewModels
             set { SetProperty(ref phoneLabel, value); }
         }
 
-        public LoginPageViewModel(AzureService azure, OfertasService service)
+        public LoginPageViewModel(AzureService azure)
         {
             azureService = azure;
             UltimasOfertas = new ObservableCollection<OfertaDto>();
             FacebookLoginCommand = new Command(ExecuteFacebookLogin, CanExecuteLogin);
             ContactListLoginCommand = new Command(ExecuteLocalProfileLogin, CanExecuteLogin);
             ContactListCommand = new Command(ExecuteOpenContactList);
-            InitializeCollection(service);
         }
 
         private async void InitializeCollection(OfertasService service)
@@ -79,9 +78,11 @@ namespace GoodBuy.ViewModels
                 await this.PushAsync<MainMenuViewModel>(resetNavigation: true);
             else
             {
-
                 using (var scope = App.Container.BeginLifetimeScope())
+                {
                     ContactPicked(profileUserContact = scope.Resolve<IContactListService>().PickProfileUser());
+                    InitializeCollection(scope.Resolve<OfertasService>());
+                }
             }
         }
 

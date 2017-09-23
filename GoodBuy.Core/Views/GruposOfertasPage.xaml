@@ -24,7 +24,7 @@
     </ContentPage.Resources>
     <ContentPage.Content>
         <StackLayout>
-            <SearchBar Placeholder="Pesquisar grupos na rede de ofertas" />
+            <controls:CustomSearchBar x:Name="search" Placeholder="Pesquisar grupos na rede de ofertas" SearchCommand="{Binding SearchPublicGroup}" TextChangedCommand="{Binding  SearchPublicGroup}" />
             <Button Text="Novo Grupo" HorizontalOptions="EndAndExpand" Command="{Binding NovoGrupoCommand}" Style="{StaticResource novoGrupo}"/>
             <controls:CustomListView  
                 x:Name="lvwGruposUsuarios"

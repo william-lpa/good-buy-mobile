@@ -40,21 +40,30 @@ namespace GoodBuy.Service
         public async Task<bool> FirstUsage() => (await OfertaRepository.GetEntities(0, 1)).Count == 0;
 
 
-        public void SyncronizeFirstUse()
+        public async void SyncronizeFirstUse()
         {
-            Task.WaitAll(new Task[]
-            {
-                        Task.Run(() => OfertaRepository.SyncDataBase()),
-                        Task.Run(() => CarteiraProdutoRepository.SyncDataBase()),
-                        Task.Run(() => ProdutoRepository.SyncDataBase()),
-                        Task.Run(() => SaborRepository.SyncDataBase()),
-                        Task.Run(() => MarcaRepository.SyncDataBase()),
-                        Task.Run(() => EstabelecimentoRepository.SyncDataBase()),
-                        Task.Run(() => UnidadeMedidaRepository.SyncDataBase()),
-                        Task.Run(() => GrupoOfertaRepository.SyncDataBase()),
-                        Task.Run(() => ParticipanteGrupoRepository.SyncDataBase()),
-                        Task.Run(() => UserRepository.SyncDataBase()),
-            });
+            await SyncronizeData();
+        }
+        public async void Syncronize(DateTime fromDate)
+        {
+            await SyncronizeData(fromDate);
+        }
+
+        private async Task SyncronizeData(DateTime? date = null)
+        {
+            await Task.WhenAll(new Task[]
+           {
+                        Task.Run(() => OfertaRepository.SyncDataBase(date)),
+                        Task.Run(() => CarteiraProdutoRepository.SyncDataBase(date)),
+                        Task.Run(() => ProdutoRepository.SyncDataBase(date)),
+                        Task.Run(() => SaborRepository.SyncDataBase(date)),
+                        Task.Run(() => MarcaRepository.SyncDataBase(date)),
+                        Task.Run(() => EstabelecimentoRepository.SyncDataBase(date)),
+                        Task.Run(() => UnidadeMedidaRepository.SyncDataBase(date)),
+                        Task.Run(() => GrupoOfertaRepository.SyncDataBase(date)),
+                        Task.Run(() => ParticipanteGrupoRepository.SyncDataBase(date)),
+                        Task.Run(() => UserRepository.SyncDataBase(date)),
+           });
         }
     }
 }

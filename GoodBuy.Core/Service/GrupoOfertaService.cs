@@ -25,10 +25,27 @@ namespace GoodBuy.Service
         }
         public async Task<IEnumerable<GrupoOferta>> CarregarGrupoDeOfertasUsuarioLogado()
         {
-            Task.WaitAll(new Task[] { Task.Run(() => participantesRepository.SyncDataBase()), Task.Run(() => participantesRepository.SyncDataBase()) });
             Dictionary<string, GrupoOferta> grupos = (await grupoRepository.GetEntities()).ToDictionary(key => key.Id, value => value);
             var retorno = (await participantesRepository.GetEntities()).Where(x => x.IdUser == azureService.CurrentUser.User.Id).Select(x => grupos[x.IdGrupoOferta]).OrderBy(x => x.Name);
             return retorno.ToArray();
+        }
+        public async Task<IEnumerable<GrupoOferta>> CarregarGrupoDeOfertasUsuarioLogadoSync(IEnumerable<string> localResult = null)
+        {
+            var date = azureService.CurrentUser.User.UpdatedAt;
+            await Task.WhenAll(new Task[] { Task.Run(() => participantesRepository.SyncDataBase(date)), Task.Run(() => participantesRepository.SyncDataBase(date)) });
+
+            var newResult = await CarregarGrupoDeOfertasUsuarioLogado();
+            if (newResult.Count() > localResult.Count())
+            {
+                return newResult.Where(x => !localResult.Contains(x.Id)).ToList();
+            }
+            return null;
+        }
+
+
+        public async Task<IEnumerable<GrupoOferta>> LocalizarGruposOfertaPublicos(string searchTerm)
+        {
+            return await grupoRepository.SyncTableModel.Where(x => !x.Private && x.Name.ToLower().Contains(searchTerm.ToLower())).ToListAsync();
         }
 
         public async Task CadastrarNovoGrupoUsuario(GrupoOferta grupoOferta)

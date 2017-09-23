@@ -36,6 +36,7 @@ namespace GoodBuy
             container.RegisterType<NovoGrupoOfertaPageViewModel>();
             container.RegisterType<GrupoOfertaService>().SingleInstance();
             container.RegisterType<OfertasService>().SingleInstance();
+            container.RegisterType<UserService>().SingleInstance();
             container.RegisterType<SyncronizedAccessService>().SingleInstance();
             container.RegisterType<GenericRepository<Model.IEntity>>();
             return container;
