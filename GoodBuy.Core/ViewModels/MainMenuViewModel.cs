@@ -52,7 +52,6 @@ namespace GoodBuy.ViewModels
                 syncronizeAccessService.SyncronizeFirstUse();
                 await PopModalAsync();
             }
-
         }
 
         private async void ExecuteListarGrupoOfertas()

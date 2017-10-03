@@ -11,12 +11,12 @@ namespace GoodBuy.Service
     {
         private readonly IGenericRepository<User> userRepository;
         private readonly AzureService azureService;
-
-        public UserService(AzureService azureService, SyncronizedAccessService syncronizedAccessService)
+        public bool FirstUsage { get; set; }
+        public UserService(AzureService azureService)//, SyncronizedAccessService syncronizedAccessService)
         {
             this.azureService = azureService;
-            userRepository = syncronizedAccessService.UserRepository;
-            userRepository.SyncDataBase();
+            //FirstUsage = syncronizedAccessService.FirstUsage().Result;
+            userRepository = new GenericRepository<User>(azureService);
         }
 
         public async Task<IEnumerable<User>> LocalizarUsuariosPesquisados(string searchTerm)
@@ -37,16 +37,12 @@ namespace GoodBuy.Service
         {
             var existingUser = await userRepository.GetById(user.Id);
             if (existingUser == null)
-            {
                 await userRepository.CreateEntity(user);
-                using (var scope = App.Container.BeginLifetimeScope())
-                    scope.Resolve<SyncronizedAccessService>().SyncronizeFirstUse();
-            }
             else
             {
+                await userRepository.UpdateEntity(existingUser);
                 using (var scope = App.Container.BeginLifetimeScope())
-                    scope.Resolve<SyncronizedAccessService>().Syncronize(user.UpdatedAt);
-                await userRepository.UpdateEntity(user);
+                    scope.Resolve<SyncronizedAccessService>().Syncronize(existingUser.UpdatedAt);
             }
         }
     }

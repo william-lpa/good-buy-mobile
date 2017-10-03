@@ -237,7 +237,9 @@
     <Compile Include="Authentication\FacebookApi.cs" />
     <Compile Include="Authentication\SocialAuthentication.cs" />
     <Compile Include="ContactList\ContactList.cs" />
-    <Compile Include="GmcService.cs" />
+    <Compile Include="CustomRenders\AutoCompleteEntryRenderer.cs" />
+    <Compile Include="Push\DeviceInstallation.cs" />
+    <Compile Include="Push\GmcService.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

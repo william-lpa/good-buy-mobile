@@ -50,9 +50,14 @@ namespace GoodBuy.ViewModels
 
         private async void InitializeCollection(OfertasService service)
         {
-            foreach (var item in await service.ObterUltimasTresOfertasFromServer())
+            var ofertas = await service.ObterUltimasTresOfertasFromServer();
+
+            if (ofertas != null)
             {
-                UltimasOfertas.Add(item);
+                foreach (var item in ofertas)
+                {
+                    UltimasOfertas.Add(item);
+                }
             }
         }
 

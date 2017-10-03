@@ -10,7 +10,6 @@ namespace goodBuy.Droid
 {
     public class SocialAuthentication : IAuthentication
     {
-        private static AccountStore storeAccount;
         public bool SignIn { get; set; }
         public LoginResultContent LoginResult { get; set; }
 
@@ -52,6 +51,12 @@ namespace goodBuy.Droid
             //}
         }
 
+        public void RegisterForPushNotificaton(MobileServiceClient client)
+        {
+            GcmService.Client = client;
+            Gcm.Client.GcmClient.Register(MainActivity.CurrentActivity, PushHandlerBroadcastReceiver.SENDER_IDS);
+        }
+
         public async Task<MobileServiceUser> LoginAzureAsync(MobileServiceClient client, MobileServiceAuthenticationProvider provider)
         {
             var zumoPayload = new Newtonsoft.Json.Linq.JObject()
@@ -59,8 +64,7 @@ namespace goodBuy.Droid
                 ["access_token"] = LoginResult.Token
             };
             var user = await client.LoginAsync(provider, zumoPayload);
-            GcmService.Client = client;
-            Gcm.Client.GcmClient.Register(MainActivity.CurrentActivity, PushHandlerBroadcastReceiver.SENDER_IDS);
+            RegisterForPushNotificaton(client);
             return user;
         }
     }

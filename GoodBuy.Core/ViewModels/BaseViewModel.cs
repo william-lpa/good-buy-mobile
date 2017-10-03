@@ -61,10 +61,16 @@ namespace GoodBuy.ViewModels
 
         protected async Task PopAsync<TViewModel>() where TViewModel : BaseViewModel
         {
-             await Application.Current.MainPage.Navigation.PopAsync(true);
-            var lastPage = GetNavigation().NavigationStack.LastOrDefault();
-            (lastPage.BindingContext as TViewModel).Init();
-
+            try
+            {
+                await Application.Current.MainPage.Navigation.PopAsync(true);
+                var lastPage = GetNavigation().NavigationStack.LastOrDefault();
+                (lastPage.BindingContext as TViewModel).Init();
+            }
+            catch (Exception err)
+            {
+                Log.Log.Instance.AddLog(err);
+            }
         }
 
         private INavigation GetNavigation()

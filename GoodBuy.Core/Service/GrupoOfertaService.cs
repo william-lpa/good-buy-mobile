@@ -32,7 +32,8 @@ namespace GoodBuy.Service
         public async Task<IEnumerable<GrupoOferta>> CarregarGrupoDeOfertasUsuarioLogadoSync(IEnumerable<string> localResult = null)
         {
             var date = azureService.CurrentUser.User.UpdatedAt;
-            await Task.WhenAll(new Task[] { Task.Run(() => participantesRepository.SyncDataBase(date)), Task.Run(() => participantesRepository.SyncDataBase(date)) });
+            await participantesRepository.SyncDataBase(date);
+            await grupoRepository.SyncDataBase(date);
 
             var newResult = await CarregarGrupoDeOfertasUsuarioLogado();
             if (newResult.Count() > localResult.Count())
@@ -48,13 +49,15 @@ namespace GoodBuy.Service
             return await grupoRepository.SyncTableModel.Where(x => !x.Private && x.Name.ToLower().Contains(searchTerm.ToLower())).ToListAsync();
         }
 
-        public async Task CadastrarNovoGrupoUsuario(GrupoOferta grupoOferta)
+        public async Task CadastrarNovoGrupoUsuario(GrupoOferta grupoOferta, List<ParticipanteGrupo> participantes)
         {
             var idOferta = await grupoRepository.CreateEntity(grupoOferta, true);
-            foreach (var participante in grupoOferta?.Participantes)
+            foreach (var participante in participantes)
             {
-                participante.IdGrupoOferta = idOferta;//confirmar
-                await participantesRepository.CreateEntity(participante);
+                var participanteNovo = new ParticipanteGrupo(participante.IdUser);
+                participanteNovo.IdGrupoOferta = idOferta;
+                participanteNovo.NomeGrupo = grupoOferta.Name;
+                await participantesRepository.CreateEntity(participanteNovo);
             }
         }
 
@@ -67,6 +70,7 @@ namespace GoodBuy.Service
                 if (participante.IdGrupoOferta == null) //novo participante
                 {
                     participante.IdGrupoOferta = grupoOferta.Id;
+                    participante.NomeGrupo = grupoOferta.Name;
                     await participantesRepository.CreateEntity(participante);
                 }
             }
@@ -81,8 +85,14 @@ namespace GoodBuy.Service
 
             foreach (var participante in grupoOferta?.Participantes)
             {
-                await participantesRepository.SyncTableModel.DeleteAsync(participante);
+                participante.Delete = true;
+                await participantesRepository.UpdateEntity(participante); //notify ser and delete on server         
             }
+            grupoOferta.Delete = true;
+            await grupoRepository.UpdateEntity(grupoOferta);
+            await grupoRepository.SyncDataBase();
+
+            grupoOferta?.Participantes.ToList().ForEach(async x => await participantesRepository.DeleteEntity(x));
             await grupoRepository.DeleteEntity(grupoOferta);
         }
 
@@ -97,6 +107,15 @@ namespace GoodBuy.Service
             participantes.ForEach(async x => x.User = await userRepository.GetById(x.IdUser));
             return participantes;
 
+        }
+
+        internal async Task ExcluirParticipanteGrupoOferta(ParticipanteGrupo membro)
+        {
+            membro.Delete = true;
+            await participantesRepository.UpdateEntity(membro); //notify ser and delete on server            
+            await participantesRepository.SyncDataBase();
+            await participantesRepository.DeleteEntity(membro);
+            await participantesRepository.SyncDataBase();
         }
     }
 }

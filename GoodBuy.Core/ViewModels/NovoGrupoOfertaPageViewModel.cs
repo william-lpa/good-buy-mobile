@@ -8,6 +8,7 @@ using Autofac;
 using GoodBuy.Log;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.WindowsAzure.MobileServices;
 
 namespace GoodBuy.ViewModels
 {
@@ -30,15 +31,21 @@ namespace GoodBuy.ViewModels
         public bool Private { get; set; }
         public Command PersistGrupoOfertaCommand { get; }
         public Command SearchContact { get; }
-        public Command RemoverUltimoParticipanteCommand { get; }
+        public Command RemoverParticipanteSelecionadoCommand { get; }
         public Command RemoverGrupoCommand { get; }
         public Command SearchUser { get; }
+        public Command InteractGrupoOfertaCommand { get; }
+        public Command UserSelectedCommand { get; }
+
         public ObservableCollection<ParticipanteGrupo> Members { get; }
         public bool EditingGroup { get; set; }
         public string PrimaryAction => EditingGroup ? "Salvar" : "Criar";
+
+        public string SecondaryAction => UsuarioLogadoPertenceAoGrupo ? "Sair" : "Participar";
         public ObservableCollection<ParticipanteGrupo> CachedList { get; private set; }
 
         private GrupoOferta editGrupoOferta;
+        private ParticipanteGrupo participanteGrupoOferta;
 
         public NovoGrupoOfertaPageViewModel(AzureService azureService, GrupoOfertaService service, UserService userService)
         {
@@ -47,12 +54,54 @@ namespace GoodBuy.ViewModels
             this.userService = userService;
             UserRepository = new GenericRepository<User>(azureService);
             PersistGrupoOfertaCommand = new Command(SalvarGrupoUsuario, PodeCriarGrupoOferta);
+            InteractGrupoOfertaCommand = new Command(ExecutePermanenciaGrupo, PodeInteragirGrupoOferta);
             SearchContact = new Command(ExecuteOpenContactList);
-            RemoverGrupoCommand = new Command(ExcluirGrupoOferta);
-            RemoverUltimoParticipanteCommand = new Command(ExecuteRemoverUltimoParticipante);
+            RemoverGrupoCommand = new Command(ExcluirGrupoOferta, PodeCriarGrupoOferta);
+            RemoverParticipanteSelecionadoCommand = new Command(ExecuteRemoverParticipanteSelecionado, PodeExcluirParticipante);
+            UserSelectedCommand = new Command<ParticipanteGrupo>(ExecuteStoreParticipante);
             SearchUser = new Command<string>(ExecuteSearchUser);
             Members = new ObservableCollection<ParticipanteGrupo>();
             CachedList = new ObservableCollection<ParticipanteGrupo>();
+        }
+
+
+        private void ExecuteStoreParticipante(ParticipanteGrupo participante)
+        {
+            this.participanteGrupoOferta = participante;
+            RemoverParticipanteSelecionadoCommand.ChangeCanExecute();
+        }
+
+        private async void ExecutePermanenciaGrupo()
+        {
+            if (UsuarioLogadoPertenceAoGrupo)
+            {
+                if (await MessageDisplayer.Instance.ShowAsk("Deixar o grupo de oferta", $"Você tem certeza que deseja sair do grupo {editGrupoOferta.Name} ?", "Sim", "Não"))
+                {
+                    var membro = Members.First(x => x.IdUser == azureService.CurrentUser.User.Id);
+                    Members.Remove(membro);
+                    await grupoOfertaService.ExcluirParticipanteGrupoOferta(membro);
+                    AtualizarStatus();
+                }
+            }
+            else
+            {
+                if (await MessageDisplayer.Instance.ShowAsk("Participar do grupo de oferta", $"Você tem certeza que deseja participar do grupo {editGrupoOferta.Name} ?", "Sim", "Não"))
+                {
+                    var user = azureService.CurrentUser.User;
+                    AdicionarParticipante(new ParticipanteGrupo(user.Id) { User = user });
+                    SalvarEdicao();
+                    AtualizarStatus();
+                }
+            }
+        }
+
+        private void AtualizarStatus()
+        {
+            PersistGrupoOfertaCommand.ChangeCanExecute();
+            InteractGrupoOfertaCommand.ChangeCanExecute();
+            RemoverGrupoCommand.ChangeCanExecute();
+            RemoverParticipanteSelecionadoCommand.ChangeCanExecute();
+            OnPropertyChanged(nameof(SecondaryAction));
         }
 
         private async void ExcluirGrupoOferta()
@@ -92,16 +141,21 @@ namespace GoodBuy.ViewModels
         {
             Name = editGrupoOferta.Name;
             Private = editGrupoOferta.Private;
-            IEnumerable<ParticipanteGrupo> participantes = await grupoOfertaService.CarregarParticipantesPorIdGrupoOferta(editGrupoOferta.Id);
+            editGrupoOferta.Participantes = await grupoOfertaService.CarregarParticipantesPorIdGrupoOferta(editGrupoOferta.Id);
 
-            foreach (var participante in participantes)
+            foreach (var participante in editGrupoOferta.Participantes)
             {
+                participante.NomeGrupo = Name;
                 AdicionarParticipante(participante);
             }
+            AtualizarStatus();
         }
 
         private async void ExecuteSearchUser(string expression)
         {
+            if (expression == null)
+                return;
+
             if (expression?.Length == 1 && CachedList.Count == 0)
             {
                 CachedList = new ObservableCollection<ParticipanteGrupo>(Members);
@@ -127,10 +181,15 @@ namespace GoodBuy.ViewModels
         }
 
 
-        private void ExecuteRemoverUltimoParticipante()
+        private async void ExecuteRemoverParticipanteSelecionado()
         {
-            if (Members.Count > 1)
-                this.Members.RemoveAt(Members.Count - 1);
+            if (Members.Count >= 1)
+            {
+                Members.Remove(participanteGrupoOferta);
+                await grupoOfertaService.ExcluirParticipanteGrupoOferta(participanteGrupoOferta);
+                participanteGrupoOferta = null;
+                AtualizarStatus();
+            }
         }
 
         private void ExecuteOpenContactList()
@@ -152,26 +211,45 @@ namespace GoodBuy.ViewModels
         private void AdicionarParticipante(ParticipanteGrupo participante)
         {
             if (Members.FirstOrDefault(x => participante.IdUser == x.IdUser) == null)
+            {
+                participante.NomeGrupo = Name;
                 Members.Add(participante);
+            }
             PersistGrupoOfertaCommand.ChangeCanExecute();
+        }
+
+        public async void SalvarEdicao()
+        {
+            if (editGrupoOferta.Name != Name || editGrupoOferta.Participantes.Count() != Members.Count || editGrupoOferta.Private != Private)
+                await grupoOfertaService.AtualizarNovoGrupoUsuario(TransformEditGrupoOferta());
         }
 
         private async void SalvarGrupoUsuario()
         {
             if (EditingGroup)
             {
-                await grupoOfertaService.AtualizarNovoGrupoUsuario(TransformEditGrupoOferta());
+                SalvarEdicao();
             }
             else
             {
                 var oferta = new GrupoOferta(Name, Private);
-                oferta.Participantes = Members;
-                await grupoOfertaService.CadastrarNovoGrupoUsuario(oferta);
+                await grupoOfertaService.CadastrarNovoGrupoUsuario(oferta, Members.ToList());
             }
             await PopAsync<GruposOfertasPageViewModel>();
         }
 
-        private bool PodeCriarGrupoOferta() => !string.IsNullOrWhiteSpace(Name) && Members.Count > 0; //alterar pra 1 dps
+        public bool UsuarioLogadoPertenceAoGrupo => Members.Select(x => x.IdUser).Contains(azureService.CurrentUser.User.Id);
 
+        private bool PodeInteragirGrupoOferta() => EditingGroup;
+
+        private bool PodeExcluirParticipante() => PodeInteragirGrupoOferta() && UsuarioLogadoPertenceAoGrupo && participanteGrupoOferta != null && CachedList?.Count == 0;
+
+        private bool PodeCriarGrupoOferta()
+        {
+            if (EditingGroup)
+                return UsuarioLogadoPertenceAoGrupo;
+            else
+                return !string.IsNullOrWhiteSpace(Name) && Members.Count > 0; //alterar pra 1 dps
+        }
     }
 }

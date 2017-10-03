@@ -1,11 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:GoodBuy.Core.Controls"
              x:Class="GoodBuy.Views.NovaOferta"
              >
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="label" TargetType="Label">
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="TextColor" Value="#4e6cab"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <ContentPage.Content>
         <StackLayout>
-            <Entry x:Name="produto" Placeholder="Nome do Produto" Text="{Binding Produto}"/>
+            <Label Text="Nome do Produto" Style="{StaticResource label}"/>
+            <controls:AutoComplete Placeholder="Suco Integral" Text="{Binding Produto}" ItemsSource="{Binding Produtos}" />
             <StackLayout Orientation="Horizontal">
                 <Label Text="Variações no sabor?" />
                 <Switch  IsToggled="false" Toggled="Switch_Toggled" />

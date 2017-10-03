@@ -53,16 +53,16 @@ namespace GoodBuy.Service
         {
             await Task.WhenAll(new Task[]
            {
-                        Task.Run(() => OfertaRepository.SyncDataBase(date)),
-                        Task.Run(() => CarteiraProdutoRepository.SyncDataBase(date)),
-                        Task.Run(() => ProdutoRepository.SyncDataBase(date)),
-                        Task.Run(() => SaborRepository.SyncDataBase(date)),
-                        Task.Run(() => MarcaRepository.SyncDataBase(date)),
-                        Task.Run(() => EstabelecimentoRepository.SyncDataBase(date)),
-                        Task.Run(() => UnidadeMedidaRepository.SyncDataBase(date)),
-                        Task.Run(() => GrupoOfertaRepository.SyncDataBase(date)),
-                        Task.Run(() => ParticipanteGrupoRepository.SyncDataBase(date)),
-                        Task.Run(() => UserRepository.SyncDataBase(date)),
+                     Task.Run(() => OfertaRepository.SyncDataBase(date)),
+                     Task.Run(() => CarteiraProdutoRepository.SyncDataBase(date)),
+                     Task.Run(() => ProdutoRepository.SyncDataBase(date)),
+                     Task.Run(() => SaborRepository.SyncDataBase(date)),
+                     Task.Run(() => MarcaRepository.SyncDataBase(date)),
+                     Task.Run(() => EstabelecimentoRepository.SyncDataBase(date)),
+                     Task.Run(() => UnidadeMedidaRepository.SyncDataBase(date)),
+                     Task.Run(() => GrupoOfertaRepository.SyncDataBase(date)),
+                     Task.Run(() => ParticipanteGrupoRepository.SyncDataBase(date)),
+                     Task.Run(() => UserRepository.SyncDataBase(date)),
            });
         }
     }

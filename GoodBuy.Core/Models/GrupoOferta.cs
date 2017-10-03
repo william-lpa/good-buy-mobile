@@ -21,6 +21,9 @@ namespace GoodBuy.Models
         [JsonIgnore]
         public string PrivacityImageGroup => Private ? "lock.png" : "unlock.png";
 
+        [JsonProperty("delete")]
+        public bool Delete { get; set; }
+
         public GrupoOferta(string name, bool restrict)
         {
             Name = name;

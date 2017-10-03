@@ -9,6 +9,7 @@ namespace GoodBuy.Model
     public abstract class BaseEntity : IEntity
     {
         [Version]
+        [JsonProperty("version")]
         public string Version { get; set; }
 
         [JsonProperty("id")]

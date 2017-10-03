@@ -18,7 +18,7 @@ namespace GoodBuy.Service
         public IDictionary<string, TModel> Cache { get; }
         private const int MINUTES_TO_REFRESH = 10;
         private DateTime LastRefresh;
-        public static bool IsFetching { get; private set; }
+        public static object pushing = new object();
 
         public GenericRepository(AzureService azureService)
         {
@@ -31,7 +31,7 @@ namespace GoodBuy.Service
         {
             try
             {
-                entidade.Id = Guid.NewGuid().ToString();
+                entidade.Id = entidade.Id ?? Guid.NewGuid().ToString();
                 await SyncTableModel.InsertAsync(entidade);
                 Cache.Add(entidade.Id, entidade);
                 await NeedsRefresh();
@@ -118,7 +118,11 @@ namespace GoodBuy.Service
         {
             try
             {
-                await Client.SyncContext.PushAsync();
+                lock (pushing)
+                {
+                    Task.Run(() => Client.SyncContext.PushAsync());
+                }
+
                 if (createdOrChangedAfter != null)
                     await SyncTableModel.PullAsync(typeof(TModel).Name, SyncTableModel.Where(x => x.UpdatedAt >= createdOrChangedAfter));
                 else

@@ -11,11 +11,15 @@ namespace GoodBuy.Models.Many_to_Many
         public GrupoOferta GrupoOferta { get; set; }
         [JsonProperty("idGrupoOferta")]
         public string IdGrupoOferta { get; set; }
-
         [JsonIgnore]
         public User User { get; set; }
         [JsonProperty("idUser")]
         public string IdUser { get; set; }
+        [JsonProperty("nomeGrupo")]
+        public string NomeGrupo { get; set; }
+        [JsonProperty("delete")]
+        public bool Delete { get; set; }
+
         public ParticipanteGrupo(string idUser)
         {
             IdUser = idUser;

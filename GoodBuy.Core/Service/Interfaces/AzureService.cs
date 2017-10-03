@@ -151,9 +151,10 @@ namespace GoodBuy.Service
         {
             try
             {
-                //RemoveTokenFromSecureStore();
-                Client = new MobileServiceClient(appURL, new ExpiredAzureRequestInterceptors(this));
-                var dbName = "goodBuy71.db";
+                RemoveTokenFromSecureStore();
+                //Client = new MobileServiceClient(appURL, new ExpiredAzureRequestInterceptors(this));
+                Client = new MobileServiceClient(appURL);
+                var dbName = "goodBuy179.db";
                 Store = new MobileServiceSQLiteStore(Path.Combine(MobileServiceClient.DefaultDatabasePath, dbName));
                 DefineTables(Store);
 
@@ -181,7 +182,11 @@ namespace GoodBuy.Service
                 CurrentUser = await RetrieveUserFromSecureStore("localUser");
             }
             if (CurrentUser != null)
+            {
+                using (var scope = App.Container.BeginLifetimeScope())
+                   // scope.Resolve<IAuthentication>().RegisterForPushNotificaton(Client);
                 LoginUser(CurrentUser.User);
+            }
 
             LoginIn = false;
         }

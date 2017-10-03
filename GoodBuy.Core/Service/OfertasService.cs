@@ -85,32 +85,35 @@ namespace GoodBuy.Service
             try
             {
                 ofertas = await azureService.Client.GetTable<Oferta>().OrderByDescending(x => x.UpdatedAt).Take(3).ToListAsync();
-                Task.WaitAll(
-                Task.Run(async () => idCarteiraProduto = await azureService.Client.GetTable<CarteiraProduto>().Where(x => x.Id == ofertas[0].IdCarteiraProduto || x.Id == ofertas[1].IdCarteiraProduto || x.Id == ofertas[2].IdCarteiraProduto).ToListAsync()),
-                Task.Run(async () => idMarcas = await azureService.Client.GetTable<Marca>().ToListAsync()),
-                Task.Run(async () => idProdutos = await azureService.Client.GetTable<Produto>().ToListAsync())
-                );
+                if (ofertas.Count > 0)
+                {
+                    Task.WaitAll(
+                    Task.Run(async () => idCarteiraProduto = await azureService.Client.GetTable<CarteiraProduto>().Where(x => x.Id == ofertas[0].IdCarteiraProduto || x.Id == ofertas[1].IdCarteiraProduto || x.Id == ofertas[2].IdCarteiraProduto).ToListAsync()),
+                    Task.Run(async () => idMarcas = await azureService.Client.GetTable<Marca>().ToListAsync()),
+                    Task.Run(async () => idProdutos = await azureService.Client.GetTable<Produto>().ToListAsync())
+                    );
 
-                Task.Run(async () => idSabor = await azureService.Client.GetTable<Sabor>().ToListAsync()).Wait();
-                Task.Run(async () => idUnidadeMedida = await azureService.Client.GetTable<UnidadeMedida>().ToListAsync()).Wait();
-                Task.Run(async () => idEstabelecimento = await azureService.Client.GetTable<Estabelecimento>().ToListAsync()).Wait();
+                    Task.Run(async () => idSabor = await azureService.Client.GetTable<Sabor>().ToListAsync()).Wait();
+                    Task.Run(async () => idUnidadeMedida = await azureService.Client.GetTable<UnidadeMedida>().ToListAsync()).Wait();
+                    Task.Run(async () => idEstabelecimento = await azureService.Client.GetTable<Estabelecimento>().ToListAsync()).Wait();
+                     
+                    var retorno = (ofertas.Select(oferta =>
+                    {
+                        var carteiraProduto = idCarteiraProduto.Find(x => x.Id == oferta.IdCarteiraProduto);
+                        var produto = idProdutos.Find(x => x.Id == carteiraProduto.IdProduto);
 
+                        return new OfertaDto(idEstabelecimento.Find(x => x.Id == oferta.IdEstabelecimento), oferta, produto,
+                                             idUnidadeMedida.Find(x => x.Id == produto.IdUnidadeMedida), idSabor.Find(x => x.Id == produto.IdSabor),
+                                             idMarcas.Find(x => x.Id == carteiraProduto.IdMarca), this);
+                    })).ToList();
+                    return retorno;
+                }
             }
-            catch (Exception)
+            catch (Exception err)
             {
+                Log.Log.Instance.AddLog("Não há ofertas até o momento");
             }
-
-            var retorno = (ofertas.Select(oferta =>
-            {
-                var carteiraProduto = idCarteiraProduto.Find(x => x.Id == oferta.IdCarteiraProduto);
-                var produto = idProdutos.Find(x => x.Id == carteiraProduto.IdProduto);
-
-                return new OfertaDto(idEstabelecimento.Find(x => x.Id == oferta.IdEstabelecimento), oferta, produto,
-                                     idUnidadeMedida.Find(x => x.Id == produto.IdUnidadeMedida), idSabor.Find(x => x.Id == produto.IdSabor),
-                                     idMarcas.Find(x => x.Id == carteiraProduto.IdMarca), this);
-            })).ToList();
-
-            return retorno;
+            return null;
         }
 
         public async Task<IList<OfertaDto>> ObterOfertas(int count = 500)

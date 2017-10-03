@@ -21,7 +21,7 @@ namespace GoodBuy.Models.Many_to_Many
 
         [JsonProperty("precoAtual")]
         public decimal PrecoAtual { get; set; }
-        
+
         [JsonProperty("likes")]
         public float Likes { get; set; }
         [JsonProperty("avaliacoes")]
@@ -32,6 +32,8 @@ namespace GoodBuy.Models.Many_to_Many
 
         public Oferta(string idEstabelecimento, string idCarteira, decimal preco)
         {
+            Likes = 1;
+            Avaliacoes = 1;
             IdEstabelecimento = idEstabelecimento;
             IdCarteiraProduto = idCarteira;
             PrecoAtual = preco;

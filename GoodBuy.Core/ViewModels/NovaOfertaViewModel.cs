@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using GoodBuy.Model;
 using GoodBuy.Models.Many_to_Many;
+using System.Collections.Generic;
 
 namespace GoodBuy.ViewModels
 {
@@ -22,6 +23,7 @@ namespace GoodBuy.ViewModels
         private string categoria;
         private string estabelecimento;
         private decimal preco;
+        public List<string> Produtos { get; set; }
 
         public string Produto
         {
@@ -69,7 +71,14 @@ namespace GoodBuy.ViewModels
         {
             this.azure = azure;
             CadastrarOfertaCommand = new Command(ExecuteCadastroOferta, VerificarCamposObrigatorios);
+            CarregarProdutos();
             new Action(async () => await UpdateOfertasAsync()).Invoke();
+        }
+
+        private async void CarregarProdutos()
+        {
+            //Produtos = new List<string>() { "Arroz", "Feijão", "Couve" };
+            Produtos = new List<string>((await new GenericRepository<Produto>(azure).GetEntities()).Select(x => x.Nome));
         }
 
         private async Task UpdateOfertasAsync()
@@ -98,6 +107,13 @@ namespace GoodBuy.ViewModels
         {
             try
             {
+                var produtosCArteiras = await azure.GetTable<CarteiraProduto>().ToListAsync();
+                var estabelecimentos = await azure.GetTable<Estabelecimento>().ToListAsync();
+                await CriarOferta(produtosCArteiras.First().Id, estabelecimentos.First().Id);
+                //await CriarOferta(idCarteiraProduto, idEstabelecimento);
+                await PopModalAsync();
+                return;
+
                 var idSabor = await CriarSabor();
                 var idUnidadeMedida = await CriarUnidadeMedida();
                 var idCategoria = await CriarCategoria();
@@ -105,8 +121,7 @@ namespace GoodBuy.ViewModels
                 var idProduto = await CriarProduto(idSabor, idUnidadeMedida, idCategoria);
                 var idEstabelecimento = await CriarEstabelecimento();
                 var idCarteiraProduto = await CriarCarteiraProduto(idProduto, idMarca);
-                await CriarOferta(idCarteiraProduto, idEstabelecimento);
-                await PopModalAsync();
+
             }
             catch (Exception err)
             {
@@ -117,31 +132,38 @@ namespace GoodBuy.ViewModels
         private async Task CriarOferta(string idCarteira, string idEstabelecimento)
         {
             var repository = await GetEntityService<Oferta>();
-            if (idCarteira == null || Preco < 1)
-                return;
 
-            if (Estabelecimento != null)
-            {
-                var ofertaExistente = (await repository.SyncTableModel
-                                    .Where(x => x.IdCarteiraProduto == idCarteira && x.IdEstabelecimento == idEstabelecimento)
-                                    //.OrderByDescending( x => x.)dataCriacao azure;
-                                    .Select(x => x).ToEnumerableAsync()).FirstOrDefault();
-                if (ofertaExistente != null)
-                {
-                    if (ofertaExistente.PrecoAtual == Preco) { } //aplicar um "like"
-                    else
-                    {
-                        var historico = (await GetEntityService<HistoricoOferta>()).CreateEntity(new HistoricoOferta(ofertaExistente));
-                        //ofertaExistente.datacreatedOnAzure = DateTime.Now;
-                        ofertaExistente.PrecoAtual = preco;
-                        await repository?.UpdateEntity(ofertaExistente);
-                    }
-                }
-                else
-                    await repository?.CreateEntity(new Oferta(idEstabelecimento, idCarteira, Preco));
+            Preco = 1.99M;
 
-                await repository.SyncDataBase();
-            }
+            await repository?.CreateEntity(new Oferta(idEstabelecimento, idCarteira, Preco));
+
+            await repository.SyncDataBase();
+            //var repository = await GetEntityService<Oferta>();
+            //if (idCarteira == null || Preco < 1)
+            //    return;
+
+            //if (Estabelecimento != null)
+            //{
+            //    var ofertaExistente = (await repository.SyncTableModel
+            //                        .Where(x => x.IdCarteiraProduto == idCarteira && x.IdEstabelecimento == idEstabelecimento)
+            //                        //.OrderByDescending( x => x.)dataCriacao azure;
+            //                        .Select(x => x).ToEnumerableAsync()).FirstOrDefault();
+            //    if (ofertaExistente != null)
+            //    {
+            //        if (ofertaExistente.PrecoAtual == Preco) { } //aplicar um "like"
+            //        else
+            //        {
+            //            var historico = (await GetEntityService<HistoricoOferta>()).CreateEntity(new HistoricoOferta(ofertaExistente));
+            //            //ofertaExistente.datacreatedOnAzure = DateTime.Now;
+            //            ofertaExistente.PrecoAtual = preco;
+            //            await repository?.UpdateEntity(ofertaExistente);
+            //        }
+            //    }
+            //    else
+            //        await repository?.CreateEntity(new Oferta(idEstabelecimento, idCarteira, Preco));
+
+            //    await repository.SyncDataBase();
+
         }
 
         private async Task<string> CriarMarca()

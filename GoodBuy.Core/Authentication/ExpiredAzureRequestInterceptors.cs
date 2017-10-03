@@ -17,22 +17,30 @@ namespace GoodBuy
             // Clone the request, in case we need to re-issue it
             var clone = await CloneHttpRequestMessageAsync(request);
             // Now do the request
-            var response = await base.SendAsync(request, cancellationToken);
-
-            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            try
             {
-                // The request resulted in a 401 Unauthorized.  We need to do a LoginAsync,
-                // which will do the Refresh if appropriate, or ask for credentials if not.
-                await service.LoginAsync(Microsoft.WindowsAzure.MobileServices.MobileServiceAuthenticationProvider.Facebook, null);
+                var response = await base.SendAsync(request, cancellationToken);
 
-                // Now, retry the request with the cloned request.  The only thing we have
-                // to do is replace the X-ZUMO-AUTH header with the new auth token.
-                clone.Headers.Remove("X-ZUMO-AUTH");
-                clone.Headers.Add("X-ZUMO-AUTH", service.Client.CurrentUser.MobileServiceAuthenticationToken);
-                response = await base.SendAsync(clone, cancellationToken);
+                if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    // The request resulted in a 401 Unauthorized.  We need to do a LoginAsync,
+                    // which will do the Refresh if appropriate, or ask for credentials if not.
+                    await service.LoginAsync(Microsoft.WindowsAzure.MobileServices.MobileServiceAuthenticationProvider.Facebook, null);
+
+                    // Now, retry the request with the cloned request.  The only thing we have
+                    // to do is replace the X-ZUMO-AUTH header with the new auth token.
+                    clone.Headers.Remove("X-ZUMO-AUTH");
+                    clone.Headers.Add("X-ZUMO-AUTH", service.Client.CurrentUser.MobileServiceAuthenticationToken);
+                    response = await base.SendAsync(clone, cancellationToken);
+                    return response;
+                }
             }
+            catch (System.Exception err)
+            {
+                Log.Log.Instance.AddLog(err);
+            }
+            return null;
 
-            return response;
         }
 
         public static async Task<HttpRequestMessage> CloneHttpRequestMessageAsync(HttpRequestMessage req)

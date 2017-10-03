@@ -16,7 +16,7 @@ namespace GoodBuy.Log
         private async void ShowLog(string text)
         {
             System.Diagnostics.Debug.WriteLine(text);
-            await MessageDisplayer.Instance.ShowMessage("Error!", text, "OK");
+            //await MessageDisplayer.Instance.ShowMessage("Error!", text, "OK");
         }
 
         public void AddLog(string text)

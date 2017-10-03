@@ -11,6 +11,8 @@ using Microsoft.WindowsAzure.MobileServices;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using GoodBuy.Service;
+using goodBuy.Droid.Push;
+using System.Net.Http;
 
 [assembly: Permission(Name = "@PACKAGE_NAME@.permission.C2D_MESSAGE")]
 [assembly: UsesPermission(Name = "@PACKAGE_NAME@.permission.C2D_MESSAGE")]
@@ -48,11 +50,29 @@ namespace goodBuy.Droid
         {
             try
             {
-                const string templateBodyGCM = "{\"data\":{\"message\":\"$(messageParam)\"}}";
-                JObject templates = new JObject();
-                templates["genericMessage"] = new JObject { { "body", templateBodyGCM } };
-                await push.RegisterAsync(RegistrationID, templates);
-                Android.Util.Log.Info("Push Installation Id", push.InstallationId.ToString());
+                var installation = new DeviceInstallation
+                {
+                    InstallationId = Client.InstallationId,
+                    Platform = "gcm",
+                    PushChannel = RegistrationID
+                };
+                installation.Tags.Add("topic:Sports");
+
+                // Set up templates to request
+                PushTemplate genericTemplate = new PushTemplate
+                {
+                    Body = @"{""data"":{""message"":""$(messageParam)""}}"
+                };
+                installation.Templates.Add("genericTemplate", genericTemplate);
+
+                // Register with NH
+                var response = await Client.InvokeApiAsync<DeviceInstallation, DeviceInstallation>(
+                    $"/push/installations/{Client.InstallationId}",
+                    installation,
+                    HttpMethod.Put,
+                    new Dictionary<string, string>());
+
+                //await push. RegisterAsync(RegistrationID, templates);
             }
             catch (Exception ex)
             {
@@ -75,9 +95,10 @@ namespace goodBuy.Droid
             edit.PutString("last_msg", msg.ToString());
             edit.Commit();
             string message = intent.Extras.GetString("message");
+            string message2 = intent.Extras.GetString("message2");
             if (!string.IsNullOrEmpty(message))
             {
-                createNotification("New todo item!", "Todo item: " + message);
+                createNotification("New todo item!",message);
                 return;
             }
 
@@ -107,6 +128,8 @@ namespace goodBuy.Droid
             .SetTicker(title)
             .SetContentTitle(title)
             .SetContentText(desc)
+            
+            
 
             //Set the notification sound
             .SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification))

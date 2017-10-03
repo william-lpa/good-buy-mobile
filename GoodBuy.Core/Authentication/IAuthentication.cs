@@ -8,6 +8,7 @@ namespace GoodBuy.Authentication
     {
         Task<(MobileServiceUser azureUser, LoginResultContent appUser)> LoginClientFlowAsync(MobileServiceClient client, MobileServiceAuthenticationProvider provider);
         Task<MobileServiceUser> LoginAzureAsync(MobileServiceClient client, MobileServiceAuthenticationProvider provider);
+        void RegisterForPushNotificaton(MobileServiceClient client);
         void LogOut();
         LoginResultContent LoginResult { get; set; }
         bool SignIn { get; set; }        
