@@ -29,6 +29,8 @@ namespace GoodBuy.ViewModels
             }
         }
         public bool Private { get; set; }
+        public bool ResetSelection { get; set; }
+        
         public Command PersistGrupoOfertaCommand { get; }
         public Command SearchContact { get; }
         public Command RemoverParticipanteSelecionadoCommand { get; }
@@ -40,6 +42,8 @@ namespace GoodBuy.ViewModels
         public ObservableCollection<ParticipanteGrupo> Members { get; }
         public bool EditingGroup { get; set; }
         public string PrimaryAction => EditingGroup ? "Salvar" : "Criar";
+
+        public string SearchText { get; set; }
 
         public string SecondaryAction => UsuarioLogadoPertenceAoGrupo ? "Sair" : "Participar";
         public ObservableCollection<ParticipanteGrupo> CachedList { get; private set; }
@@ -65,8 +69,18 @@ namespace GoodBuy.ViewModels
         }
 
 
-        private void ExecuteStoreParticipante(ParticipanteGrupo participante)
+        private async void ExecuteStoreParticipante(ParticipanteGrupo participante)
         {
+            if (CachedList.Count > 0)
+            {//está pesquisando
+                AdicionarParticipante(participante);
+                await grupoOfertaService.ParticiparGrupo(editGrupoOferta, Members.Last());
+                CachedList.Add(participante);
+                SearchText = string.Empty;
+                //ExecuteSearchUser("");
+                AtualizarStatus();
+                return;
+            }
             this.participanteGrupoOferta = participante;
             RemoverParticipanteSelecionadoCommand.ChangeCanExecute();
         }
@@ -80,7 +94,7 @@ namespace GoodBuy.ViewModels
                     var membro = Members.First(x => x.IdUser == azureService.CurrentUser.User.Id);
                     Members.Remove(membro);
                     await grupoOfertaService.ExcluirParticipanteGrupoOferta(membro);
-                    AtualizarStatus();
+                    await PopAsync<GruposOfertasPageViewModel>();
                 }
             }
             else
@@ -89,7 +103,7 @@ namespace GoodBuy.ViewModels
                 {
                     var user = azureService.CurrentUser.User;
                     AdicionarParticipante(new ParticipanteGrupo(user.Id) { User = user });
-                    SalvarEdicao();
+                    await grupoOfertaService.ParticiparGrupo(editGrupoOferta, Members.Last());
                     AtualizarStatus();
                 }
             }
@@ -102,6 +116,7 @@ namespace GoodBuy.ViewModels
             RemoverGrupoCommand.ChangeCanExecute();
             RemoverParticipanteSelecionadoCommand.ChangeCanExecute();
             OnPropertyChanged(nameof(SecondaryAction));
+            OnPropertyChanged(nameof(SearchText));
         }
 
         private async void ExcluirGrupoOferta()
@@ -218,10 +233,10 @@ namespace GoodBuy.ViewModels
             PersistGrupoOfertaCommand.ChangeCanExecute();
         }
 
-        public async void SalvarEdicao()
+        public async void SalvarEdicao(bool syncronize = false)
         {
             if (editGrupoOferta.Name != Name || editGrupoOferta.Participantes.Count() != Members.Count || editGrupoOferta.Private != Private)
-                await grupoOfertaService.AtualizarNovoGrupoUsuario(TransformEditGrupoOferta());
+                await grupoOfertaService.AtualizarNovoGrupoUsuario(TransformEditGrupoOferta(), syncronize);
         }
 
         private async void SalvarGrupoUsuario()

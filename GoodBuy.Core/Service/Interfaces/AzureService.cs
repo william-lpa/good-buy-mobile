@@ -154,7 +154,7 @@ namespace GoodBuy.Service
                 RemoveTokenFromSecureStore();
                 //Client = new MobileServiceClient(appURL, new ExpiredAzureRequestInterceptors(this));
                 Client = new MobileServiceClient(appURL);
-                var dbName = "goodBuy179.db";
+                var dbName = "goodBuy199.db";
                 Store = new MobileServiceSQLiteStore(Path.Combine(MobileServiceClient.DefaultDatabasePath, dbName));
                 DefineTables(Store);
 

@@ -61,7 +61,15 @@ namespace GoodBuy.Service
             }
         }
 
-        public async Task AtualizarNovoGrupoUsuario(GrupoOferta grupoOferta)
+        public async Task ParticiparGrupo(GrupoOferta grupoOferta, ParticipanteGrupo participanteGrupo)
+        {
+            participanteGrupo.IdGrupoOferta = grupoOferta.Id;
+            participanteGrupo.NomeGrupo = grupoOferta.Name;
+            await participantesRepository.CreateEntity(participanteGrupo);
+            await participantesRepository.SyncDataBase();
+        }
+
+        public async Task AtualizarNovoGrupoUsuario(GrupoOferta grupoOferta, bool sync)
         {
             await grupoRepository.UpdateEntity(grupoOferta);
 
@@ -72,6 +80,9 @@ namespace GoodBuy.Service
                     participante.IdGrupoOferta = grupoOferta.Id;
                     participante.NomeGrupo = grupoOferta.Name;
                     await participantesRepository.CreateEntity(participante);
+                    if (sync)
+                        await participantesRepository.SyncDataBase();
+
                 }
             }
         }
