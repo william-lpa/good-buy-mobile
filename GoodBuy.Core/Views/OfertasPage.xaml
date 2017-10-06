@@ -24,10 +24,20 @@
 
             <Style x:Key="dislike" TargetType="Button">
                 <Setter Property="FontSize" Value="Micro"/>
-                <Setter Property="TextColor" Value="Red"/>                
+                <Setter Property="TextColor" Value="Red"/>
                 <Setter Property="Image" Value="dislike.png"/>
                 <Setter Property="BackgroundColor" Value="LightGray"/>
                 <Setter Property="HorizontalOptions" Value="EndAndExpand"/>
+            </Style>
+
+            <Style x:Key="shareOption" TargetType="Button">
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="WidthRequest" Value="150"/>
+                <Setter Property="HeightRequest" Value="30"/>
+                <Setter Property="Image" Value="share.png"/>
+                <Setter Property="BackgroundColor" Value="LightGray"/>
+                <Setter Property="Margin" Value="0,0,0,5"/>
             </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
@@ -65,7 +75,8 @@
                                 </StackLayout>
                                 <StackLayout Orientation="Horizontal">
                                     <Button Text="Adicionar a Lista" Style="{StaticResource ofertaOption}" HorizontalOptions="StartAndExpand"/>
-                                    <Button Text="Monitorar oferta" Style="{StaticResource ofertaOption}" FontSize="10" HorizontalOptions="End" />
+                                    <Button Text="Compartilhar" Style="{StaticResource shareOption}" HorizontalOptions="Center"/>
+                                    <Button Text="Monitorar oferta" Style="{StaticResource ofertaOption}" HorizontalOptions="End" />
                                 </StackLayout>
                             </StackLayout>
                         </ViewCell>

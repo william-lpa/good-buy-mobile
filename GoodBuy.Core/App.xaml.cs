@@ -16,7 +16,7 @@ namespace GoodBuy
 
             Container = BuildDependencies(container).Build();
 
-            MainPage = new NavigationPage(new LoginPage());
+            MainPage = new NavigationPage(new Core.Views.CompartilharOfertasPage());
         }
 
         protected override void OnStart()
