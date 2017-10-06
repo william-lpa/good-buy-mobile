@@ -1,6 +1,8 @@
 ﻿using GoodBuy.Models.Many_to_Many;
 using GoodBuy.Service;
+using GoodBuy.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -8,11 +10,10 @@ using Xamarin.Forms;
 
 namespace GoodBuy.Models.Logical
 {
-    public class OfertaDto: INotifyPropertyChanged
+    public class OfertaDto : BaseViewModel
     {
-        private readonly string IdOFerta;
+        private readonly string idOFerta;
         private float confiabilidade;
-        public event PropertyChangedEventHandler PropertyChanged;
         private readonly OfertasService ofertasService;
         public string DescricaoOferta { get; }
         public decimal ValorOferta { get; }
@@ -21,9 +22,7 @@ namespace GoodBuy.Models.Logical
             get { return confiabilidade; }
             set
             {
-                confiabilidade = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(ConfiabilidadeNegativa));
+                SetProperty(ref confiabilidade, value);
             }
         }
         public float ConfiabilidadeNegativa => 100 - Confiabilidade;
@@ -32,13 +31,14 @@ namespace GoodBuy.Models.Logical
         public string Estabelecimento { get; set; }
         public Command AumentarConfiabilidadeCommand { get; }
         public Command DiminuirConfiabilidadeCommand { get; }
+        public Command ShareOfertaCommand { get; }
         public bool? LikePerformed { get; set; } = null;
 
 
 
         public OfertaDto(Estabelecimento estabelecimento, Oferta oferta, Produto produto, UnidadeMedida unidade, Sabor sabor, Marca marca, OfertasService ofertasService)
         {
-            IdOFerta = oferta.Id;
+            idOFerta = oferta.Id;
             this.ofertasService = ofertasService;
             CreatedAt = oferta.CreatedAt;
             ValorOferta = oferta.PrecoAtual;
@@ -47,33 +47,35 @@ namespace GoodBuy.Models.Logical
             DescricaoOferta = $"{produto.Nome} - {sabor.Nome}, {marca.Nome}, {produto.QuantidadeMensuravel} {unidade.Nome}";
             AumentarConfiabilidadeCommand = new Command(ExecuteAplicarLike);
             DiminuirConfiabilidadeCommand = new Command(ExecuteAplicarDislike);
+            ShareOfertaCommand = new Command(ExecuteCompartilharOferta);
         }
 
-
-        protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
+        private async void ExecuteCompartilharOferta()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("ID", idOFerta);
+            await PushAsync<CompartilharOfertasPageViewModel>(false, parameters);
         }
 
         private async Task NeedsReversal()
         {
             if (LikePerformed != null) //ja foi realizado anteriormente
             {
-                Confiabilidade = await ofertasService.RevertConfiabilidade(IdOFerta, LikePerformed.Value);
+                Confiabilidade = await ofertasService.RevertConfiabilidade(idOFerta, LikePerformed.Value);
             }
         }
         private async void ExecuteAplicarDislike()
         {
             await NeedsReversal();
             LikePerformed = false;
-            Confiabilidade = await ofertasService.ApplyDislike(IdOFerta);
+            Confiabilidade = await ofertasService.ApplyDislike(idOFerta);
         }
 
         private async void ExecuteAplicarLike()
         {
             await NeedsReversal();
             LikePerformed = true;
-            Confiabilidade = await ofertasService.ApplyLike(IdOFerta);
+            Confiabilidade = await ofertasService.ApplyLike(idOFerta);
         }
     }
 }

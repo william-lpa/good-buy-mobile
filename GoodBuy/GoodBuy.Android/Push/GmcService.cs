@@ -56,14 +56,19 @@ namespace goodBuy.Droid
                     Platform = "gcm",
                     PushChannel = RegistrationID
                 };
-                installation.Tags.Add("topic:Sports");
 
                 // Set up templates to request
                 PushTemplate genericTemplate = new PushTemplate
                 {
                     Body = @"{""data"":{""message"":""$(messageParam)""}}"
                 };
+                PushTemplate ofertaTemplate = new PushTemplate
+                {
+                    Body = @"{""data"":{""ofertaTitle"":""$(ofertaTitleParam)"",""ofertaDescription"":""$(ofertaDescriptionParam)"",""idOFerta"":""$(ofertaIdParam)""}}"
+                };
+
                 installation.Templates.Add("genericTemplate", genericTemplate);
+                installation.Templates.Add("ofertaTemplate", ofertaTemplate);
 
                 // Register with NH
                 var response = await Client.InvokeApiAsync<DeviceInstallation, DeviceInstallation>(
@@ -98,7 +103,7 @@ namespace goodBuy.Droid
             string message2 = intent.Extras.GetString("message2");
             if (!string.IsNullOrEmpty(message))
             {
-                createNotification("New todo item!",message);
+                createNotification("New todo item!", message);
                 return;
             }
 
@@ -128,8 +133,8 @@ namespace goodBuy.Droid
             .SetTicker(title)
             .SetContentTitle(title)
             .SetContentText(desc)
-            
-            
+
+
 
             //Set the notification sound
             .SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification))

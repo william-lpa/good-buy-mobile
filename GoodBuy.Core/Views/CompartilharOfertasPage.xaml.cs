@@ -2,7 +2,7 @@
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
-namespace GoodBuy.Core.Views
+namespace GoodBuy.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class CompartilharOfertasPage : TabbedPage
@@ -12,9 +12,14 @@ namespace GoodBuy.Core.Views
             InitializeComponent();
             using (var scope = App.Container.BeginLifetimeScope())
             {
+                var usuariosVm = scope.Resolve<ViewModels.NovoGrupoOfertaPageViewModel>();
+                usuariosVm.NotSharing = false;
+                usuarios.BindingContext = usuariosVm;
+
                 var grupoofertaVm = scope.Resolve<ViewModels.GruposOfertasPageViewModel>();
                 grupoofertaVm.NotSharing = false;
                 grupoOfertas.BindingContext = grupoofertaVm;
+
             }
         }
     }

@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
 using GoodBuy.Log;
+using Newtonsoft.Json.Linq;
+using GoodBuy.Core.Models.Logical;
 
 namespace GoodBuy.ViewModels
 {
@@ -20,11 +22,14 @@ namespace GoodBuy.ViewModels
         public ObservableCollection<GrupoOferta> GruposOfertasUsuario { get; private set; }
         public ObservableCollection<GrupoOferta> CachedList { get; set; }
         private bool notShareMode;
-
         public bool NotSharing
         {
             get { return notShareMode; }
-            set { SetProperty(ref notShareMode, value); }
+            set
+            {
+                SetProperty(ref notShareMode, value);
+                if (!value) Init();
+            }
         }
 
         public GruposOfertasPageViewModel(AzureService azureService, GrupoOfertaService service)
@@ -76,10 +81,17 @@ namespace GoodBuy.ViewModels
             {
                 if (await MessageDisplayer.Instance.ShowAsk("Compartilhar Oferta", $"Você tem certeza que deseja compartilhar a oferta selecionada com o grupo {grupoOferta.Name} ?", "Sim", "Não"))
                 {
-                    //azureService.Client.InvokeApiAsync();
-                    //await PopAsync<GruposOfertasPageViewModel>();
-                }
+                    var body = new CompartilhamentoOfertaGrupo()
+                    {
+                        Title = $"Nova oferta Compartilhada no grupo {grupoOferta.Name}",
+                        Description = $"{azureService.CurrentUser.User.FullName} compartilhou uma nova oferta, clique para mais detalhes",
+                        IdGrupo = grupoOferta.Id,
+                        IdOferta = CompartilharOfertasPageViewModel.IdSharingOferta,
+                    };
 
+                    await azureService.Client.InvokeApiAsync<CompartilhamentoOfertaGrupo, CompartilhamentoOfertaGrupo>("compartilharOfertaGrupo", body);
+                }
+                await PopAsync<OfertasPageViewModel>();
             }
         }
 

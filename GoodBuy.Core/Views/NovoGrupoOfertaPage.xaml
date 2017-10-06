@@ -15,7 +15,7 @@
     </ContentPage.Resources>
     <ScrollView>
         <StackLayout>
-            <StackLayout Spacing="10">
+            <StackLayout Spacing="10" IsVisible="{Binding NotSharing}">
                 <StackLayout Spacing="0">
                     <Label Text="Nome do grupo a ser criado" Style="{StaticResource labelCadastro}" HorizontalOptions="StartAndExpand"/>
                     <Entry Placeholder="Nome do grupo" Text="{Binding Name}"/>

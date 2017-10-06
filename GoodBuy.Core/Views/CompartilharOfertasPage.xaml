@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GoodBuy.Core.Views.CompartilharOfertasPage"
-            xmlns:local="clr-namespace:GoodBuy.Views">
-    <ContentPage Title="Tab 1" />
+             x:Class="GoodBuy.Views.CompartilharOfertasPage"
+            xmlns:local="clr-namespace:GoodBuy.Views"
+            Title="Compartilhar Oferta Selecionada">
+    <local:NovoGrupoOfertaPage x:Name="usuarios" Title="Usuários" />
     <local:GruposOfertasPage x:Name="grupoOfertas" />
 </TabbedPage> 

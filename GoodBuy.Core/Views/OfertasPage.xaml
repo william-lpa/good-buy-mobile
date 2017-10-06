@@ -75,7 +75,7 @@
                                 </StackLayout>
                                 <StackLayout Orientation="Horizontal">
                                     <Button Text="Adicionar a Lista" Style="{StaticResource ofertaOption}" HorizontalOptions="StartAndExpand"/>
-                                    <Button Text="Compartilhar" Style="{StaticResource shareOption}" HorizontalOptions="Center"/>
+                                    <Button Text="Compartilhar" Style="{StaticResource shareOption}" Command="{Binding ShareOfertaCommand}" HorizontalOptions="Center"/>
                                     <Button Text="Monitorar oferta" Style="{StaticResource ofertaOption}" HorizontalOptions="End" />
                                 </StackLayout>
                             </StackLayout>

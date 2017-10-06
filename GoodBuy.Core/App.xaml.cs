@@ -16,7 +16,7 @@ namespace GoodBuy
 
             Container = BuildDependencies(container).Build();
 
-            MainPage = new NavigationPage(new Core.Views.CompartilharOfertasPage());
+            MainPage = new NavigationPage(new LoginPage());
         }
 
         protected override void OnStart()
@@ -37,6 +37,7 @@ namespace GoodBuy
             container.RegisterType<GrupoOfertaService>();
             container.RegisterType<OfertasService>();
             container.RegisterType<UserService>();
+            container.RegisterType<CompartilharOfertasPageViewModel>();
             container.RegisterType<SyncronizedAccessService>().SingleInstance();
             container.RegisterType<GenericRepository<Model.IEntity>>();
             return container;

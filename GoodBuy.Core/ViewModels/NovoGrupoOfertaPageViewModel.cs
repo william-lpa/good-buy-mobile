@@ -30,7 +30,7 @@ namespace GoodBuy.ViewModels
         }
         public bool Private { get; set; }
         public bool ResetSelection { get; set; }
-        
+
         public Command PersistGrupoOfertaCommand { get; }
         public Command SearchContact { get; }
         public Command RemoverParticipanteSelecionadoCommand { get; }
@@ -42,6 +42,16 @@ namespace GoodBuy.ViewModels
         public ObservableCollection<ParticipanteGrupo> Members { get; }
         public bool EditingGroup { get; set; }
         public string PrimaryAction => EditingGroup ? "Salvar" : "Criar";
+        private bool notShareMode;
+        public bool NotSharing
+        {
+            get { return notShareMode; }
+            set
+            {
+                SetProperty(ref notShareMode, value);
+                if (!value) Init();
+            }
+        }
 
         public string SearchText { get; set; }
 
@@ -53,6 +63,7 @@ namespace GoodBuy.ViewModels
 
         public NovoGrupoOfertaPageViewModel(AzureService azureService, GrupoOfertaService service, UserService userService)
         {
+            NotSharing = true;
             this.azureService = azureService;
             grupoOfertaService = service;
             this.userService = userService;
