@@ -6,6 +6,7 @@ using System;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
+using GoodBuy.Log;
 
 namespace GoodBuy.ViewModels
 {
@@ -18,9 +19,17 @@ namespace GoodBuy.ViewModels
         public Command SearchPublicGroup { get; }
         public ObservableCollection<GrupoOferta> GruposOfertasUsuario { get; private set; }
         public ObservableCollection<GrupoOferta> CachedList { get; set; }
+        private bool notShareMode;
+
+        public bool NotSharing
+        {
+            get { return notShareMode; }
+            set { SetProperty(ref notShareMode, value); }
+        }
 
         public GruposOfertasPageViewModel(AzureService azureService, GrupoOfertaService service)
         {
+            NotSharing = true;
             this.azureService = azureService;
             grupoOfertaService = service;
             NovoGrupoCommand = new Command(ExecuteCriarNovoGrupoOferta);
@@ -57,9 +66,21 @@ namespace GoodBuy.ViewModels
 
         private async void ExecuteEditarGroupoOfertas(GrupoOferta grupoOferta)
         {
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("ID", grupoOferta.Id);
-            await PushAsync<NovoGrupoOfertaPageViewModel>(false, parameters);
+            if (NotSharing)
+            {
+                var parameters = new Dictionary<string, string>();
+                parameters.Add("ID", grupoOferta.Id);
+                await PushAsync<NovoGrupoOfertaPageViewModel>(false, parameters);
+            }
+            else
+            {
+                if (await MessageDisplayer.Instance.ShowAsk("Compartilhar Oferta", $"Você tem certeza que deseja compartilhar a oferta selecionada com o grupo {grupoOferta.Name} ?", "Sim", "Não"))
+                {
+                    //azureService.Client.InvokeApiAsync();
+                    //await PopAsync<GruposOfertasPageViewModel>();
+                }
+
+            }
         }
 
         protected async override void Init(Dictionary<string, string> parameters = null)
