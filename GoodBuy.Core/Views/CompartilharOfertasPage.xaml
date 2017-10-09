@@ -4,6 +4,6 @@
              x:Class="GoodBuy.Views.CompartilharOfertasPage"
             xmlns:local="clr-namespace:GoodBuy.Views"
             Title="Compartilhar Oferta Selecionada">
-    <local:NovoGrupoOfertaPage x:Name="usuarios" Title="Usuários" />
+    <local:ListagemUsuariosPage x:Name="usuarios" Title="Usuários" />
     <local:GruposOfertasPage x:Name="grupoOfertas" />
 </TabbedPage> 

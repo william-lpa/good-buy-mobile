@@ -21,7 +21,10 @@ namespace GoodBuy.Service
         private readonly IGenericRepository<UnidadeMedida> unidadeMedidaRepository;
         private readonly IGenericRepository<Sabor> saborRepository;
         private readonly IGenericRepository<Produto> produtoRepository;
+        private readonly IGenericRepository<Categoria> categoriaRepository;
+        private readonly IGenericRepository<HistoricoOferta> historicoOfertaRepository;
         private const int BASE_PERCENTUAL = 100;
+        public static event Action<string, List<string>> OnCollectionLoaded;
         public OfertasService(AzureService azureService, SyncronizedAccessService syncronizedAccessService)
         {
             this.azureService = azureService;
@@ -31,7 +34,9 @@ namespace GoodBuy.Service
             marcaRepository = syncronizedAccessService.MarcaRepository;
             unidadeMedidaRepository = syncronizedAccessService.UnidadeMedidaRepository;
             produtoRepository = syncronizedAccessService.ProdutoRepository;
+            historicoOfertaRepository = syncronizedAccessService.HistoricoOfertaRepository;
             saborRepository = syncronizedAccessService.SaborRepository;
+            categoriaRepository = syncronizedAccessService.CategoriaRepository;
         }
 
         internal float CalculateConfiabilidade(Oferta oferta)
@@ -40,8 +45,35 @@ namespace GoodBuy.Service
                 return 0;
             return (oferta.Likes * BASE_PERCENTUAL) / oferta.Avaliacoes;
         }
+        public async Task SyncronizeBaseDeOfertas()
+        {
+            var t1 = Task.Run(async () => await (saborRepository.PullUpdates()));
+            var t2 = Task.Run(async () => await (unidadeMedidaRepository.PullUpdates()));
+            var t3 = Task.Run(async () => await (carteiraProdutoRepository.PullUpdates()));
+            await (produtoRepository.PullUpdates());
+            await (marcaRepository.PullUpdates());
+            var t4 = Task.Run(async () => await (estabelecimentoRepository.PullUpdates()));
+            await (carteiraProdutoRepository.PullUpdates());
+            await (ofertaRepository.PullUpdates());
+            await (historicoOfertaRepository.PullUpdates());
+            Task.WaitAll(new Task[] { t1, t2, t3, t4 });
+        }
 
-
+        internal async Task LoadAutoCompleteAsync()
+        {
+            var Produtos = new List<string>((await produtoRepository.GetEntities()).Select(x => x.Nome));
+            OnCollectionLoaded(nameof(Produtos), Produtos);
+            var Sabores = new List<string>((await saborRepository.GetEntities()).Select(x => x.Nome));
+            OnCollectionLoaded(nameof(Sabores), Sabores);
+            var UnidadesMedidas = new List<string>((await unidadeMedidaRepository.GetEntities()).Select(x => x.Nome));
+            OnCollectionLoaded(nameof(UnidadesMedidas), UnidadesMedidas);
+            var Marcas = new List<string>((await marcaRepository.GetEntities()).Select(x => x.Nome));
+            OnCollectionLoaded(nameof(Marcas), Marcas);
+            var Categorias = new List<string>((await categoriaRepository.GetEntities()).Select(x => x.Nome));
+            OnCollectionLoaded(nameof(Categorias), Categorias);
+            var Estabelecimentos = new List<string>((await estabelecimentoRepository.GetEntities()).Select(x => x.Nome));
+            OnCollectionLoaded(nameof(Estabelecimentos), Estabelecimentos);
+        }
 
         internal async Task<float> ApplyLike(string idOFerta)
         {
@@ -96,7 +128,7 @@ namespace GoodBuy.Service
                     Task.Run(async () => idSabor = await azureService.Client.GetTable<Sabor>().ToListAsync()).Wait();
                     Task.Run(async () => idUnidadeMedida = await azureService.Client.GetTable<UnidadeMedida>().ToListAsync()).Wait();
                     Task.Run(async () => idEstabelecimento = await azureService.Client.GetTable<Estabelecimento>().ToListAsync()).Wait();
-                     
+
                     var retorno = (ofertas.Select(oferta =>
                     {
                         var carteiraProduto = idCarteiraProduto.Find(x => x.Id == oferta.IdCarteiraProduto);

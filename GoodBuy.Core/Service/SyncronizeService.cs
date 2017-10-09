@@ -11,6 +11,7 @@ namespace GoodBuy.Service
     public class SyncronizedAccessService
     {
         public IGenericRepository<Oferta> OfertaRepository { get; }
+        public IGenericRepository<HistoricoOferta> HistoricoOfertaRepository { get; }
         public IGenericRepository<CarteiraProduto> CarteiraProdutoRepository { get; }
         public IGenericRepository<Estabelecimento> EstabelecimentoRepository { get; }
         public IGenericRepository<Marca> MarcaRepository { get; }
@@ -20,6 +21,8 @@ namespace GoodBuy.Service
         public IGenericRepository<GrupoOferta> GrupoOfertaRepository { get; }
         public IGenericRepository<ParticipanteGrupo> ParticipanteGrupoRepository { get; }
         public IGenericRepository<User> UserRepository { get; }
+        public IGenericRepository<Categoria> CategoriaRepository { get; set; }
+
         private readonly AzureService azureService;
 
         public SyncronizedAccessService(AzureService azureService)
@@ -33,7 +36,9 @@ namespace GoodBuy.Service
             ProdutoRepository = new GenericRepository<Produto>(azureService);
             SaborRepository = new GenericRepository<Sabor>(azureService);
             GrupoOfertaRepository = new GenericRepository<GrupoOferta>(azureService);
+            HistoricoOfertaRepository = new GenericRepository<HistoricoOferta>(azureService);
             ParticipanteGrupoRepository = new GenericRepository<ParticipanteGrupo>(azureService);
+            CategoriaRepository = new GenericRepository<Categoria>(azureService);
             UserRepository = new GenericRepository<User>(azureService);
         }
 
@@ -61,9 +66,13 @@ namespace GoodBuy.Service
                      Task.Run(() => EstabelecimentoRepository.SyncDataBase(date)),
                      Task.Run(() => UnidadeMedidaRepository.SyncDataBase(date)),
                      Task.Run(() => GrupoOfertaRepository.SyncDataBase(date)),
+                     Task.Run(() => HistoricoOfertaRepository.SyncDataBase(date)),
                      Task.Run(() => ParticipanteGrupoRepository.SyncDataBase(date)),
                      Task.Run(() => UserRepository.SyncDataBase(date)),
+                     Task.Run(() => CategoriaRepository.SyncDataBase(date)),
+                     
            });
         }
     }
 }
+

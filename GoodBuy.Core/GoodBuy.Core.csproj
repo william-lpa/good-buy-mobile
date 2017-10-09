@@ -30,4 +30,10 @@
     <PackageReference Include="Xamarin.Forms" Version="2.4.0.266-pre1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Views\MonitorarOfertaPage.xaml.cs">
+      <DependentUpon>MonitorarOfertaPage.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>

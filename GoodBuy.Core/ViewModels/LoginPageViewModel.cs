@@ -75,12 +75,16 @@ namespace GoodBuy.ViewModels
 
         public bool CanExecuteLogin() => !string.IsNullOrEmpty(PhoneNumber) && PhoneNumber.Length >= 8;
 
-        public async void TrySSO()
+        public async void TrySSO(string param)
         {
             while (azureService.LoginIn) await Task.Delay(200);
 
             if (azureService.CurrentUser != null)
+            {
                 await this.PushAsync<MainMenuViewModel>(resetNavigation: true);
+                if (param == "grupos")
+                    await this.PushAsync<GruposOfertasPageViewModel>();
+            }
             else
             {
                 using (var scope = App.Container.BeginLifetimeScope())

@@ -10,13 +10,13 @@ namespace GoodBuy
     {
         public static IContainer Container { get; private set; }
         public App() => InitializeComponent();
-        public App(ContainerBuilder container)
+        public App(ContainerBuilder container, string param)
         {
             InitializeComponent();
 
             Container = BuildDependencies(container).Build();
 
-            MainPage = new NavigationPage(new LoginPage());
+            MainPage = new NavigationPage(new LoginPage(param));
         }
 
         protected override void OnStart()
@@ -37,7 +37,9 @@ namespace GoodBuy
             container.RegisterType<GrupoOfertaService>();
             container.RegisterType<OfertasService>();
             container.RegisterType<UserService>();
+            container.RegisterType<MonitorarOfertaPageViewModel>();
             container.RegisterType<CompartilharOfertasPageViewModel>();
+            container.RegisterType<ListagemUsuariosPageViewModel>();
             container.RegisterType<SyncronizedAccessService>().SingleInstance();
             container.RegisterType<GenericRepository<Model.IEntity>>();
             return container;

@@ -14,25 +14,45 @@
         </ResourceDictionary>
     </ContentPage.Resources>
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Nome do Produto" Style="{StaticResource label}"/>
-            <controls:AutoComplete Placeholder="Suco Integral" Text="{Binding Produto}" ItemsSource="{Binding Produtos}" />
-            <StackLayout Orientation="Horizontal">
-                <Label Text="Variações no sabor?" />
-                <Switch  IsToggled="false" Toggled="Switch_Toggled" />
-                <Entry x:Name="sabor" IsEnabled="False" Placeholder="Sabor do Produto" Text="{Binding Sabor}"/>
+        <ScrollView>
+            <StackLayout>
+                <Label Text="Nome do Produto" Style="{StaticResource label}"/>
+                <controls:AutoComplete Name="Produtos" Placeholder="Suco Integral" Text="{Binding Produto}"/>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Tem um sabor?" />
+                    <Switch  IsToggled="false" Toggled="Switch_Toggled" />
+                    <controls:AutoComplete 
+                    x:Name="sabor"
+                    Name="Sabores"
+                    IsEnabled="False"
+                    Text="{Binding Sabor}"
+                    Placeholder="Morango, Chocolate, Uva..."
+                    />
+                </StackLayout>
+                <StackLayout Orientation="Horizontal"  Spacing="15">
+                    <StackLayout>
+                        <Label Text="Peso do produto" Style="{StaticResource label}"/>
+                        <Entry x:Name="quantidade" Placeholder="1, 150, 300..." Text="{Binding Quantidade}" />
+                    </StackLayout>
+                    <StackLayout>
+                        <Label Text="Unidade de medida" Style="{StaticResource label}"/>
+                        <controls:AutoComplete Name="UnidadesMedidas" Placeholder="gr, kg, unidade, pacote" Text="{Binding UnidadeMedida}" />
+                    </StackLayout>
+                </StackLayout>
+                <Label Text="Marca do produto" Style="{StaticResource label}"/>
+                <controls:AutoComplete Name="Marcas" Placeholder="Pepsi, Nestlé" Text="{Binding Marca}" />
+
+                <Label Text="Categoria" Style="{StaticResource label}"/>
+                <controls:AutoComplete Name="Categorias" Placeholder="Mercearia, Confeitaria, Eletrônicos" Text="{Binding Categoria}" />
+
+                <Label Text="Estabelecimento" Style="{StaticResource label}"/>
+                <controls:AutoComplete Name="Estabelecimentos" Placeholder="Cooper, Angeloni, BIG... " Text="{Binding Estabelecimento}" />
+
+                <Label Text="Preco" Style="{StaticResource label}"/>
+                <Entry x:Name="preco" Keyboard="Numeric" Placeholder="3.50" Text="{Binding Preco}" />
+                <Label  Margin="10,5,10,5" Text="campos marcados com '*' são de preenchimento obrigatório" FontSize="13" TextColor="Red"/>
+                <Button Text="cadastrar" Command="{Binding CadastrarOfertaCommand}"/>
             </StackLayout>
-            <StackLayout Orientation="Horizontal">
-                <Entry x:Name="quantidade" Placeholder="Peso do produto" Text="{Binding Quantidade}"/>
-                <Entry x:Name="unidadeMedida" Placeholder="kg, gr, unid, ml..." Text="{Binding UnidadeMedida}"/>
-                <!--lable : peso em, e botar * em informações obrigatórias-->
-            </StackLayout>
-            <Entry x:Name="marca" Placeholder="Marca" Text="{Binding Marca}" />
-            <Entry x:Name="categoria" Placeholder="Categoria" Text="{Binding Categoria}" />
-            <Entry x:Name="estabelecimento" Placeholder="Estabelecimento" Text="{Binding Estabelecimento}" />
-            <Entry x:Name="preco" Keyboard="Numeric" Placeholder="Preco" Text="{Binding Preco}" />
-            <Label  Margin="10,5,10,5" Text="campos marcados com '*' são de preenchimento obrigatório" FontSize="13" TextColor="Red"/>
-            <Button Text="cadastrar" Command="{Binding CadastrarOfertaCommand}"/>
-        </StackLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

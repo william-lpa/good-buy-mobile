@@ -10,11 +10,11 @@ using Xamarin.Forms.Xaml;
 namespace GoodBuy.Views
 {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
-	public partial class ListagemUsuariosPage : ContentPage
+	public partial class MonitorarOfertaPage : ContentPage
 	{
-		public ListagemUsuariosPage ()
+		public MonitorarOfertaPage ()
 		{
-			InitializeComponent ();
+			InitializeComponent();
 		}
 	}
 }

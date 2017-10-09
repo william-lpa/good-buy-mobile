@@ -14,7 +14,8 @@ namespace GoodBuy.ViewModels
 {
     public class NovaOfertaViewModel : BaseViewModel
     {
-        private readonly AzureService azure;
+        private readonly OfertasService ofertasService;
+        private readonly AzureService azureService;
         private string produto;
         private string sabor;
         private float quantidade;
@@ -23,7 +24,6 @@ namespace GoodBuy.ViewModels
         private string categoria;
         private string estabelecimento;
         private decimal preco;
-        public List<string> Produtos { get; set; }
 
         public string Produto
         {
@@ -67,35 +67,28 @@ namespace GoodBuy.ViewModels
         }
         public ICommand CadastrarOfertaCommand { get; }
 
-        public NovaOfertaViewModel(AzureService azure)
+        public NovaOfertaViewModel(AzureService azure, OfertasService ofertasService)
         {
-            this.azure = azure;
+            this.ofertasService = ofertasService;
+            this.azureService = azure;
             CadastrarOfertaCommand = new Command(ExecuteCadastroOferta, VerificarCamposObrigatorios);
-            CarregarProdutos();
-            new Action(async () => await UpdateOfertasAsync()).Invoke();
+            Initialize();
         }
 
-        private async void CarregarProdutos()
+        private async void Initialize()
         {
-            //Produtos = new List<string>() { "Arroz", "Feijão", "Couve" };
-            Produtos = new List<string>((await new GenericRepository<Produto>(azure).GetEntities()).Select(x => x.Nome));
+            await UpdateOfertasAsync();
+            await CarregarProdutos();
+        }
+
+        private async Task CarregarProdutos()
+        {
+            await ofertasService.LoadAutoCompleteAsync();
         }
 
         private async Task UpdateOfertasAsync()
         {
-            var g = System.Diagnostics.Stopwatch.StartNew();
-            var t1 = Task.Run(async () => await (new GenericRepository<Sabor>(azure)).PullUpdates());
-            var t2 = Task.Run(async () => await (new GenericRepository<UnidadeMedida>(azure)).PullUpdates());
-            var t3 = Task.Run(async () => await (new GenericRepository<Categoria>(azure)).PullUpdates());
-            await (new GenericRepository<Produto>(azure)).PullUpdates();
-            await (new GenericRepository<Marca>(azure)).PullUpdates();
-            var t4 = Task.Run(async () => await (new GenericRepository<Estabelecimento>(azure)).PullUpdates());
-            await (new GenericRepository<CarteiraProduto>(azure)).PullUpdates();
-            await (new GenericRepository<Oferta>(azure)).PullUpdates();
-            await (new GenericRepository<HistoricoOferta>(azure)).PullUpdates();
-            Task.WaitAll(new Task[] { t1, t2, t3, t4 });
-            g.Stop();
-            var teste = g.Elapsed.Seconds;
+            await ofertasService.SyncronizeBaseDeOfertas();
         }
 
         private bool VerificarCamposObrigatorios()
@@ -107,8 +100,8 @@ namespace GoodBuy.ViewModels
         {
             try
             {
-                var produtosCArteiras = await azure.GetTable<CarteiraProduto>().ToListAsync();
-                var estabelecimentos = await azure.GetTable<Estabelecimento>().ToListAsync();
+                var produtosCArteiras = await azureService.GetTable<CarteiraProduto>().ToListAsync();
+                var estabelecimentos = await azureService.GetTable<Estabelecimento>().ToListAsync();
                 await CriarOferta(produtosCArteiras.First().Id, estabelecimentos.First().Id);
                 //await CriarOferta(idCarteiraProduto, idEstabelecimento);
                 await PopModalAsync();
@@ -238,7 +231,7 @@ namespace GoodBuy.ViewModels
         }
         public async Task<GenericRepository<T>> GetEntityService<T>(bool downloadUpdates = false) where T : class, IEntity, new()
         {
-            var repository = new GenericRepository<T>(azure);
+            var repository = new GenericRepository<T>(azureService);
             if (downloadUpdates)
                 await repository.PullUpdates();
             return repository;

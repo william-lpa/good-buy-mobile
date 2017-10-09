@@ -18,7 +18,7 @@
     <StackLayout>        
         <StackLayout >
             <Button Text="Últimas atualizações em Blumenau, SC!" Style="{StaticResource headerLocationButton}" />
-            <ListView x:Name="lvwOfertas" HasUnevenRows="True" HeightRequest="290" ItemsSource="{Binding UltimasOfertas}">
+            <ListView x:Name="lvwOfertas" HasUnevenRows="True" HeightRequest="320" ItemsSource="{Binding UltimasOfertas}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
@@ -55,7 +55,7 @@
             <Entry Text="{Binding PhoneNumber}" Keyboard="Telephone" HorizontalOptions="FillAndExpand" />
             <Button Text="Selecionar núm. na agenda" HorizontalOptions="End" FontSize="11" BackgroundColor="LightGray" TextColor="Black" Command="{Binding ContactListCommand}"/>
         </StackLayout>
-        <Button Text="Logar com o Facebook" Command="{Binding FacebookLoginCommand}" HorizontalOptions="FillAndExpand" BackgroundColor="#4e6cab" TextColor="#FFF"/>
-        <Button Text="Logar com o perfil do dispositivo" Command="{Binding ContactListLoginCommand}"  HorizontalOptions="FillAndExpand" BackgroundColor="#df4a32" TextColor="#FFF"/>
+        <Button Text="Logar com o Facebook" Image="facebook.png" Command="{Binding FacebookLoginCommand}" HorizontalOptions="FillAndExpand" BackgroundColor="#4e6cab" TextColor="#FFF"/>
+        <Button Text="Logar com o perfil do dispositivo" Image="profile.png" Command="{Binding ContactListLoginCommand}"  HorizontalOptions="FillAndExpand" BackgroundColor="#df4a32" TextColor="#FFF"/>
     </StackLayout>
 </ContentPage>

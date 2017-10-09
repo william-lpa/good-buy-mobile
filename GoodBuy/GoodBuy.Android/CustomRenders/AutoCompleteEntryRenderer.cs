@@ -4,8 +4,6 @@ using Xamarin.Forms.Platform.Android;
 using GoodBuy.Core.Controls;
 using Xamarin.Forms;
 using goodBuy.Droid.CustomRenders;
-using System.Threading.Tasks;
-using Android.Runtime;
 using Android.Views;
 using Android.Views.InputMethods;
 using Android.Text;
@@ -21,11 +19,16 @@ namespace goodBuy.Droid.CustomRenders
 {
     public class AutoCompleteEntryRenderer : ViewRenderer<AutoComplete, AutoCompleteTextView>, ITextWatcher, TextView.IOnEditorActionListener
     {
+        public AutoCompleteEntryRenderer()
+        {
+            AutoPackage = false;
+            GoodBuy.Service.OfertasService.OnCollectionLoaded += UpdateAdapterLoad;
+        }
+        public string Name { get; set; }
         protected override void OnElementChanged(ElementChangedEventArgs<AutoComplete> e)
         {
             base.OnElementChanged(e);
             base.OnElementChanged(e);
-
             if (e.OldElement == null)
             {
                 var textView = CreateNativeControl();
@@ -56,13 +59,14 @@ namespace goodBuy.Droid.CustomRenders
 
                     SetNativeControl(control);
                 }
+                Name = e.NewElement.Name;
                 UpdateAdapter(e.NewElement.ItemsSource);
             }
         }
         ColorStateList _hintTextColorDefault;
         ColorStateList _textColorDefault;
         bool _disposed;
-        
+
 
         bool TextView.IOnEditorActionListener.OnEditorAction(TextView v, ImeAction actionId, KeyEvent e)
         {
@@ -91,7 +95,7 @@ namespace goodBuy.Droid.CustomRenders
                 return;
 
             ((IElementController)Element).SetValueFromRenderer(Entry.TextProperty, s.ToString());
-        }        
+        }
 
         protected override void Dispose(bool disposing)
         {
@@ -111,10 +115,6 @@ namespace goodBuy.Droid.CustomRenders
             }
 
             base.Dispose(disposing);
-        }
-        public AutoCompleteEntryRenderer()
-        {
-            AutoPackage = false;
         }
 
         protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -252,6 +252,11 @@ namespace goodBuy.Droid.CustomRenders
         void OnKeyboardBackPressed(object sender, EventArgs eventArgs)
         {
             Control?.ClearFocus();
+        }
+        private void UpdateAdapterLoad(string name, List<string> items)
+        {
+            if (name == Name)
+                UpdateAdapter(items);
         }
 
         private void UpdateAdapter(List<string> items)

@@ -35,7 +35,7 @@
                 <Setter Property="TextColor" Value="Black"/>
                 <Setter Property="WidthRequest" Value="150"/>
                 <Setter Property="HeightRequest" Value="30"/>
-                <Setter Property="Image" Value="share.png"/>
+                <Setter Property="Image" Value="shhaare.png"/>
                 <Setter Property="BackgroundColor" Value="LightGray"/>
                 <Setter Property="Margin" Value="0,0,0,5"/>
             </Style>
@@ -76,7 +76,7 @@
                                 <StackLayout Orientation="Horizontal">
                                     <Button Text="Adicionar a Lista" Style="{StaticResource ofertaOption}" HorizontalOptions="StartAndExpand"/>
                                     <Button Text="Compartilhar" Style="{StaticResource shareOption}" Command="{Binding ShareOfertaCommand}" HorizontalOptions="Center"/>
-                                    <Button Text="Monitorar oferta" Style="{StaticResource ofertaOption}" HorizontalOptions="End" />
+                                    <Button Text="Monitorar oferta" Style="{StaticResource ofertaOption}" Command="{Binding MonitorarOfertaCommand}" HorizontalOptions="End" />
                                 </StackLayout>
                             </StackLayout>
                         </ViewCell>

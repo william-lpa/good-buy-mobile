@@ -12,8 +12,7 @@ namespace GoodBuy.Views
             InitializeComponent();
             using (var scope = App.Container.BeginLifetimeScope())
             {
-                var usuariosVm = scope.Resolve<ViewModels.NovoGrupoOfertaPageViewModel>();
-                usuariosVm.NotSharing = false;
+                var usuariosVm = scope.Resolve<ViewModels.ListagemUsuariosPageViewModel>();
                 usuarios.BindingContext = usuariosVm;
 
                 var grupoofertaVm = scope.Resolve<ViewModels.GruposOfertasPageViewModel>();

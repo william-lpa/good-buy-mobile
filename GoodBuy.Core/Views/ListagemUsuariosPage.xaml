@@ -1,10 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GoodBuy.Core.Views.ListagemUsuariosPage">
+             xmlns:controls="clr-namespace:GoodBuy.Core.Controls"
+             x:Class="GoodBuy.Views.ListagemUsuariosPage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="labelCadastro" TargetType="Label">
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="TextColor" Value="#4e6cab"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin Forms!" />
-        </StackLayout>
+        <ScrollView>
+            <StackLayout>
+                <Label Text="Localizar participantes" HorizontalOptions="StartAndExpand" VerticalOptions="Center" Style="{StaticResource labelCadastro}"/>
+                <controls:CustomSearchBar Placeholder=" Nome, telefone ou e-mail" HorizontalOptions="Fill" Text="{Binding SearchText}" SearchCommand="{Binding SearchUser}" TextChangedCommand="{Binding  SearchUser}" />
+                <StackLayout Orientation="Horizontal">
+                    <Button Text="Buscar contato na agenda" HorizontalOptions="EndAndExpand" FontSize="Micro" BackgroundColor="LightGray" TextColor="Black" Command="{Binding SearchContact}"/>
+                </StackLayout>
+                <Label Text="Participantes:" HorizontalOptions="StartAndExpand" VerticalOptions="Center" Style="{StaticResource labelCadastro}"/>
+                <controls:CustomListView ItemTappedCommand="{Binding UserSelectedCommand}" ItemsSource="{Binding Users}" >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ImageCell Text="{Binding FullName}" Detail="{Binding UserDescription}" ImageSource="{Binding AvatarDisplay}" />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </controls:CustomListView>
+            </StackLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

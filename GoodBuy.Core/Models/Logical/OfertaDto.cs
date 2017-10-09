@@ -32,6 +32,7 @@ namespace GoodBuy.Models.Logical
         public Command AumentarConfiabilidadeCommand { get; }
         public Command DiminuirConfiabilidadeCommand { get; }
         public Command ShareOfertaCommand { get; }
+        public Command MonitorarOfertaCommand { get; }
         public bool? LikePerformed { get; set; } = null;
 
 
@@ -48,6 +49,7 @@ namespace GoodBuy.Models.Logical
             AumentarConfiabilidadeCommand = new Command(ExecuteAplicarLike);
             DiminuirConfiabilidadeCommand = new Command(ExecuteAplicarDislike);
             ShareOfertaCommand = new Command(ExecuteCompartilharOferta);
+            MonitorarOfertaCommand = new Command(ExecuteMonitorarOferta);
         }
 
         private async void ExecuteCompartilharOferta()
@@ -55,6 +57,12 @@ namespace GoodBuy.Models.Logical
             var parameters = new Dictionary<string, string>();
             parameters.Add("ID", idOFerta);
             await PushAsync<CompartilharOfertasPageViewModel>(false, parameters);
+        }
+        public async void ExecuteMonitorarOferta()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("ID", idOFerta);
+            await PushAsync<MonitorarOfertaPageViewModel>(false, parameters);
         }
 
         private async Task NeedsReversal()

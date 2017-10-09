@@ -53,6 +53,7 @@ namespace goodBuy.Droid
 
         protected override void OnCreate(Bundle bundle)
         {
+            var param = Intent.GetStringExtra("param");
             Xamarin.Facebook.FacebookSdk.SdkInitialize(this);
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
@@ -66,7 +67,8 @@ namespace goodBuy.Droid
 
             var container = BuildDependencies();
             instance = this;
-            LoadApplication(new App(container));
+            
+            LoadApplication(new App(container, param));
 
             //PackageInfo info = this.PackageManager.GetPackageInfo("goodbuy.app", PackageInfoFlags.Signatures);
             //foreach (var item in info.Signatures)

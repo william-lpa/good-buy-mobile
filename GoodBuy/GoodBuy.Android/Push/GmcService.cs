@@ -60,11 +60,11 @@ namespace goodBuy.Droid
                 // Set up templates to request
                 PushTemplate genericTemplate = new PushTemplate
                 {
-                    Body = @"{""data"":{""message"":""$(messageParam)""}}"
+                    Body = @"{""data"":{""key"":""$(keyParam)"",""message"":""$(messageParam)""}}"
                 };
                 PushTemplate ofertaTemplate = new PushTemplate
                 {
-                    Body = @"{""data"":{""ofertaTitle"":""$(ofertaTitleParam)"",""ofertaDescription"":""$(ofertaDescriptionParam)"",""idOFerta"":""$(ofertaIdParam)""}}"
+                    Body = @"{""data"":{""key"":""$(keyParam)"",""ofertaTitle"":""$(ofertaTitleParam)"",""ofertaDescription"":""$(ofertaDescriptionParam)"",""idOFerta"":""$(ofertaIdParam)""}}"
                 };
 
                 installation.Templates.Add("genericTemplate", genericTemplate);
@@ -85,9 +85,18 @@ namespace goodBuy.Droid
                 Debugger.Break();
             }
         }
+        enum MessageKind
+        {
+            GroupAdded = 700,
+            GroupEdited = 701,
+            GroupExcluded = 702,
+            NewMember = 703,
+            ExcludedMember = 704,
+            SharedMember = 705,
+            SharedGroup = 706,
+        }
         protected override void OnMessage(Context context, Intent intent)
         {
-            Android.Util.Log.Info("PushHandlerBroadcastReceiver", "GCM Message Received!");
             var msg = new StringBuilder();
             if (intent != null && intent.Extras != null)
             {
@@ -99,49 +108,80 @@ namespace goodBuy.Droid
             var edit = prefs.Edit();
             edit.PutString("last_msg", msg.ToString());
             edit.Commit();
-            string message = intent.Extras.GetString("message");
-            string message2 = intent.Extras.GetString("message2");
-            if (!string.IsNullOrEmpty(message))
-            {
-                createNotification("New todo item!", message);
-                return;
-            }
 
-            string msg2 = intent.Extras.GetString("msg");
-            if (!string.IsNullOrEmpty(msg2))
-            {
-                createNotification("New hub message!", msg2);
-                return;
-            }
+            var title = string.Empty;
+            var description = string.Empty;
+            var idOferta = string.Empty;
 
-            createNotification("Unknown message details", msg.ToString());
+            switch (Enum.Parse(typeof(MessageKind), intent.Extras.GetString("key")))
+            {
+                case MessageKind.GroupAdded:
+                case MessageKind.GroupEdited:
+                case MessageKind.GroupExcluded:
+                case MessageKind.NewMember:
+                case MessageKind.ExcludedMember:
+                    title = "Alteração nos grupos";
+                    description = intent.Extras.GetString("message");
+                    CreateNotification(title, description, "grupos");
+                    break;
+                case MessageKind.SharedMember:
+                case MessageKind.SharedGroup:
+                    title = intent.Extras.GetString("ofertaTitle");
+                    description = intent.Extras.GetString("ofertaDescription");
+                    idOferta = intent.Extras.GetString("idOFerta");
+                    CreateNotification(title, description, idOferta);
+                    break;
+                default:
+                    CreateNotification("Unknown message details", msg.ToString());
+                    break;
+            }
         }
-        void createNotification(string title, string desc)
+
+
+        private void CreateNotification(string title, string desc, string parameter = null)
         {
             //Create notification
             var notificationManager = GetSystemService(Context.NotificationService) as NotificationManager;
             //Create an intent to show ui
-            var uiIntent = new Intent(this, typeof(MainActivity));
-            //Use Notification Builder
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-            //Create the notification
-            //we use the pending intent, passing our ui intent over which will get called
-            //when the notification is tapped.
-            var notification =
-           builder.SetContentIntent(PendingIntent.GetActivity(this, 0, uiIntent, 0))
-            .SetSmallIcon(Android.Resource.Drawable.SymActionEmail)
-            .SetTicker(title)
-            .SetContentTitle(title)
-            .SetContentText(desc)
+            var startupIntent = new Intent(this, typeof(MainActivity));
+            startupIntent.PutExtra("param", parameter);
+
+            var builder = new Notification.Builder(this)
+              .SetContentTitle(title)
+              .SetContentText(parameter == "grupos" ? "Grupo com alteração" : "Oferta compartilhada")
+              .SetSmallIcon(Android.Resource.Drawable.IcMenuShare)
+              .AddAction(Android.Resource.Drawable.IcMenuSend, parameter == "grupos" ? "Ver grupos" : "Ir para a oferta", PendingIntent.GetActivity(this, 0, startupIntent, PendingIntentFlags.UpdateCurrent));
+
+            Notification notification = new Notification.BigTextStyle(builder)
+              .BigText(desc)
+              .Build();
+            // Put the auto cancel notification flag
+            notification.Flags |= NotificationFlags.AutoCancel;
+            notificationManager.Notify(0, notification);
+
+
+
+
+            // //Use Notification Builder
+            // NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+            // //Create the notification
+            // //we use the pending intent, passing our ui intent over which will get called
+            // //when the notification is tapped.
+            // var notification =
+            //builder.SetContentIntent(PendingIntent.GetActivity(this, 0, uiIntent, 0))
+            // .SetSmallIcon(Android.Resource.Drawable.IcMenuShare)
+            // .SetTicker(title)
+            // .SetContentTitle(title)
+            // .SetContentText(desc)
 
 
 
             //Set the notification sound
-            .SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification))
-            //Auto cancel will remove the notification once the user touches it
-            .SetAutoCancel(true).Build();
-            //Show the notification
-            notificationManager.Notify(1, notification);
+            //.SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification))
+            ////Auto cancel will remove the notification once the user touches it
+            //.SetAutoCancel(true).Build();
+            ////Show the notification
+            //notificationManager.Notify(1, notification);
         }
 
         protected override void OnUnRegistered(Context context, string registrationId)

@@ -9,6 +9,7 @@ using GoodBuy.Log;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.WindowsAzure.MobileServices;
+using GoodBuy.Core.Models.Logical;
 
 namespace GoodBuy.ViewModels
 {
@@ -42,16 +43,6 @@ namespace GoodBuy.ViewModels
         public ObservableCollection<ParticipanteGrupo> Members { get; }
         public bool EditingGroup { get; set; }
         public string PrimaryAction => EditingGroup ? "Salvar" : "Criar";
-        private bool notShareMode;
-        public bool NotSharing
-        {
-            get { return notShareMode; }
-            set
-            {
-                SetProperty(ref notShareMode, value);
-                if (!value) Init();
-            }
-        }
 
         public string SearchText { get; set; }
 
@@ -63,7 +54,6 @@ namespace GoodBuy.ViewModels
 
         public NovoGrupoOfertaPageViewModel(AzureService azureService, GrupoOfertaService service, UserService userService)
         {
-            NotSharing = true;
             this.azureService = azureService;
             grupoOfertaService = service;
             this.userService = userService;

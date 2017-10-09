@@ -8,7 +8,7 @@ namespace GoodBuy.Views
     //[XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class LoginPage : ContentPage
     {
-        public LoginPage()
+        public LoginPage(string param = null)
         {
             LoginPageViewModel login;
             InitializeComponent();
@@ -17,8 +17,7 @@ namespace GoodBuy.Views
                 login = scope.Resolve<LoginPageViewModel>();
                 BindingContext = login;
             }
-            login.TrySSO();
-
+            login.TrySSO(param);
         }
     }
 }
