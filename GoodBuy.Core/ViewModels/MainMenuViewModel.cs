@@ -48,7 +48,7 @@ namespace GoodBuy.ViewModels
             if (await syncronizeAccessService.FirstUsage())
             {
                 await Log.MessageDisplayer.Instance.ShowMessage("Sincronizar base de dados", "O aplicativo irá sincronizar a base de dados para um primeiro uso. Isto pode levar alguns segundos", "OK");
-                await PushModalAsync<LoadingPageViewModel>(new NamedParameter("operation", Operation.SyncInitalDataBase));
+                await PushModalAsync<LoadingPageViewModel>(null,new NamedParameter("operation", Operation.SyncInitalDataBase));
                 syncronizeAccessService.SyncronizeFirstUse();
                 await PopModalAsync();
             }
@@ -71,7 +71,7 @@ namespace GoodBuy.ViewModels
 
         private async void ExecuteCadastrarNovaOferta()
         {
-            await PushModalAsync<NovaOfertaViewModel>();
+            await PushModalAsync<OfertaDetalhePageViewModel>();
         }
     }
 }

@@ -7,6 +7,7 @@ using Autofac;
 using GoodBuy.Models;
 using System.Collections.ObjectModel;
 using GoodBuy.Models.Logical;
+using System.Collections.Generic;
 
 namespace GoodBuy.ViewModels
 {
@@ -84,6 +85,8 @@ namespace GoodBuy.ViewModels
                 await this.PushAsync<MainMenuViewModel>(resetNavigation: true);
                 if (param == "grupos")
                     await this.PushAsync<GruposOfertasPageViewModel>();
+                else if (param != null)
+                    await this.PushAsync<OfertaDetalhePageViewModel>(false, new Dictionary<string, string>() { ["ID"] = param });
             }
             else
             {
@@ -128,7 +131,7 @@ namespace GoodBuy.ViewModels
             try
             {
                 VerifyNumberManualChange();
-                await PushModalAsync<LoadingPageViewModel>(new NamedParameter("operation", Operation.Login));
+                await PushModalAsync<LoadingPageViewModel>(null, new NamedParameter("operation", Operation.Login));
                 await azureService.LoginAsync(MobileServiceAuthenticationProvider.Facebook, profileUserContact);
                 await PushAsync<MainMenuViewModel>(resetNavigation: true);
             }

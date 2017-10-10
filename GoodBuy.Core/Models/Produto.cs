@@ -1,14 +1,15 @@
 ﻿using GoodBuy.Model;
+using GoodBuy.Service;
 using Microsoft.WindowsAzure.MobileServices;
 using Newtonsoft.Json;
 
 namespace GoodBuy.Models
 {
     [DataTable(nameof(Produto))]
-    public class Produto : BaseEntity
+    public class Produto : BaseEntity, IName
     {
         [JsonProperty("nome")]
-        public string Nome { get; private set; }
+        public string Nome { get; set; }
 
         [JsonProperty("idSabor")]
         public string IdSabor { get; private set; }
@@ -26,7 +27,7 @@ namespace GoodBuy.Models
         public UnidadeMedida UnidadeMedida { get; set; }
 
         [JsonProperty("quantidadeMensuravel")]
-        public float QuantidadeMensuravel { get; private set; }
+        public float QuantidadeMensuravel { get;  set; }
 
         public Produto(string nome, string idSabor, string idUnidadeMedida, string idCategoria, float quantidadeMensuravel)
         {

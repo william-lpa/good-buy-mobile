@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Views\MonitorarOfertaPage.xaml.cs">
-      <DependentUpon>MonitorarOfertaPage.xaml</DependentUpon>
+    <Compile Update="Views\OfertaDetalhePage.xaml.cs">
+      <DependentUpon>OfertaDetalhePage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 

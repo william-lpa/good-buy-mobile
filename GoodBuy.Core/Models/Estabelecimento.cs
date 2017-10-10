@@ -1,4 +1,5 @@
 ﻿using GoodBuy.Model;
+using GoodBuy.Service;
 using Microsoft.WindowsAzure.MobileServices;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Collections.Generic;
 namespace GoodBuy.Models
 {
     [DataTable(nameof(Estabelecimento))]
-    public class Estabelecimento : BaseEntity
+    public class Estabelecimento : BaseEntity, IName
     {
         //[Version]
         //public string Version { get; set; }

@@ -8,7 +8,7 @@ using GoodBuy.Service;
 namespace GoodBuy.Models
 {
     [DataTable(nameof(Marca))]
-    public class Marca : BaseEntity
+    public class Marca : BaseEntity, IName
     {
         [JsonProperty("nome")]
         public string Nome { get; set; }

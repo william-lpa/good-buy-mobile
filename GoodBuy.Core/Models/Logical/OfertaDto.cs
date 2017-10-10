@@ -62,7 +62,7 @@ namespace GoodBuy.Models.Logical
         {
             var parameters = new Dictionary<string, string>();
             parameters.Add("ID", idOFerta);
-            await PushAsync<MonitorarOfertaPageViewModel>(false, parameters);
+            await PushAsync<OfertaDetalhePageViewModel>(false, parameters);
         }
 
         private async Task NeedsReversal()

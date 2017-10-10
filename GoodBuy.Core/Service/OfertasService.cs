@@ -25,6 +25,7 @@ namespace GoodBuy.Service
         private readonly IGenericRepository<HistoricoOferta> historicoOfertaRepository;
         private const int BASE_PERCENTUAL = 100;
         public static event Action<string, List<string>> OnCollectionLoaded;
+
         public OfertasService(AzureService azureService, SyncronizedAccessService syncronizedAccessService)
         {
             this.azureService = azureService;
@@ -166,6 +167,101 @@ namespace GoodBuy.Service
 
             return retorno;
         }
+
+        public async Task<Oferta> ObterOfertaCompleta(string id)
+        {
+            var oferta = await ofertaRepository.GetById(id);
+            var tasks = new Task[7];
+            await Task.WhenAll(
+                tasks[0] = Task.Run(async () => oferta.Estabelecimento = await estabelecimentoRepository.GetById(oferta.IdEstabelecimento)),
+                tasks[1] = Task.Run(async () => oferta.CarteiraProduto = await carteiraProdutoRepository.GetById(oferta.IdCarteiraProduto))
+                ).ContinueWith((action) =>
+               {
+                   Task.WhenAll(
+                       tasks[2] = Task.Run(async () => oferta.CarteiraProduto.Marca = await marcaRepository.GetById(oferta.CarteiraProduto.IdMarca)),
+                       tasks[3] = Task.Run(async () => oferta.CarteiraProduto.Produto = await produtoRepository.GetById(oferta.CarteiraProduto.IdProduto))
+                       ).ContinueWith((task) =>
+                       {
+                           Task.WhenAll(
+                              tasks[4] = Task.Run(async () => oferta.CarteiraProduto.Produto.Categoria = await categoriaRepository.GetById(oferta.CarteiraProduto.Produto.IdCategoria)),
+                              tasks[5] = Task.Run(async () => oferta.CarteiraProduto.Produto.Sabor = await saborRepository.GetById(oferta.CarteiraProduto.Produto.IdSabor)),
+                              tasks[6] = Task.Run(async () => oferta.CarteiraProduto.Produto.UnidadeMedida = await unidadeMedidaRepository.GetById(oferta.CarteiraProduto.Produto.IdUnidadeMedida))
+                             );
+                       });
+               });
+            Task.WaitAll(tasks);
+            return oferta;
+        }
+        public async void CriarNovaOferta(Oferta oferta)
+        {
+            var idEstabelecimento = await CreateOrRetrieveEntityByName(oferta?.Estabelecimento);
+            await CreateOrRetrieveEntityByName(oferta?.CarteiraProduto?.Produto?.Sabor);
+            await CreateOrRetrieveEntityByName(oferta?.CarteiraProduto?.Produto?.UnidadeMedida);
+            await CreateOrRetrieveEntityByName(oferta?.CarteiraProduto?.Produto?.Categoria);
+            var idMarca = await CreateOrRetrieveEntityByName(oferta?.CarteiraProduto?.Marca);
+            await azureService.Client.SyncContext.PushAsync(new System.Threading.CancellationToken());
+            var idProduto = await CreateOrRetrieveEntityByName(oferta?.CarteiraProduto?.Produto);
+            await SyncronizeBaseDeOfertas();
+            var idCarteira = await CriarCarteiraProduto(idProduto, idMarca);
+            await SyncronizeBaseDeOfertas();
+            await CriarOferta(idEstabelecimento, idCarteira, oferta.PrecoAtual);
+            await SyncronizeBaseDeOfertas();
+        }
+
+        private async Task<string> CreateOrRetrieveEntityByName<TEntity>(TEntity entity) where TEntity : class, IEntity, IName, new()
+        {
+            var repository = await GetEntityService<TEntity>();
+            if (entity?.Nome == null)
+                return null;
+            return
+                ((await repository?.SyncTableModel.Where(x => x.Nome == entity.Nome).Select(x => x.Id).ToEnumerableAsync()).FirstOrDefault()) ??
+                 await repository?.CreateEntity(new TEntity() { Nome = entity.Nome });
+        }
+
+        private async Task<string> CriarCarteiraProduto(string idProduto, string idMarca)
+        {
+            var repository = await GetEntityService<CarteiraProduto>();
+            var id = ((await repository?.SyncTableModel.Where(x => x.IdMarca == idMarca && x.IdProduto == idProduto).Select(x => x.Id).ToEnumerableAsync()).FirstOrDefault()) ??
+                       await repository?.CreateEntity(new CarteiraProduto(idProduto, idMarca));
+            return id;
+        }
+        private async Task<GenericRepository<T>> GetEntityService<T>(bool downloadUpdates = false) where T : class, IEntity, new()
+        {
+            var repository = new GenericRepository<T>(azureService);
+            if (downloadUpdates)
+                await repository.PullUpdates();
+            return repository;
+        }
+
+        private async Task CriarOferta(string idCarteira, string idEstabelecimento, decimal preco)
+        {
+            if (idCarteira == null || preco < 1)
+                return;
+
+            if (idEstabelecimento != null)
+            {
+                var ofertaExistente = (await ofertaRepository.SyncTableModel
+                                    .Where(x => x.IdCarteiraProduto == idCarteira && x.IdEstabelecimento == idEstabelecimento)
+                                    .OrderByDescending(x => x.UpdatedAt)
+                                    .Select(x => x).ToEnumerableAsync()).FirstOrDefault();
+                if (ofertaExistente != null)
+                {
+                    if (ofertaExistente.PrecoAtual == preco)
+                    {
+                        await ApplyLike(ofertaExistente.Id);
+                    }
+                    else
+                    {
+                        var historico = historicoOfertaRepository.CreateEntity(new HistoricoOferta(ofertaExistente));
+                        ofertaExistente.PrecoAtual = preco;
+                        await ofertaRepository?.UpdateEntity(ofertaExistente);
+                    }
+                }
+                else
+                    await ofertaRepository?.CreateEntity(new Oferta(idEstabelecimento, idCarteira, preco));
+            }
+        }
+
     }
 }
 

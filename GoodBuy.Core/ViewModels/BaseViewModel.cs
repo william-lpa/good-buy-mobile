@@ -89,7 +89,7 @@ namespace GoodBuy.ViewModels
 
         protected async Task PopToRootAsync() => await Application.Current.MainPage.Navigation.PopToRootAsync(true);
 
-        protected async Task<TViewModel> PushModalAsync<TViewModel>(params NamedParameter[] args) where TViewModel : BaseViewModel
+        protected async Task<TViewModel> PushModalAsync<TViewModel>(Dictionary<string, string> parameters = null, params NamedParameter[] args) where TViewModel : BaseViewModel
         {
             var viewmodelType = typeof(TViewModel);
             var viewModelTypeName = viewmodelType.Name;
@@ -100,6 +100,7 @@ namespace GoodBuy.ViewModels
             TViewModel viewModel = null;
             using (var scope = App.Container.BeginLifetimeScope())
             { viewModel = scope.Resolve<TViewModel>(args); }
+            viewModel.Init(parameters);
             //var viewModel = Activator.CreateInstance(viewmodelType, args);
             if (page != null)
                 page.BindingContext = viewModel;

@@ -10,20 +10,13 @@ using Xamarin.Forms.Xaml;
 namespace GoodBuy.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class NovaOferta : ContentPage
+    public partial class OfertaDetalhePage : ContentPage
     {
-
-        public event EventHandler<FocusEventArgs> ValidatableEntries = delegate { };
-        public NovaOferta()
+        public OfertaDetalhePage()
         {
             InitializeComponent();
         }
-
-        private void Entry_Unfocused(object sender, FocusEventArgs e)
-        {
-            //(BindingContext as ViewModels.NovaOfertaViewModel).ValidatableEntries<string>(nameof(produto));
-        }
-
+        
         private void Switch_Toggled(object sender, ToggledEventArgs e)
         {
             sabor.IsEnabled = e.Value;
