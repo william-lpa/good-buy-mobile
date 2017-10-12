@@ -3,44 +3,35 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GoodBuy.Views.ContactLoginPage"
              Title="Login de acesso">
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <Style x:Key="labelLogin" TargetType="Label">
-                <Setter Property="FontSize" Value="16"/>
-                <Setter Property="TextColor" Value="#4e6cab"/>                
-                <Setter Property="Margin" Value="0,0,0,0"/>
-            </Style>
-        </ResourceDictionary>
-    </ContentPage.Resources>
     <StackLayout Spacing="10">
         <StackLayout Spacing="0">
-            <Label Text="Nome completo" Style="{StaticResource labelLogin}" HorizontalOptions="StartAndExpand"/>
+            <Label Text="Nome completo" Style="{StaticResource label}" HorizontalOptions="StartAndExpand"/>
             <Entry Placeholder="Nome do usuário" Text="{Binding Name}"/>
         </StackLayout>
         <StackLayout Spacing="0">
-            <Label Text="E-Mail" Style="{StaticResource labelLogin}" HorizontalOptions="StartAndExpand"/>
-            <Entry Placeholder="Email pessoal" Text="{Binding Email}"/>
+            <Label Text="E-Mail" Style="{StaticResource label}" HorizontalOptions="StartAndExpand"/>
+            <Entry Placeholder="Email pessoal" Keyboard="Email" Text="{Binding Email}"/>
         </StackLayout>
         <StackLayout Spacing="0">
-            <Label Text="Telefone" Style="{StaticResource labelLogin}" HorizontalOptions="StartAndExpand"/>
+            <Label Text="Telefone" Style="{StaticResource label}" HorizontalOptions="StartAndExpand"/>
             <StackLayout Orientation="Horizontal">
                 <Entry Placeholder="Telefone Celular" Text="{Binding PhoneNumber}"  HorizontalOptions="FillAndExpand"/>
                 <Button Text="Selecionar núm. na agenda" HorizontalOptions="End" FontSize="11" BackgroundColor="LightGray" TextColor="Black" Command="{Binding SearchContactProfile}"/>
             </StackLayout>
         </StackLayout>
         <StackLayout Spacing="10">
-            <Label Text="Gênero/Sexo" Style="{StaticResource labelLogin}" HorizontalOptions="StartAndExpand"/>
+            <Label Text="Gênero/Sexo" Style="{StaticResource label}" HorizontalOptions="StartAndExpand"/>
             <StackLayout Orientation="Horizontal">
                 <Label Text="Masculino"  HorizontalOptions="Start"/>
                 <Switch IsToggled="{Binding Male}" />
             </StackLayout>
         </StackLayout>
         <StackLayout Spacing="10">
-            <Label Text="Data de Nascimento" Style="{StaticResource labelLogin}" HorizontalOptions="StartAndExpand"/>
+            <Label Text="Data de Nascimento" Style="{StaticResource label}" HorizontalOptions="StartAndExpand"/>
             <DatePicker MinimumDate="01/01/1950" Date="{Binding Birth}" MaximumDate="01/01/2012"/>
         </StackLayout>
         <StackLayout Spacing="10">
-            <Label Text="Cidade Atual" Style="{StaticResource labelLogin}" HorizontalOptions="StartAndExpand"/>
+            <Label Text="Cidade Atual" Style="{StaticResource label}" HorizontalOptions="StartAndExpand"/>
             <Entry Placeholder="Cidade/Município atual" Text="{Binding City}"  HorizontalOptions="FillAndExpand"/>
         </StackLayout>
         <Button Text="Logar com o perfil do dispositivo" Command="{Binding ProfileDeviceLoginCommand}" HorizontalOptions="FillAndExpand" BackgroundColor="#4e6cab" TextColor="#FFF"/>

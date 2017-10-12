@@ -17,6 +17,15 @@ namespace GoodBuy.ViewModels
         public Command FacebookLoginCommand { get; }
         public Command ContactListLoginCommand { get; }
         public Command ContactListCommand { get; }
+        private bool isRunning;
+        public bool IsLoading
+        {
+            get => isRunning;
+            set => SetProperty(ref isRunning, value);
+        }
+        public bool NotRunning => !IsLoading;
+
+
         public ObservableCollection<OfertaDto> UltimasOfertas { get; }
         private User profileUserContact;
         private string phoneNumber;
@@ -42,6 +51,8 @@ namespace GoodBuy.ViewModels
 
         public LoginPageViewModel(AzureService azure)
         {
+            IsLoading = true;
+            OnPropertyChanged(nameof(NotRunning));
             azureService = azure;
             UltimasOfertas = new ObservableCollection<OfertaDto>();
             FacebookLoginCommand = new Command(ExecuteFacebookLogin, CanExecuteLogin);
@@ -49,12 +60,13 @@ namespace GoodBuy.ViewModels
             ContactListCommand = new Command(ExecuteOpenContactList);
         }
 
-        private async void InitializeCollection(OfertasService service)
+        private async Task InitializeCollection(OfertasService service)
         {
             var ofertas = await service.ObterUltimasTresOfertasFromServer();
 
             if (ofertas != null)
             {
+                UltimasOfertas.Clear();
                 foreach (var item in ofertas)
                 {
                     UltimasOfertas.Add(item);
@@ -86,14 +98,16 @@ namespace GoodBuy.ViewModels
                 if (param == "grupos")
                     await this.PushAsync<GruposOfertasPageViewModel>();
                 else if (param != null)
-                    await this.PushAsync<OfertaDetalhePageViewModel>(false, new Dictionary<string, string>() { ["ID"] = param });
+                    await this.PushAsync<OfertasTabDetailPageViewModel>(false, new Dictionary<string, string>() { ["ID"] = param });
             }
             else
             {
                 using (var scope = App.Container.BeginLifetimeScope())
                 {
                     ContactPicked(profileUserContact = scope.Resolve<IContactListService>().PickProfileUser());
-                    InitializeCollection(scope.Resolve<OfertasService>());
+                    await InitializeCollection(scope.Resolve<OfertasService>());
+                    IsLoading = false;
+                    OnPropertyChanged(nameof(NotRunning));
                 }
             }
         }

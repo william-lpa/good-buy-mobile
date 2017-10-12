@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:GoodBuy.Core.Controls"
+             x:Class="GoodBuy.Views.OfertaDetalhePage"
+             Title="Monitorar Oferta"
+             >
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout>
+                <StackLayout IsEnabled="{Binding NotEditingOferta}">
+                    <Label Text="Nome do Produto*" Style="{StaticResource label}"/>
+                    <controls:AutoComplete Name="Produtos" Keyboard="Text" Placeholder="Suco Integral" Text="{Binding Produto}"/>
+                    <StackLayout Orientation="Horizontal" >
+                        <Label Text="Tem um sabor?" />
+                        <Switch  IsToggled="false" Toggled="Switch_Toggled"  />
+                        <controls:AutoComplete 
+                    x:Name="sabor"
+                    IsEnabled="False"
+                    Name="Sabores"
+                    Text="{Binding Sabor}"
+                    Placeholder="Morango, Chocolate, Uva..."
+                    />
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal"  Spacing="15" >
+                        <StackLayout>
+                            <Label Text="Peso do produto*" Style="{StaticResource label}"/>
+                            <Entry x:Name="quantidade" Keyboard="Numeric" Placeholder="1, 150, 300..." Text="{Binding Quantidade}" />
+                        </StackLayout>
+                        <StackLayout>
+                            <Label Text="Unidade de medida*" Style="{StaticResource label}"/>
+                            <controls:AutoComplete Name="UnidadesMedidas" Placeholder="gr, kg, unidade, pacote" Text="{Binding UnidadeMedida}" />
+                        </StackLayout>
+                    </StackLayout>
+                    <Label Text="Marca do produto*" Style="{StaticResource label}"/>
+                    <controls:AutoComplete Name="Marcas" Placeholder="Pepsi, Nestlé" Text="{Binding Marca}" />
+
+                    <Label Text="Categoria" Style="{StaticResource label}"/>
+                    <controls:AutoComplete Name="Categorias" Placeholder="Mercearia, Confeitaria, Eletrônicos" Text="{Binding Categoria}" />
+
+                    <Label Text="Estabelecimento*" Style="{StaticResource label}"/>
+                    <controls:AutoComplete Name="Estabelecimentos" Placeholder="Cooper, Angeloni, BIG... " Text="{Binding Estabelecimento}" />
+
+                    <Label Text="Preco*" Style="{StaticResource label}"/>
+                    <Entry x:Name="preco"  Keyboard="Numeric" Placeholder="3.50" Text="{Binding Preco}" />
+
+                    <Label  Margin="10,5,10,5" IsVisible="{Binding NotEditingOferta}" Text="campos marcados com '*' são de preenchimento obrigatório" FontSize="13" TextColor="Red"/>
+
+                </StackLayout>
+                <Button Text="{Binding PrimaryActionText}" Command="{Binding PrimaryAction}"/>
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

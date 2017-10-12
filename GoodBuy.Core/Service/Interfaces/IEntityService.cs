@@ -2,15 +2,15 @@
 using Microsoft.WindowsAzure.MobileServices;
 using Microsoft.WindowsAzure.MobileServices.Sync;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace GoodBuy.Service.Interfaces
 {
     public interface IGenericRepository<TModel> : ICrudOperation<TModel> where TModel : IEntity
     {
-        IDictionary<string, TModel> Cache { get; }
+        ConcurrentDictionary<string, TModel> Cache { get; }
         IMobileServiceClient Client { get; }
         IMobileServiceSyncTable<TModel> SyncTableModel { get; }
         Task SyncDataBase(DateTime? createdOrChangedAfter = null);

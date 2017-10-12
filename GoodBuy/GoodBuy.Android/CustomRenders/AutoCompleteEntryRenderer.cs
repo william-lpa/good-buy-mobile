@@ -262,7 +262,8 @@ namespace goodBuy.Droid.CustomRenders
         private void UpdateAdapter(List<string> items)
         {
             ArrayAdapter autoCompleteAdapter = new ArrayAdapter(Xamarin.Forms.Forms.Context, Android.Resource.Layout.SimpleDropDownItem1Line, items);
-            Control.Adapter = autoCompleteAdapter;
+            if (Control != null)
+                Control.Adapter = autoCompleteAdapter;
         }
     }
 }

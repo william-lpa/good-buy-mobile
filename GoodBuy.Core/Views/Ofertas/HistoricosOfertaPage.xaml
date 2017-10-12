@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GoodBuy.Views.HistoricosOfertaPage">
+    <ContentPage.Content>        
+        <StackLayout Spacing="10">
+            <Label Text="Monitorar ofertas" Style="{StaticResource label}" FontSize="Large" HorizontalOptions="StartAndExpand"/>
+            <StackLayout Orientation="Vertical">
+                <Label Text="Monitorar quando atingir preço"  HorizontalOptions="Start"/>
+                <StackLayout Orientation="Horizontal">
+                    <Switch IsToggled="{Binding MonitorarOferta}" />
+                    <Entry Text="{Binding MonitorarOfertaValor}" HorizontalOptions="FillAndExpand"/>
+                </StackLayout>
+            </StackLayout>
+            <Button Text="Criar Alerta" Command="{Binding CriarAlertaCommand}"/>
+            <Label Text="Variação Preço" Style="{StaticResource label}" FontSize="Large" HorizontalOptions="StartAndExpand"/>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

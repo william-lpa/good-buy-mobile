@@ -112,8 +112,7 @@ namespace GoodBuy.ViewModels
         {
             return (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(Email)
                             && !string.IsNullOrEmpty(PhoneNumber)
-                            && !string.IsNullOrEmpty(City)
-                            && Birth.Year > 1909);
+                            && !string.IsNullOrEmpty(City));
         }
 
         private User Transform()

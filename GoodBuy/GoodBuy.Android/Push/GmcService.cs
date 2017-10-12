@@ -128,7 +128,7 @@ namespace goodBuy.Droid
                 case MessageKind.SharedGroup:
                     title = intent.Extras.GetString("ofertaTitle");
                     description = intent.Extras.GetString("ofertaDescription");
-                    idOferta = intent.Extras.GetString("idOFerta");
+                    idOferta = intent.Extras.GetString("idOferta");
                     CreateNotification(title, description, idOferta);
                     break;
                 default:
@@ -150,6 +150,7 @@ namespace goodBuy.Droid
               .SetContentTitle(title)
               .SetContentText(parameter == "grupos" ? "Grupo com alteração" : "Oferta compartilhada")
               .SetSmallIcon(Android.Resource.Drawable.IcMenuShare)
+              .SetContentIntent(PendingIntent.GetActivity(this, 0, startupIntent, PendingIntentFlags.UpdateCurrent))
               .AddAction(Android.Resource.Drawable.IcMenuSend, parameter == "grupos" ? "Ver grupos" : "Ir para a oferta", PendingIntent.GetActivity(this, 0, startupIntent, PendingIntentFlags.UpdateCurrent));
 
             Notification notification = new Notification.BigTextStyle(builder)

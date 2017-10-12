@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GoodBuy.Views.LoginPage"
+             xmlns:controls="clr-namespace:GoodBuy.Core.Controls"
              Title="Bem Vindo">
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -15,10 +16,12 @@
             </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
-    <StackLayout>        
-        <StackLayout >
+    <StackLayout>
+        <ActivityIndicator Color="#4e6cab" IsVisible="{Binding IsLoading}" IsRunning="{Binding IsLoading, Mode=TwoWay}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" HeightRequest="320"/>
+        <Label Text="Carregando Ofertas" IsVisible="{Binding IsLoading}" HorizontalOptions="CenterAndExpand"/>
+        <StackLayout IsVisible="{Binding NotRunning}" >
             <Button Text="Últimas atualizações em Blumenau, SC!" Style="{StaticResource headerLocationButton}" />
-            <ListView x:Name="lvwOfertas" HasUnevenRows="True" HeightRequest="320" ItemsSource="{Binding UltimasOfertas}">
+            <controls:CustomListView x:Name="lvwOfertas" HasUnevenRows="True" HeightRequest="320" ItemsSource="{Binding UltimasOfertas}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
@@ -48,7 +51,7 @@
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
-            </ListView>
+            </controls:CustomListView>
         </StackLayout>
         <Label  Text="{Binding PhoneLabel}" FontSize="Medium"/>
         <StackLayout Orientation="Horizontal">

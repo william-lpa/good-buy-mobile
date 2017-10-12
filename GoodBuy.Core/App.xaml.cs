@@ -40,6 +40,8 @@ namespace GoodBuy
             container.RegisterType<OfertaDetalhePageViewModel>();
             container.RegisterType<CompartilharOfertasPageViewModel>();
             container.RegisterType<ListagemUsuariosPageViewModel>();
+            container.RegisterType<OfertasTabDetailPageViewModel>();
+            container.RegisterType<HistoricosOfertaPageViewModel>();
             container.RegisterType<SyncronizedAccessService>().SingleInstance();
             container.RegisterType<GenericRepository<Model.IEntity>>();
             return container;

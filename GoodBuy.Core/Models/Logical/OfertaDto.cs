@@ -12,7 +12,7 @@ namespace GoodBuy.Models.Logical
 {
     public class OfertaDto : BaseViewModel
     {
-        private readonly string idOFerta;
+        public readonly string idOFerta;
         private float confiabilidade;
         private readonly OfertasService ofertasService;
         public string DescricaoOferta { get; }
@@ -32,10 +32,8 @@ namespace GoodBuy.Models.Logical
         public Command AumentarConfiabilidadeCommand { get; }
         public Command DiminuirConfiabilidadeCommand { get; }
         public Command ShareOfertaCommand { get; }
-        public Command MonitorarOfertaCommand { get; }
+        public Command OfertaDetailCommand { get; }
         public bool? LikePerformed { get; set; } = null;
-
-
 
         public OfertaDto(Estabelecimento estabelecimento, Oferta oferta, Produto produto, UnidadeMedida unidade, Sabor sabor, Marca marca, OfertasService ofertasService)
         {
@@ -45,11 +43,11 @@ namespace GoodBuy.Models.Logical
             ValorOferta = oferta.PrecoAtual;
             Confiabilidade = ofertasService.CalculateConfiabilidade(oferta);
             Estabelecimento = estabelecimento.Nome;
-            DescricaoOferta = $"{produto.Nome} - {sabor.Nome}, {marca.Nome}, {produto.QuantidadeMensuravel} {unidade.Nome}";
+            DescricaoOferta = $"{produto.Nome} - {sabor?.Nome}, {marca.Nome}, {produto.QuantidadeMensuravel} {unidade.Nome}";
             AumentarConfiabilidadeCommand = new Command(ExecuteAplicarLike);
             DiminuirConfiabilidadeCommand = new Command(ExecuteAplicarDislike);
             ShareOfertaCommand = new Command(ExecuteCompartilharOferta);
-            MonitorarOfertaCommand = new Command(ExecuteMonitorarOferta);
+            OfertaDetailCommand = new Command(ExecuteMonitorarOferta);
         }
 
         private async void ExecuteCompartilharOferta()
@@ -62,7 +60,7 @@ namespace GoodBuy.Models.Logical
         {
             var parameters = new Dictionary<string, string>();
             parameters.Add("ID", idOFerta);
-            await PushAsync<OfertaDetalhePageViewModel>(false, parameters);
+            await PushAsync<OfertasTabDetailPageViewModel>(false, parameters);
         }
 
         private async Task NeedsReversal()

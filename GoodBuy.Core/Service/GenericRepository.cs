@@ -5,9 +5,8 @@ using GoodBuy.Model;
 using GoodBuy.Service.Interfaces;
 using Microsoft.WindowsAzure.MobileServices.Sync;
 using Microsoft.WindowsAzure.MobileServices;
-using System.Linq.Expressions;
 using System.Linq;
-using GoodBuy.Models;
+using System.Collections.Concurrent;
 
 namespace GoodBuy.Service
 {
@@ -15,14 +14,14 @@ namespace GoodBuy.Service
     {
         public IMobileServiceSyncTable<TModel> SyncTableModel { get; }
         public IMobileServiceClient Client { get; }
-        public IDictionary<string, TModel> Cache { get; }
+        public ConcurrentDictionary<string, TModel> Cache { get; }
         private const int MINUTES_TO_REFRESH = 10;
         private DateTime LastRefresh;
         public static object pushing = new object();
 
         public GenericRepository(AzureService azureService)
         {
-            Cache = new SortedList<string, TModel>();
+            Cache = new ConcurrentDictionary<string, TModel>();
             Client = azureService.Client;
             SyncTableModel = azureService.GetTable<TModel>();
             LastRefresh = DateTime.Now;
@@ -33,7 +32,7 @@ namespace GoodBuy.Service
             {
                 entidade.Id = entidade.Id ?? Guid.NewGuid().ToString();
                 await SyncTableModel.InsertAsync(entidade);
-                Cache.Add(entidade.Id, entidade);
+                Cache.AddOrUpdate(entidade.Id, entidade, (key, value) => value);
                 await NeedsRefresh();
                 if (forceSync)
                     await SyncDataBase(DateTime.Now);
@@ -50,7 +49,7 @@ namespace GoodBuy.Service
             try
             {
                 await SyncTableModel.DeleteAsync(entidade);
-                Cache.Remove(entidade.Id);
+                Cache.TryRemove(entidade.Id, out entidade);
                 await NeedsRefresh();
             }
             catch (Exception err)
@@ -62,13 +61,18 @@ namespace GoodBuy.Service
         {
             try
             {
+                if (string.IsNullOrEmpty(id))
+                    return null;
+
                 await NeedsRefresh();
 
                 if (!Cache.ContainsKey(id))
                 {
+                    var entities = await (SyncTableModel.ToListAsync());
                     var entity = await (SyncTableModel.LookupAsync(id));
                     if (entity != null)
-                        Cache.Add(entity.Id, entity);
+                        Cache.AddOrUpdate(entity.Id, entity, (key, value) => value);
+
                     return entity;
                 }
                 return Cache[id];

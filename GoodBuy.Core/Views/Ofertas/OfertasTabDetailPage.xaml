@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:GoodBuy.Views"
+             x:Class="GoodBuy.Views.OfertasTabDetailPage"
+             Title="Detalhes da Oferta">
+    <!--Pages can be added as references or inline-->
+    <local:OfertaDetalhePage Title="Oferta" x:Name="oferta" />
+    <local:HistoricosOfertaPage Title="Monitorar Oferta" x:Name="historico" />
+
+</TabbedPage>

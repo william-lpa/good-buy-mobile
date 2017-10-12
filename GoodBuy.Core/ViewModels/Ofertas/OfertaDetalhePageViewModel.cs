@@ -98,8 +98,17 @@ namespace GoodBuy.ViewModels
             }
         }
         public Command PrimaryAction { get; }
+        private bool editingOferta;
         public bool NotEditingOferta => !EditingOferta;
-        public bool EditingOferta { get; private set; }
+        public bool EditingOferta
+        {
+            get => editingOferta;
+            set
+            {
+                SetProperty(ref editingOferta, value);
+                Init();
+            }
+        }
         public string PrimaryActionText => EditingOferta ? "Confirmar" : "Cadastrar";
         public bool MonitorarOferta { get; set; }
         public string MonitorarOfertaValor { get; set; }
@@ -117,19 +126,22 @@ namespace GoodBuy.ViewModels
             this.ofertasService = ofertasService;
             this.azureService = azure;
             PrimaryAction = new Command(ExecutePersistOferta, VerificarCamposObrigatorios);
+
+
         }
 
         protected async override void Init(Dictionary<string, string> parameters = null)
         {
-            if (parameters != null && parameters.ContainsKey("ID"))
+            if (EditingOferta || (parameters != null && parameters.ContainsKey("ID")))
             {
-                EditingOferta = true;
-                editOferta = await ofertasService.ObterOfertaCompleta(parameters["ID"]);
+                while (OfertasTabDetailPageViewModel.IdOferta == null) await Task.Delay(200);
+
+                editOferta = await ofertasService.ObterOfertaCompleta(OfertasTabDetailPageViewModel.IdOferta);
                 Adapter();
+
             }
             else
             {
-                EditingOferta = false;
                 Initialize();
             }
             AtualizarStatus();
@@ -138,11 +150,11 @@ namespace GoodBuy.ViewModels
         private void Adapter()
         {
             Produto = editOferta?.CarteiraProduto?.Produto?.Nome;
-            Sabor = editOferta?.CarteiraProduto?.Produto?.Sabor?.Nome;
+            Sabor = editOferta?.CarteiraProduto?.Produto?.Sabor?.Nome ?? "Sabor não informado";
             Quantidade = editOferta?.CarteiraProduto?.Produto?.QuantidadeMensuravel ?? 0;
             Marca = editOferta?.CarteiraProduto?.Marca?.Nome;
             UnidadeMedida = editOferta?.CarteiraProduto?.Produto?.UnidadeMedida?.Nome;
-            Categoria = editOferta?.CarteiraProduto?.Produto?.Categoria?.Nome;
+            Categoria = editOferta?.CarteiraProduto?.Produto?.Categoria?.Nome ?? "Categoria não informada";
             Preco = editOferta?.PrecoAtual ?? 0;
             Estabelecimento = editOferta?.Estabelecimento?.Nome;//talbez historico
         }

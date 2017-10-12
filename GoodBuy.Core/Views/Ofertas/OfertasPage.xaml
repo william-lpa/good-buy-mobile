@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GoodBuy.Views.OfertasPage"
+             xmlns:controls="clr-namespace:GoodBuy.Core.Controls"
              Title="Ofertas recente do dia">
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -43,7 +44,7 @@
     </ContentPage.Resources>
     <ContentPage.Content>
         <StackLayout>
-            <ListView x:Name="lvwOfertasAtuais" ItemsSource="{Binding Path=Ofertas}" HasUnevenRows="True">
+            <controls:CustomListView x:Name="lvwOfertasAtuais" ItemsSource="{Binding Path=Ofertas}" HasUnevenRows="True" ItemTappedCommand="{Binding OfertaDetailCommand}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
@@ -76,13 +77,13 @@
                                 <StackLayout Orientation="Horizontal">
                                     <Button Text="Adicionar a Lista" Style="{StaticResource ofertaOption}" HorizontalOptions="StartAndExpand"/>
                                     <Button Text="Compartilhar" Style="{StaticResource shareOption}" Command="{Binding ShareOfertaCommand}" HorizontalOptions="Center"/>
-                                    <Button Text="Monitorar oferta" Style="{StaticResource ofertaOption}" Command="{Binding MonitorarOfertaCommand}" HorizontalOptions="End" />
+                                    <Button Text="Monitorar oferta" Style="{StaticResource ofertaOption}" Command="{Binding OfertaDetailCommand}" HorizontalOptions="End" />
                                 </StackLayout>
                             </StackLayout>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
-            </ListView>
+            </controls:CustomListView>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

@@ -8,6 +8,10 @@ namespace GoodBuy.Views
     //[XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class LoginPage : ContentPage
     {
+        public LoginPage() : this(null)
+        {
+
+        }
         public LoginPage(string param = null)
         {
             LoginPageViewModel login;
