@@ -126,19 +126,16 @@ namespace GoodBuy.ViewModels
             this.ofertasService = ofertasService;
             this.azureService = azure;
             PrimaryAction = new Command(ExecutePersistOferta, VerificarCamposObrigatorios);
-
-
         }
 
         protected async override void Init(Dictionary<string, string> parameters = null)
         {
             if (EditingOferta || (parameters != null && parameters.ContainsKey("ID")))
             {
-                while (OfertasTabDetailPageViewModel.IdOferta == null) await Task.Delay(200);
+                while (OfertasTabDetailPageViewModel.Oferta == null) await Task.Delay(55);
 
-                editOferta = await ofertasService.ObterOfertaCompleta(OfertasTabDetailPageViewModel.IdOferta);
+                editOferta = OfertasTabDetailPageViewModel.Oferta;
                 Adapter();
-
             }
             else
             {
@@ -177,6 +174,7 @@ namespace GoodBuy.ViewModels
 
         private bool VerificarCamposObrigatorios()
         {
+            return true;
             var retrr = !string.IsNullOrEmpty(Produto) && !string.IsNullOrEmpty(Marca) && Preco > 0 &&
                    !string.IsNullOrEmpty(Estabelecimento) && !string.IsNullOrEmpty(UnidadeMedida) &&
                    Quantidade > 0;
@@ -187,6 +185,11 @@ namespace GoodBuy.ViewModels
         {
             try
             {
+                var ofertaTeste = (await azureService.GetTable<Oferta>().LookupAsync("379724d7-fdff-4b8f-a510-205459ab6ce0"));
+                await ofertasService.CriarHistoricoAPartirDeOferta(ofertaTeste, 2.20M);
+                await azureService.Client.SyncContext.PushAsync(new System.Threading.CancellationToken());
+                return;
+
                 if (NotEditingOferta)
                 {
                     var oferta = new Oferta()

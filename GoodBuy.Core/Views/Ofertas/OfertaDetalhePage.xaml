@@ -15,12 +15,12 @@
                         <Label Text="Tem um sabor?" />
                         <Switch  IsToggled="false" Toggled="Switch_Toggled"  />
                         <controls:AutoComplete 
-                    x:Name="sabor"
-                    IsEnabled="False"
-                    Name="Sabores"
-                    Text="{Binding Sabor}"
-                    Placeholder="Morango, Chocolate, Uva..."
-                    />
+                            x:Name="sabor"
+                            IsEnabled="False"
+                            Name="Sabores"
+                            Text="{Binding Sabor}"
+                            Placeholder="Morango, Chocolate, Uva..."
+                        />
                     </StackLayout>
                     <StackLayout Orientation="Horizontal"  Spacing="15" >
                         <StackLayout>

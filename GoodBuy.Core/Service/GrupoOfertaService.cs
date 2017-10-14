@@ -54,10 +54,9 @@ namespace GoodBuy.Service
             var idOferta = await grupoRepository.CreateEntity(grupoOferta, true);
             foreach (var participante in participantes)
             {
-                var participanteNovo = new ParticipanteGrupo(participante.IdUser);
-                participanteNovo.IdGrupoOferta = idOferta;
-                participanteNovo.NomeGrupo = grupoOferta.Name;
-                await participantesRepository.CreateEntity(participanteNovo);
+                participante.IdGrupoOferta = idOferta;
+                participante.NomeGrupo = grupoOferta.Name;
+                await participantesRepository.CreateEntity(participante);
             }
         }
 

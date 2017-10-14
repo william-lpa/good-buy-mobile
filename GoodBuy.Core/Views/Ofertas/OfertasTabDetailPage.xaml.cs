@@ -13,12 +13,13 @@ namespace GoodBuy.Views
             InitializeComponent();
             using (var scope = App.Container.BeginLifetimeScope())
             {
+                ViewModels.OfertasTabDetailPageViewModel.Oferta = null;
                 var ofertaInfoVm = scope.Resolve<ViewModels.OfertaDetalhePageViewModel>();
                 ofertaInfoVm.EditingOferta = true;
                 oferta.BindingContext = ofertaInfoVm;
 
                 var historicoVm = scope.Resolve<ViewModels.HistoricosOfertaPageViewModel>();
-                historico.BindingContext = historico;
+                historico.BindingContext = historicoVm;
             }
         }
     }

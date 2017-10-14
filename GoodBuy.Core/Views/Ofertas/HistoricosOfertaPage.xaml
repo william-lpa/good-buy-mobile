@@ -2,17 +2,17 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GoodBuy.Views.HistoricosOfertaPage">
-    <ContentPage.Content>        
+    <ContentPage.Content>
         <StackLayout Spacing="10">
             <Label Text="Monitorar ofertas" Style="{StaticResource label}" FontSize="Large" HorizontalOptions="StartAndExpand"/>
             <StackLayout Orientation="Vertical">
                 <Label Text="Monitorar quando atingir preço"  HorizontalOptions="Start"/>
                 <StackLayout Orientation="Horizontal">
-                    <Switch IsToggled="{Binding MonitorarOferta}" />
-                    <Entry Text="{Binding MonitorarOfertaValor}" HorizontalOptions="FillAndExpand"/>
+                    <Switch IsToggled="{Binding ExistsAlert}" Toggled="Switch_Toggled" />
+                    <Entry x:Name="campoMonitore" Keyboard="Numeric" IsEnabled="False" Text="{Binding MonitorarOfertaValor}" Placeholder="Informe o preço do alerta" HorizontalOptions="FillAndExpand"/>
                 </StackLayout>
             </StackLayout>
-            <Button Text="Criar Alerta" Command="{Binding CriarAlertaCommand}"/>
+            <Button Text="Salvar Alteracoes" Command="{Binding PrimaryAction}"/>
             <Label Text="Variação Preço" Style="{StaticResource label}" FontSize="Large" HorizontalOptions="StartAndExpand"/>
         </StackLayout>
     </ContentPage.Content>

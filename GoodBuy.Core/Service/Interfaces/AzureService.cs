@@ -36,15 +36,14 @@ namespace GoodBuy.Service
         {
             try
             {
-                IAuthentication auth;
-                using (var scope = App.Container.BeginLifetimeScope())
-                    auth = scope.Resolve<IAuthentication>();
-
                 Task initializingSyncContext = null;
                 if (!Client.SyncContext.IsInitialized)
                     initializingSyncContext = Client.SyncContext.InitializeAsync(Store, new MobileServiceSyncHandler());
                 if (provider == MobileServiceAuthenticationProvider.Facebook)
                 {
+                    IAuthentication auth;
+                    using (var scope = App.Container.BeginLifetimeScope())
+                        auth = scope.Resolve<IAuthentication>();
                     // We need to ask for credentials at this point
                     await LoginWithFacebookAsync(initializingSyncContext, auth, profileUser);
                 }
@@ -151,10 +150,10 @@ namespace GoodBuy.Service
         {
             try
             {
-                //RemoveTokenFromSecureStore();
+                RemoveTokenFromSecureStore();
                 //Client = new MobileServiceClient(appURL, new ExpiredAzureRequestInterceptors(this));
                 Client = new MobileServiceClient(appURL);
-                var dbName = "goodBuy214.db";
+                var dbName = "goodBuy229.db";
                 Store = new MobileServiceSQLiteStore(Path.Combine(MobileServiceClient.DefaultDatabasePath, dbName));
                 DefineTables(Store);
 
@@ -184,8 +183,8 @@ namespace GoodBuy.Service
             if (CurrentUser != null)
             {
                 using (var scope = App.Container.BeginLifetimeScope())
-                   // scope.Resolve<IAuthentication>().RegisterForPushNotificaton(Client);
-                LoginUser(CurrentUser.User);
+                    // scope.Resolve<IAuthentication>().RegisterForPushNotificaton(Client);
+                    LoginUser(CurrentUser.User);
             }
 
             LoginIn = false;
@@ -225,6 +224,7 @@ namespace GoodBuy.Service
             store.DefineTable<User>();
             store.DefineTable<GrupoOferta>();
             store.DefineTable<ParticipanteGrupo>();
+            store.DefineTable<MonitoramentoOferta>();
         }
 
         public void StoreTokenInSecureStore(string userId, string key, string token = "")

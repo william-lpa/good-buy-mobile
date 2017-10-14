@@ -94,6 +94,10 @@ namespace goodBuy.Droid
             ExcludedMember = 704,
             SharedMember = 705,
             SharedGroup = 706,
+            AlertCreated = 707,
+            AlertUpdated = 708,
+            AlertedDeleted = 709,
+            PriceReached = 710,
         }
         protected override void OnMessage(Context context, Intent intent)
         {
@@ -126,10 +130,18 @@ namespace goodBuy.Droid
                     break;
                 case MessageKind.SharedMember:
                 case MessageKind.SharedGroup:
+                case MessageKind.PriceReached:
                     title = intent.Extras.GetString("ofertaTitle");
                     description = intent.Extras.GetString("ofertaDescription");
                     idOferta = intent.Extras.GetString("idOferta");
                     CreateNotification(title, description, idOferta);
+                    break;
+                case MessageKind.AlertCreated:
+                case MessageKind.AlertedDeleted:
+                case MessageKind.AlertUpdated:
+                    title = "Alteração nos alertas de ofertas";
+                    description = intent.Extras.GetString("message");
+                    CreateAlertNotification(title, description);
                     break;
                 default:
                     CreateNotification("Unknown message details", msg.ToString());
@@ -137,6 +149,23 @@ namespace goodBuy.Droid
             }
         }
 
+        private void CreateAlertNotification(string title, string desc)
+        {
+            var notificationManager = GetSystemService(Context.NotificationService) as NotificationManager;
+            //Create an intent to show ui
+
+            var builder = new Notification.Builder(this)
+              .SetContentTitle(title)
+              .SetContentText(desc)
+              .SetSmallIcon(Android.Resource.Drawable.IcMenuShare);
+
+            Notification notification = new Notification.BigTextStyle(builder)
+              .BigText(desc)
+              .Build();
+            // Put the auto cancel notification flag
+            notification.Flags |= NotificationFlags.AutoCancel;
+            notificationManager.Notify(0, notification);
+        }
 
         private void CreateNotification(string title, string desc, string parameter = null)
         {
@@ -159,30 +188,6 @@ namespace goodBuy.Droid
             // Put the auto cancel notification flag
             notification.Flags |= NotificationFlags.AutoCancel;
             notificationManager.Notify(0, notification);
-
-
-
-
-            // //Use Notification Builder
-            // NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-            // //Create the notification
-            // //we use the pending intent, passing our ui intent over which will get called
-            // //when the notification is tapped.
-            // var notification =
-            //builder.SetContentIntent(PendingIntent.GetActivity(this, 0, uiIntent, 0))
-            // .SetSmallIcon(Android.Resource.Drawable.IcMenuShare)
-            // .SetTicker(title)
-            // .SetContentTitle(title)
-            // .SetContentText(desc)
-
-
-
-            //Set the notification sound
-            //.SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification))
-            ////Auto cancel will remove the notification once the user touches it
-            //.SetAutoCancel(true).Build();
-            ////Show the notification
-            //notificationManager.Notify(1, notification);
         }
 
         protected override void OnUnRegistered(Context context, string registrationId)

@@ -22,6 +22,8 @@ namespace GoodBuy.Service
         public IGenericRepository<ParticipanteGrupo> ParticipanteGrupoRepository { get; }
         public IGenericRepository<User> UserRepository { get; }
         public IGenericRepository<Categoria> CategoriaRepository { get; set; }
+        public IGenericRepository<MonitoramentoOferta> MonitoramentoOfertaRepository { get; set; }
+
 
         private readonly AzureService azureService;
 
@@ -40,6 +42,7 @@ namespace GoodBuy.Service
             ParticipanteGrupoRepository = new GenericRepository<ParticipanteGrupo>(azureService);
             CategoriaRepository = new GenericRepository<Categoria>(azureService);
             UserRepository = new GenericRepository<User>(azureService);
+            MonitoramentoOfertaRepository = new GenericRepository<MonitoramentoOferta>(azureService);
         }
 
         public async Task<bool> FirstUsage() => (await OfertaRepository.GetEntities(0, 1)).Count == 0;
@@ -70,7 +73,7 @@ namespace GoodBuy.Service
                      Task.Run(() => ParticipanteGrupoRepository.SyncDataBase(date)),
                      Task.Run(() => UserRepository.SyncDataBase(date)),
                      Task.Run(() => CategoriaRepository.SyncDataBase(date)),
-                     
+                     Task.Run(() => MonitoramentoOfertaRepository.SyncDataBase(date)),
            });
         }
     }

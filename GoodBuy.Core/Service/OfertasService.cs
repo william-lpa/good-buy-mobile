@@ -6,7 +6,6 @@ using GoodBuy.Service.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace GoodBuy.Service
@@ -21,6 +20,7 @@ namespace GoodBuy.Service
         private readonly IGenericRepository<UnidadeMedida> unidadeMedidaRepository;
         private readonly IGenericRepository<Sabor> saborRepository;
         private readonly IGenericRepository<Produto> produtoRepository;
+        private readonly IGenericRepository<MonitoramentoOferta> monitoramentoOfertaRepository;
         private readonly IGenericRepository<Categoria> categoriaRepository;
         private readonly IGenericRepository<HistoricoOferta> historicoOfertaRepository;
         private const int BASE_PERCENTUAL = 100;
@@ -38,8 +38,8 @@ namespace GoodBuy.Service
             historicoOfertaRepository = syncronizedAccessService.HistoricoOfertaRepository;
             saborRepository = syncronizedAccessService.SaborRepository;
             categoriaRepository = syncronizedAccessService.CategoriaRepository;
+            monitoramentoOfertaRepository = syncronizedAccessService.MonitoramentoOfertaRepository;
         }
-
         internal float CalculateConfiabilidade(Oferta oferta)
         {
             if (oferta.Likes == 0)
@@ -113,7 +113,7 @@ namespace GoodBuy.Service
             var idProdutos = new List<Produto>();
             var idSabor = new List<Sabor>();
             var idUnidadeMedida = new List<UnidadeMedida>();
-            var idEstabelecimento = new List<Estabelecimento>();
+            var idEstabelecimento = new List<Estabelecimento>();            
 
             try
             {
@@ -184,7 +184,6 @@ namespace GoodBuy.Service
             tasks[1] = Task.Run(async () => oferta.CarteiraProduto.Produto.Sabor = await saborRepository.GetById(oferta.CarteiraProduto.Produto.IdSabor));
             tasks[2] = Task.Run(async () => oferta.CarteiraProduto.Produto.UnidadeMedida = await unidadeMedidaRepository.GetById(oferta.CarteiraProduto.Produto.IdUnidadeMedida));
             Task.WaitAll(tasks);
-
             return oferta;
         }
         public async void CriarNovaOferta(Oferta oferta)
@@ -241,6 +240,35 @@ namespace GoodBuy.Service
             return repository;
         }
 
+        internal async void CriarNovoAlerta(decimal valor)
+        {
+            var alerta = new MonitoramentoOferta(ViewModels.OfertasTabDetailPageViewModel.Oferta.Id, azureService.CurrentUser.User.Id);
+            alerta.PrecoAlvo = valor;
+            await monitoramentoOfertaRepository.CreateEntity(alerta);
+            await monitoramentoOfertaRepository.PullUpdates();
+        }
+        internal async Task<MonitoramentoOferta> TryLoadAlerta(string idOferta)
+        {
+            await monitoramentoOfertaRepository.PullUpdates();
+            return (await monitoramentoOfertaRepository.SyncTableModel.Where(x => x.IdOferta == idOferta && x.IdUser == azureService.CurrentUser.User.Id).ToListAsync()).FirstOrDefault();
+        }
+        internal async void RemoverAlerta(MonitoramentoOferta alerta)
+        {
+            var data = DateTime.Today;
+            alerta.Delete = true;
+            await monitoramentoOfertaRepository.UpdateEntity(alerta); //notify ser and delete on server            
+            await monitoramentoOfertaRepository.SyncDataBase(data);
+            await monitoramentoOfertaRepository.DeleteEntity(alerta);
+            await monitoramentoOfertaRepository.SyncDataBase(data);
+        }
+
+        internal async void AtualizarAlerta(MonitoramentoOferta alerta, decimal valor)
+        {
+            alerta.PrecoAlvo = valor;
+            await monitoramentoOfertaRepository.UpdateEntity(alerta); //notify ser and delete on server            
+            await monitoramentoOfertaRepository.SyncDataBase(DateTime.Today);
+        }
+
         private async Task CriarOferta(string idCarteira, string idEstabelecimento, decimal preco)
         {
             if (idCarteira == null || preco < 1)
@@ -260,16 +288,22 @@ namespace GoodBuy.Service
                     }
                     else
                     {
-                        var historico = historicoOfertaRepository.CreateEntity(new HistoricoOferta(ofertaExistente));
-                        ofertaExistente.PrecoAtual = preco;
-                        ofertaExistente.Likes = 1;
-                        ofertaExistente.Avaliacoes = 1;
-                        await ofertaRepository?.UpdateEntity(ofertaExistente);
+                        var historico = CriarHistoricoAPartirDeOferta(ofertaExistente, preco);
                     }
                 }
                 else
                     await ofertaRepository?.CreateEntity(new Oferta(idEstabelecimento, idCarteira, preco));
             }
+        }
+
+        public async Task<string> CriarHistoricoAPartirDeOferta(Oferta ofertaAtual, decimal preco) //private é o certo
+        {
+            var historico = await historicoOfertaRepository.CreateEntity(new HistoricoOferta(ofertaAtual));
+            ofertaAtual.PrecoAtual = preco;
+            ofertaAtual.Likes = 1;
+            ofertaAtual.Avaliacoes = 1;
+            await ofertaRepository?.UpdateEntity(ofertaAtual);
+            return historico;
         }
 
     }

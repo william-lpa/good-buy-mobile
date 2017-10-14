@@ -20,6 +20,9 @@ namespace GoodBuy.Models.Many_to_Many
         [JsonProperty("delete")]
         public bool Delete { get; set; }
 
+        [JsonProperty("owner")]
+        public bool Owner { get; set; }
+
         public ParticipanteGrupo(string idUser)
         {
             IdUser = idUser;

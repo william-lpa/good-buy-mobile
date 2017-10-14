@@ -22,7 +22,8 @@ namespace GoodBuy.Models.Logical
             get { return confiabilidade; }
             set
             {
-                SetProperty(ref confiabilidade, value);
+                if (SetProperty(ref confiabilidade, value))
+                    OnPropertyChanged(nameof(ConfiabilidadeNegativa));
             }
         }
         public float ConfiabilidadeNegativa => 100 - Confiabilidade;

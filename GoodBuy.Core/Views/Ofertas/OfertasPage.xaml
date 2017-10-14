@@ -9,7 +9,6 @@
             <Style x:Key="ofertaOption" TargetType="Button">
                 <Setter Property="FontSize" Value="10"/>
                 <Setter Property="TextColor" Value="Black"/>
-                <Setter Property="WidthRequest" Value="120"/>
                 <Setter Property="HeightRequest" Value="30"/>
                 <Setter Property="BackgroundColor" Value="LightGray"/>
                 <Setter Property="Margin" Value="0,0,0,5"/>
@@ -33,13 +32,22 @@
 
             <Style x:Key="shareOption" TargetType="Button">
                 <Setter Property="FontSize" Value="10"/>
-                <Setter Property="TextColor" Value="Black"/>
-                <Setter Property="WidthRequest" Value="150"/>
+                <Setter Property="TextColor" Value="Black"/>                
                 <Setter Property="HeightRequest" Value="30"/>
                 <Setter Property="Image" Value="shhaare.png"/>
                 <Setter Property="BackgroundColor" Value="LightGray"/>
                 <Setter Property="Margin" Value="0,0,0,5"/>
             </Style>
+            
+            <Style x:Key="monitoreOferta" TargetType="Button">
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="TextColor" Value="Black"/>                
+                <Setter Property="HeightRequest" Value="30"/>
+                <Setter Property="Image" Value="monitore.png"/>
+                <Setter Property="BackgroundColor" Value="LightGray"/>
+                <Setter Property="Margin" Value="0,0,0,5"/>
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
     <ContentPage.Content>
@@ -76,8 +84,8 @@
                                 </StackLayout>
                                 <StackLayout Orientation="Horizontal">
                                     <Button Text="Adicionar a Lista" Style="{StaticResource ofertaOption}" HorizontalOptions="StartAndExpand"/>
-                                    <Button Text="Compartilhar" Style="{StaticResource shareOption}" Command="{Binding ShareOfertaCommand}" HorizontalOptions="Center"/>
-                                    <Button Text="Monitorar oferta" Style="{StaticResource ofertaOption}" Command="{Binding OfertaDetailCommand}" HorizontalOptions="End" />
+                                    <Button Text="Compartilhar" Style="{StaticResource shareOption}" Command="{Binding ShareOfertaCommand}" HorizontalOptions="CenterAndExpand"/>
+                                    <Button Text="Monitorar oferta" Style="{StaticResource monitoreOferta}" Command="{Binding OfertaDetailCommand}" HorizontalOptions="EndAndExpand" />
                                 </StackLayout>
                             </StackLayout>
                         </ViewCell>

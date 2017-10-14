@@ -61,7 +61,7 @@ namespace GoodBuy.ViewModels
             PersistGrupoOfertaCommand = new Command(SalvarGrupoUsuario, PodeCriarGrupoOferta);
             InteractGrupoOfertaCommand = new Command(ExecutePermanenciaGrupo, PodeInteragirGrupoOferta);
             SearchContact = new Command(ExecuteOpenContactList);
-            RemoverGrupoCommand = new Command(ExcluirGrupoOferta, PodeCriarGrupoOferta);
+            RemoverGrupoCommand = new Command(ExcluirGrupoOferta, PodeExcluirGrupo);
             RemoverParticipanteSelecionadoCommand = new Command(ExecuteRemoverParticipanteSelecionado, PodeExcluirParticipante);
             UserSelectedCommand = new Command<ParticipanteGrupo>(ExecuteStoreParticipante);
             SearchUser = new Command<string>(ExecuteSearchUser);
@@ -140,7 +140,7 @@ namespace GoodBuy.ViewModels
             {
                 EditingGroup = false;
                 var user = azureService.CurrentUser.User;
-                AdicionarParticipante(new ParticipanteGrupo(user.Id) { User = user });
+                AdicionarParticipante(new ParticipanteGrupo(user.Id) { User = user, Owner = true });
             }
         }
 
@@ -256,9 +256,14 @@ namespace GoodBuy.ViewModels
 
         public bool UsuarioLogadoPertenceAoGrupo => Members.Select(x => x.IdUser).Contains(azureService.CurrentUser.User.Id);
 
+        private bool UsuarioLogadoCriouOGrupo => Members.FirstOrDefault(x => x.IdUser == azureService.CurrentUser.User.Id)?.Owner ?? false;
+
         private bool PodeInteragirGrupoOferta() => EditingGroup;
 
         private bool PodeExcluirParticipante() => PodeInteragirGrupoOferta() && UsuarioLogadoPertenceAoGrupo && participanteGrupoOferta != null && CachedList?.Count == 0;
+
+        private bool PodeExcluirGrupo() => PodeInteragirGrupoOferta() && UsuarioLogadoCriouOGrupo;
+
 
         private bool PodeCriarGrupoOferta()
         {

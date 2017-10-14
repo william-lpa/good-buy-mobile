@@ -68,7 +68,6 @@ namespace GoodBuy.Service
 
                 if (!Cache.ContainsKey(id))
                 {
-                    var entities = await (SyncTableModel.ToListAsync());
                     var entity = await (SyncTableModel.LookupAsync(id));
                     if (entity != null)
                         Cache.AddOrUpdate(entity.Id, entity, (key, value) => value);
