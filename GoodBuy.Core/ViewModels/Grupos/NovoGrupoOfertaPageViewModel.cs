@@ -3,13 +3,10 @@ using GoodBuy.Models.Many_to_Many;
 using GoodBuy.Service;
 using System.Collections.ObjectModel;
 using Xamarin.Forms;
-using System;
 using Autofac;
 using GoodBuy.Log;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.WindowsAzure.MobileServices;
-using GoodBuy.Core.Models.Logical;
 
 namespace GoodBuy.ViewModels
 {
@@ -58,24 +55,24 @@ namespace GoodBuy.ViewModels
             grupoOfertaService = service;
             this.userService = userService;
             UserRepository = new GenericRepository<User>(azureService);
-            PersistGrupoOfertaCommand = new Command(SalvarGrupoUsuario, PodeCriarGrupoOferta);
-            InteractGrupoOfertaCommand = new Command(ExecutePermanenciaGrupo, PodeInteragirGrupoOferta);
+            PersistGrupoOfertaCommand = new Command(SalvarGrupoUsuarioAsync, PodeCriarGrupoOferta);
+            InteractGrupoOfertaCommand = new Command(ExecutePermanenciaGrupoAsync, PodeInteragirGrupoOferta);
             SearchContact = new Command(ExecuteOpenContactList);
-            RemoverGrupoCommand = new Command(ExcluirGrupoOferta, PodeExcluirGrupo);
-            RemoverParticipanteSelecionadoCommand = new Command(ExecuteRemoverParticipanteSelecionado, PodeExcluirParticipante);
-            UserSelectedCommand = new Command<ParticipanteGrupo>(ExecuteStoreParticipante);
-            SearchUser = new Command<string>(ExecuteSearchUser);
+            RemoverGrupoCommand = new Command(ExcluirGrupoOfertaAsync, PodeExcluirGrupo);
+            RemoverParticipanteSelecionadoCommand = new Command(ExecuteRemoverParticipanteSelecionadoAsync, PodeExcluirParticipante);
+            UserSelectedCommand = new Command<ParticipanteGrupo>(ExecuteStoreParticipanteAsync);
+            SearchUser = new Command<string>(ExecuteSearchUserAsync);
             Members = new ObservableCollection<ParticipanteGrupo>();
             CachedList = new ObservableCollection<ParticipanteGrupo>();
         }
 
 
-        private async void ExecuteStoreParticipante(ParticipanteGrupo participante)
+        private async void ExecuteStoreParticipanteAsync(ParticipanteGrupo participante)
         {
             if (CachedList.Count > 0)
             {//está pesquisando
                 AdicionarParticipante(participante);
-                await grupoOfertaService.ParticiparGrupo(editGrupoOferta, Members.Last());
+                await grupoOfertaService.ParticiparGrupoAsync(editGrupoOferta, Members.Last());
                 CachedList.Add(participante);
                 SearchText = string.Empty;
                 //ExecuteSearchUser("");
@@ -86,25 +83,25 @@ namespace GoodBuy.ViewModels
             RemoverParticipanteSelecionadoCommand.ChangeCanExecute();
         }
 
-        private async void ExecutePermanenciaGrupo()
+        private async void ExecutePermanenciaGrupoAsync()
         {
             if (UsuarioLogadoPertenceAoGrupo)
             {
-                if (await MessageDisplayer.Instance.ShowAsk("Deixar o grupo de oferta", $"Você tem certeza que deseja sair do grupo {editGrupoOferta.Name} ?", "Sim", "Não"))
+                if (await MessageDisplayer.Instance.ShowAskAsync("Deixar o grupo de oferta", $"Você tem certeza que deseja sair do grupo {editGrupoOferta.Name} ?", "Sim", "Não"))
                 {
                     var membro = Members.First(x => x.IdUser == azureService.CurrentUser.User.Id);
                     Members.Remove(membro);
-                    await grupoOfertaService.ExcluirParticipanteGrupoOferta(membro);
+                    await grupoOfertaService.ExcluirParticipanteGrupoOfertaAsync(membro);
                     await PopAsync<GruposOfertasPageViewModel>();
                 }
             }
             else
             {
-                if (await MessageDisplayer.Instance.ShowAsk("Participar do grupo de oferta", $"Você tem certeza que deseja participar do grupo {editGrupoOferta.Name} ?", "Sim", "Não"))
+                if (await MessageDisplayer.Instance.ShowAskAsync("Participar do grupo de oferta", $"Você tem certeza que deseja participar do grupo {editGrupoOferta.Name} ?", "Sim", "Não"))
                 {
                     var user = azureService.CurrentUser.User;
                     AdicionarParticipante(new ParticipanteGrupo(user.Id) { User = user });
-                    await grupoOfertaService.ParticiparGrupo(editGrupoOferta, Members.Last());
+                    await grupoOfertaService.ParticiparGrupoAsync(editGrupoOferta, Members.Last());
                     AtualizarStatus();
                 }
             }
@@ -120,11 +117,11 @@ namespace GoodBuy.ViewModels
             OnPropertyChanged(nameof(SearchText));
         }
 
-        private async void ExcluirGrupoOferta()
+        private async void ExcluirGrupoOfertaAsync()
         {
-            if (await MessageDisplayer.Instance.ShowAsk("Excluir grupo de oferta", "Você tem certeza que deseja excluir o grupo?", "Sim", "Não"))
+            if (await MessageDisplayer.Instance.ShowAskAsync("Excluir grupo de oferta", "Você tem certeza que deseja excluir o grupo?", "Sim", "Não"))
             {
-                await grupoOfertaService.ExcluirGrupoOferta(editGrupoOferta);
+                await grupoOfertaService.ExcluirGrupoOfertaAsync(editGrupoOferta);
                 await PopAsync<GruposOfertasPageViewModel>();
             }
         }
@@ -133,8 +130,8 @@ namespace GoodBuy.ViewModels
             if (parameters != null && parameters.ContainsKey("ID"))
             {
                 EditingGroup = true;
-                editGrupoOferta = await grupoOfertaService.CarregarGrupoOfertaPorId(parameters["ID"]);
-                Adapter();
+                editGrupoOferta = await grupoOfertaService.CarregarGrupoOfertaPorIdAsync(parameters["ID"]);
+                AdapterAsync();
             }
             else
             {
@@ -153,11 +150,11 @@ namespace GoodBuy.ViewModels
             return editGrupoOferta;
         }
 
-        private async void Adapter()
+        private async void AdapterAsync()
         {
             Name = editGrupoOferta.Name;
             Private = editGrupoOferta.Private;
-            editGrupoOferta.Participantes = await grupoOfertaService.CarregarParticipantesPorIdGrupoOferta(editGrupoOferta.Id);
+            editGrupoOferta.Participantes = await grupoOfertaService.CarregarParticipantesPorIdGrupoOfertaAsync(editGrupoOferta.Id);
 
             foreach (var participante in editGrupoOferta.Participantes)
             {
@@ -167,7 +164,7 @@ namespace GoodBuy.ViewModels
             AtualizarStatus();
         }
 
-        private async void ExecuteSearchUser(string expression)
+        private async void ExecuteSearchUserAsync(string expression)
         {
             if (expression == null)
                 return;
@@ -188,7 +185,7 @@ namespace GoodBuy.ViewModels
                 return;
             }
 
-            var users = await userService.LocalizarUsuariosPesquisados(expression);
+            var users = await userService.LocalizarUsuariosPesquisadosAsync(expression);
             if (users != null)
                 foreach (var user in users)
                 {
@@ -197,12 +194,12 @@ namespace GoodBuy.ViewModels
         }
 
 
-        private async void ExecuteRemoverParticipanteSelecionado()
+        private async void ExecuteRemoverParticipanteSelecionadoAsync()
         {
             if (Members.Count >= 1)
             {
                 Members.Remove(participanteGrupoOferta);
-                await grupoOfertaService.ExcluirParticipanteGrupoOferta(participanteGrupoOferta);
+                await grupoOfertaService.ExcluirParticipanteGrupoOfertaAsync(participanteGrupoOferta);
                 participanteGrupoOferta = null;
                 AtualizarStatus();
             }
@@ -211,17 +208,17 @@ namespace GoodBuy.ViewModels
         private void ExecuteOpenContactList()
         {
             using (var scope = App.Container.BeginLifetimeScope())
-                scope.Resolve<IContactListService>().PickContactList(ContactPicked);
+                scope.Resolve<IContactListService>().PickContactList(ContactPickedAsync);
         }
 
-        private async void ContactPicked(User user)
+        private async void ContactPickedAsync(User user)
         {
-            if (await UserRepository.GetById(user.Id) != null)
+            if (await UserRepository.GetByIdAsync(user.Id) != null)
             {
                 AdicionarParticipante(new ParticipanteGrupo(user.Id) { User = user });
             }
             else
-                await MessageDisplayer.Instance.ShowMessage("Usuário não encontrado", "O contato selecionado não está utilizando o aplicativo, portanto não pode ser incluso no grupo", "OK");
+                await MessageDisplayer.Instance.ShowMessageAsync("Usuário não encontrado", "O contato selecionado não está utilizando o aplicativo, portanto não pode ser incluso no grupo", "OK");
         }
 
         private void AdicionarParticipante(ParticipanteGrupo participante)
@@ -234,22 +231,22 @@ namespace GoodBuy.ViewModels
             PersistGrupoOfertaCommand.ChangeCanExecute();
         }
 
-        public async void SalvarEdicao(bool syncronize = false)
+        public async void SalvarEdicaoAsync(bool syncronize = false)
         {
             if (editGrupoOferta.Name != Name || editGrupoOferta.Participantes.Count() != Members.Count || editGrupoOferta.Private != Private)
-                await grupoOfertaService.AtualizarNovoGrupoUsuario(TransformEditGrupoOferta(), syncronize);
+                await grupoOfertaService.AtualizarNovoGrupoUsuarioAsync(TransformEditGrupoOferta(), syncronize);
         }
 
-        private async void SalvarGrupoUsuario()
+        private async void SalvarGrupoUsuarioAsync()
         {
             if (EditingGroup)
             {
-                SalvarEdicao();
+                SalvarEdicaoAsync();
             }
             else
             {
                 var oferta = new GrupoOferta(Name, Private);
-                await grupoOfertaService.CadastrarNovoGrupoUsuario(oferta, Members.ToList());
+                await grupoOfertaService.CadastrarNovoGrupoUsuarioAsync(oferta, Members.ToList());
             }
             await PopAsync<GruposOfertasPageViewModel>();
         }

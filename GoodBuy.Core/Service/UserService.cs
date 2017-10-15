@@ -2,7 +2,6 @@
 using GoodBuy.Service.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System;
 using Autofac;
 
 namespace GoodBuy.Service
@@ -19,7 +18,7 @@ namespace GoodBuy.Service
             userRepository = new GenericRepository<User>(azureService);
         }
 
-        public async Task<IEnumerable<User>> LocalizarUsuariosPesquisados(string searchTerm)
+        public async Task<IEnumerable<User>> LocalizarUsuariosPesquisadosAsync(string searchTerm)
         {
             try
             {
@@ -33,16 +32,16 @@ namespace GoodBuy.Service
             }
         }
 
-        internal async void LogarUsuario(User user)
+        internal async void LogarUsuarioAsync(User user)
         {
-            var existingUser = await userRepository.GetById(user.Id);
+            var existingUser = await userRepository.GetByIdAsync(user.Id);
             if (existingUser == null)
-                await userRepository.CreateEntity(user);
+                await userRepository.CreateEntityAsync(user);
             else
             {
-                await userRepository.UpdateEntity(existingUser);
+                await userRepository.UpdateEntityAsync(existingUser);
                 using (var scope = App.Container.BeginLifetimeScope())
-                    scope.Resolve<SyncronizedAccessService>().Syncronize(existingUser.UpdatedAt);
+                    scope.Resolve<SyncronizedAccessService>().SyncronizeAsync(existingUser.UpdatedAt);
             }
         }
     }

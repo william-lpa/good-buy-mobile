@@ -13,10 +13,10 @@ namespace GoodBuy.Service.Interfaces
         ConcurrentDictionary<string, TModel> Cache { get; }
         IMobileServiceClient Client { get; }
         IMobileServiceSyncTable<TModel> SyncTableModel { get; }
-        Task SyncDataBase(DateTime? createdOrChangedAfter = null);
-        Task PullUpdates();
-        Task<List<TModel>> GetEntities(int currentPage = 0, int pageSize = 200, DateTime? createdOrChangedAfter = null);
-        Task<TModel> GetById(string id);
-        Task<IEnumerable<TModel>> GetByIds(string[] id);
+        Task SyncDataBaseAsync(DateTime? createdOrChangedAfter = null);
+        Task PullUpdatesAsync();
+        Task<List<TModel>> GetEntitiesAsync(int currentPage = 0, int pageSize = 200, DateTime? createdOrChangedAfter = null);
+        Task<TModel> GetByIdAsync(string id);
+        Task<IEnumerable<TModel>> GetByIdsAsync(string[] id);
     }
 }

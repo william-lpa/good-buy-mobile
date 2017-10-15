@@ -20,11 +20,11 @@ namespace GoodBuy.ViewModels
             base.Init(parameters);
             if (parameters != null && parameters.ContainsKey("ID"))
             {
-                await LoadOferta(parameters["ID"]);
+                await LoadOfertaAsync(parameters["ID"]);
             }
         }
 
-        private async Task LoadOferta(string idOFerta) => Oferta = await ofertasService.ObterOfertaCompleta(idOFerta);
+        private async Task LoadOfertaAsync(string idOFerta) => Oferta = await ofertasService.ObterOfertaCompletaAsync(idOFerta);
 
     }
 }

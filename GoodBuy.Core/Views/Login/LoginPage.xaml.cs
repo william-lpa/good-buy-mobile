@@ -1,7 +1,6 @@
 ﻿using Autofac;
 using GoodBuy.ViewModels;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
 
 namespace GoodBuy.Views
 {
@@ -21,7 +20,7 @@ namespace GoodBuy.Views
                 login = scope.Resolve<LoginPageViewModel>();
                 BindingContext = login;
             }
-            login.TrySSO(param);
+            login.TrySSOAsync(param);
         }
     }
 }

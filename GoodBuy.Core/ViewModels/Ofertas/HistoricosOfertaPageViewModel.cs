@@ -2,11 +2,11 @@
 using System;
 using Xamarin.Forms;
 using System.Collections.Generic;
-using GoodBuy.Models;
 using GoodBuy.Log;
 using Microcharts;
 using SkiaSharp;
 using System.Linq;
+using GoodBuy.Models.Many_to_Many;
 
 namespace GoodBuy.ViewModels
 {
@@ -27,13 +27,13 @@ namespace GoodBuy.ViewModels
         public HistoricosOfertaPageViewModel(AzureService azureService, OfertasService ofertasService)
         {
             this.ofertasService = ofertasService;
-            PrimaryAction = new Command(ExecuteCriarOferta);
+            PrimaryAction = new Command(ExecuteCriarOfertaAsync);
             Init();
         }
         protected override async void Init(Dictionary<string, string> parameters = null)
         {
             while (OfertasTabDetailPageViewModel.Oferta == null) await System.Threading.Tasks.Task.Delay(55);
-            alerta = await ofertasService.TryLoadAlerta(OfertasTabDetailPageViewModel.Oferta.Id);
+            alerta = await ofertasService.TryLoadAlertaAsync(OfertasTabDetailPageViewModel.Oferta.Id);
             MonitorarOfertaValor = Math.Round(OfertasTabDetailPageViewModel.Oferta.PrecoAtual * 0.9M, 2);
             Adapter();
             var chart = HistoricoOfertaChart;
@@ -108,27 +108,27 @@ namespace GoodBuy.ViewModels
                 ExistsAlert = false;
         }
 
-        private async void ExecuteCriarOferta()
+        private async void ExecuteCriarOfertaAsync()
         {
             var mensagem = string.Empty;
             Action action = null;
             if (alerta == null)
             {
                 mensagem = "Você tem certeza de quer criar um alerta para monitorar o valor desta oferta?";
-                action = () => ofertasService.CriarNovoAlerta(MonitorarOfertaValor);
+                action = () => ofertasService.CriarNovoAlertaAsync(MonitorarOfertaValor);
             }
             else if (ExistsAlert && MonitorarOfertaValor != alerta.PrecoAlvo)
             {
                 mensagem = "Você tem certeza de quer alterar o valor do alerta criado anteriormente?";
-                action = () => ofertasService.AtualizarAlerta(alerta, MonitorarOfertaValor);
+                action = () => ofertasService.AtualizarAlertaAsync(alerta, MonitorarOfertaValor);
             }
             else if (!ExistsAlert)
             {
                 mensagem = "Você tem certeza de quer excluir o alerta  de preço criado para esta oferta?";
-                action = () => ofertasService.RemoverAlerta(alerta);
+                action = () => ofertasService.RemoverAlertaAsync(alerta);
             }
 
-            if (action != null && await MessageDisplayer.Instance.ShowAsk("Monitorar oferta", mensagem, "Sim", "Não"))
+            if (action != null && await MessageDisplayer.Instance.ShowAskAsync("Monitorar oferta", mensagem, "Sim", "Não"))
             {
                 action.Invoke();
                 await PopAsync<OfertasPageViewModel>();

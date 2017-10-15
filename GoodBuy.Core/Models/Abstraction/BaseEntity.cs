@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json;
-using GoodBuy.Service.Interfaces;
-using GoodBuy.Service;
 using System;
 using Microsoft.WindowsAzure.MobileServices;
 

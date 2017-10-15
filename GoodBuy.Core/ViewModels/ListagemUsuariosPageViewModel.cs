@@ -28,19 +28,19 @@ namespace GoodBuy.ViewModels
             grupoOfertaService = service;
             this.userService = userService;
             SearchContact = new Command(ExecuteOpenContactList);
-            UserSelectedCommand = new Command<User>(ExecuteCompartilharOFertaUsuario);
-            SearchUser = new Command<string>(ExecuteSearchUser);
+            UserSelectedCommand = new Command<User>(ExecuteCompartilharOFertaUsuarioAsync);
+            SearchUser = new Command<string>(ExecuteSearchUserAsync);
             Users = new ObservableCollection<User>();
             Init();
         }
         protected override void Init(Dictionary<string, string> parameters = null)
         {
-            ExecuteSearchUser("");
+            ExecuteSearchUserAsync("");
         }
 
-        private async void ExecuteCompartilharOFertaUsuario(User user)
+        private async void ExecuteCompartilharOFertaUsuarioAsync(User user)
         {
-            if (await MessageDisplayer.Instance.ShowAsk("Compartilhar Oferta", $"Você tem certeza que deseja compartilhar a oferta selecionada com {user.FullName} ?", "Sim", "Não"))
+            if (await MessageDisplayer.Instance.ShowAskAsync("Compartilhar Oferta", $"Você tem certeza que deseja compartilhar a oferta selecionada com {user.FullName} ?", "Sim", "Não"))
             {
                 var body = new CompartilhamentoOfertaUsuario()
                 {
@@ -55,7 +55,7 @@ namespace GoodBuy.ViewModels
             }
 
         }
-        private async void ExecuteSearchUser(string expression)
+        private async void ExecuteSearchUserAsync(string expression)
         {
             if (expression == null)
                 return;
@@ -63,7 +63,7 @@ namespace GoodBuy.ViewModels
             if (expression.Length > 0 && expression.Length <= 2)
                 return;
 
-            var users = await userService.LocalizarUsuariosPesquisados(expression);
+            var users = await userService.LocalizarUsuariosPesquisadosAsync(expression);
             Users.Clear();
             if (users != null)
                 foreach (var user in users)
@@ -73,15 +73,15 @@ namespace GoodBuy.ViewModels
         private void ExecuteOpenContactList()
         {
             using (var scope = App.Container.BeginLifetimeScope())
-                scope.Resolve<IContactListService>().PickContactList(ContactPicked);
+                scope.Resolve<IContactListService>().PickContactList(ContactPickedAsync);
         }
 
-        private async void ContactPicked(User user)
+        private async void ContactPickedAsync(User user)
         {
-            if (await UserRepository.GetById(user.Id) != null)
-                ExecuteCompartilharOFertaUsuario(user);
+            if (await UserRepository.GetByIdAsync(user.Id) != null)
+                ExecuteCompartilharOFertaUsuarioAsync(user);
             else
-                await MessageDisplayer.Instance.ShowMessage("Usuário não encontrado", "O contato selecionado não está utilizando o aplicativo, portanto não pode ser incluso no grupo", "OK");
+                await MessageDisplayer.Instance.ShowMessageAsync("Usuário não encontrado", "O contato selecionado não está utilizando o aplicativo, portanto não pode ser incluso no grupo", "OK");
         }
     }
 }

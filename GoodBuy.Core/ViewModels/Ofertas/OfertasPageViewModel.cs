@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using GoodBuy.Models.Logical;
 using Xamarin.Forms;
-using System;
 using System.Collections.Generic;
 
 namespace GoodBuy.ViewModels
@@ -19,21 +18,21 @@ namespace GoodBuy.ViewModels
             azureService = service;
             this.ofertasService = ofertasService;
             Ofertas = new ObservableCollection<OfertaDto>();
-            OfertaDetailCommand = new Command<OfertaDto>(ExecuteDetailOferta);
+            OfertaDetailCommand = new Command<OfertaDto>(ExecuteDetailOfertaAsync);
 
-            FillListView();
+            FillListViewAsync();
         }
 
-        private async void ExecuteDetailOferta(OfertaDto oferta)
+        private async void ExecuteDetailOfertaAsync(OfertaDto oferta)
         {
             var parameters = new Dictionary<string, string>();
             parameters.Add("ID", oferta.idOFerta);
             await PushAsync<OfertasTabDetailPageViewModel>(false, parameters);
         }
 
-        private async void FillListView()
+        private async void FillListViewAsync()
         {
-            var ofertas = await ofertasService.ObterOfertas();
+            var ofertas = await ofertasService.ObterOfertasAsync();
 
             foreach (var oferta in ofertas)
             {

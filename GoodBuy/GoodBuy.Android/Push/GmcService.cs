@@ -3,14 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using Android.App;
 using Android.Content;
-using Android.Media;
-using Android.Support.V4.App;
-using Android.Util;
 using Gcm.Client;
 using Microsoft.WindowsAzure.MobileServices;
-using Newtonsoft.Json.Linq;
 using System.Diagnostics;
-using GoodBuy.Service;
 using goodBuy.Droid.Push;
 using System.Net.Http;
 
@@ -44,9 +39,9 @@ namespace goodBuy.Droid
             Android.Util.Log.Verbose("PushHandlerBroadcastReceiver", "GCM Registered: " + registrationId);
             RegistrationID = registrationId;
             var push = Client.GetPush();
-            MainActivity.CurrentActivity.RunOnUiThread(() => Register(push, null));
+            MainActivity.CurrentActivity.RunOnUiThread(() => RegisterAsync(push, null));
         }
-        public async void Register(Microsoft.WindowsAzure.MobileServices.Push push, IEnumerable<string> tags)
+        public async void RegisterAsync(Microsoft.WindowsAzure.MobileServices.Push push, IEnumerable<string> tags)
         {
             try
             {

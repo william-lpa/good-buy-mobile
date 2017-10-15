@@ -2,8 +2,6 @@
 using GoodBuy.Models.Many_to_Many;
 using GoodBuy.Service.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace GoodBuy.Service
@@ -45,14 +43,14 @@ namespace GoodBuy.Service
             MonitoramentoOfertaRepository = new GenericRepository<MonitoramentoOferta>(azureService);
         }
 
-        public async Task<bool> FirstUsage() => (await OfertaRepository.GetEntities(0, 1)).Count == 0;
+        public async Task<bool> FirstUsageAsync() => (await OfertaRepository.GetEntitiesAsync(0, 1)).Count == 0;
 
 
-        public async void SyncronizeFirstUse()
+        public async void SyncronizeFirstUseAsync()
         {
             await SyncronizeData();
         }
-        public async void Syncronize(DateTime fromDate)
+        public async void SyncronizeAsync(DateTime fromDate)
         {
             await SyncronizeData(fromDate);
         }
@@ -61,19 +59,19 @@ namespace GoodBuy.Service
         {
             await Task.WhenAll(new Task[]
            {
-                     Task.Run(() => OfertaRepository.SyncDataBase(date)),
-                     Task.Run(() => CarteiraProdutoRepository.SyncDataBase(date)),
-                     Task.Run(() => ProdutoRepository.SyncDataBase(date)),
-                     Task.Run(() => SaborRepository.SyncDataBase(date)),
-                     Task.Run(() => MarcaRepository.SyncDataBase(date)),
-                     Task.Run(() => EstabelecimentoRepository.SyncDataBase(date)),
-                     Task.Run(() => UnidadeMedidaRepository.SyncDataBase(date)),
-                     Task.Run(() => GrupoOfertaRepository.SyncDataBase(date)),
-                     Task.Run(() => HistoricoOfertaRepository.SyncDataBase(date)),
-                     Task.Run(() => ParticipanteGrupoRepository.SyncDataBase(date)),
-                     Task.Run(() => UserRepository.SyncDataBase(date)),
-                     Task.Run(() => CategoriaRepository.SyncDataBase(date)),
-                     Task.Run(() => MonitoramentoOfertaRepository.SyncDataBase(date)),
+                     Task.Run(() => OfertaRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => CarteiraProdutoRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => ProdutoRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => SaborRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => MarcaRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => EstabelecimentoRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => UnidadeMedidaRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => GrupoOfertaRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => HistoricoOfertaRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => ParticipanteGrupoRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => UserRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => CategoriaRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => MonitoramentoOfertaRepository.SyncDataBaseAsync(date)),
            });
         }
     }

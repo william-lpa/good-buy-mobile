@@ -26,16 +26,16 @@ namespace GoodBuy.Service
             SyncTableModel = azureService.GetTable<TModel>();
             LastRefresh = DateTime.Now;
         }
-        public async Task<string> CreateEntity(TModel entidade, bool forceSync = false)
+        public async Task<string> CreateEntityAsync(TModel entidade, bool forceSync = false)
         {
             try
             {
                 entidade.Id = entidade.Id ?? Guid.NewGuid().ToString();
                 await SyncTableModel.InsertAsync(entidade);
                 Cache.AddOrUpdate(entidade.Id, entidade, (key, value) => value);
-                await NeedsRefresh();
+                await NeedsRefreshAsync();
                 if (forceSync)
-                    await SyncDataBase(DateTime.Now);
+                    await SyncDataBaseAsync(DateTime.Now);
                 return entidade.Id;
             }
             catch (Exception err)
@@ -44,27 +44,27 @@ namespace GoodBuy.Service
                 return null;
             }
         }
-        public async Task DeleteEntity(TModel entidade)
+        public async Task DeleteEntityAsync(TModel entidade)
         {
             try
             {
                 await SyncTableModel.DeleteAsync(entidade);
                 Cache.TryRemove(entidade.Id, out entidade);
-                await NeedsRefresh();
+                await NeedsRefreshAsync();
             }
             catch (Exception err)
             {
                 Log.Log.Instance.AddLog(err);
             }
         }
-        public async Task<TModel> GetById(string id)
+        public async Task<TModel> GetByIdAsync(string id)
         {
             try
             {
                 if (string.IsNullOrEmpty(id))
                     return null;
 
-                await NeedsRefresh();
+                await NeedsRefreshAsync();
 
                 if (!Cache.ContainsKey(id))
                 {
@@ -82,11 +82,11 @@ namespace GoodBuy.Service
                 return default(TModel);
             }
         }
-        public async Task<List<TModel>> GetEntities(int currentPage = 0, int pageSize = 200, DateTime? createdOrChangedAfter = null)
+        public async Task<List<TModel>> GetEntitiesAsync(int currentPage = 0, int pageSize = 200, DateTime? createdOrChangedAfter = null)
         {
             try
             {
-                await NeedsRefresh();
+                await NeedsRefreshAsync();
 
                 List<TModel> entites = new List<TModel>();
                 if (createdOrChangedAfter != null)
@@ -105,7 +105,7 @@ namespace GoodBuy.Service
             }
         }
 
-        public async Task PullUpdates()
+        public async Task PullUpdatesAsync()
         {
             try
             {
@@ -117,7 +117,7 @@ namespace GoodBuy.Service
                 Log.Log.Instance.AddLog(err);
             }
         }
-        public async Task SyncDataBase(DateTime? createdOrChangedAfter = null)
+        public async Task SyncDataBaseAsync(DateTime? createdOrChangedAfter = null)
         {
             try
             {
@@ -139,11 +139,11 @@ namespace GoodBuy.Service
             }
         }
 
-        public async Task UpdateEntity(TModel entidade)
+        public async Task UpdateEntityAsync(TModel entidade)
         {
             try
             {
-                await NeedsRefresh();
+                await NeedsRefreshAsync();
                 await SyncTableModel.UpdateAsync(entidade);
                 Cache[entidade.Id] = entidade;
             }
@@ -161,21 +161,21 @@ namespace GoodBuy.Service
                     first.Add(item.Key, item.Value);
         }
 
-        private async Task NeedsRefresh()
+        private async Task NeedsRefreshAsync()
         {
             var date = DateTime.Now;
             if ((date - LastRefresh).TotalMinutes > MINUTES_TO_REFRESH)
             {
-                await SyncDataBase(LastRefresh);
+                await SyncDataBaseAsync(LastRefresh);
                 LastRefresh = date;
             }
         }
 
-        public async Task<IEnumerable<TModel>> GetByIds(string[] id)
+        public async Task<IEnumerable<TModel>> GetByIdsAsync(string[] id)
         {
             try
             {
-                await NeedsRefresh();
+                await NeedsRefreshAsync();
                 return (await SyncTableModel.Where(x => id.Contains(x.Id)).ToEnumerableAsync());
             }
             catch (Exception err)

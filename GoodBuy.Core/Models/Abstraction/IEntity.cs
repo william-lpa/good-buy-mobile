@@ -1,5 +1,4 @@
-﻿using GoodBuy.Service;
-using Microsoft.WindowsAzure.MobileServices;
+﻿using Microsoft.WindowsAzure.MobileServices;
 using System;
 
 namespace GoodBuy.Model

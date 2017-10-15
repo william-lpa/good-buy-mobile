@@ -84,7 +84,7 @@ namespace GoodBuy.ViewModels
         {
             this.profileUserContact = profileUserContact;
             this.azureService = azureService;
-            ProfileDeviceLoginCommand = new Command(ExecuteLoginWithLocalProfile, CanLoginWithLocalProfile);
+            ProfileDeviceLoginCommand = new Command(ExecuteLoginWithLocalProfileAsync, CanLoginWithLocalProfile);
             SearchContactProfile = new Command(ExecuteOpenContactList);
             Adapter(profileUserContact);
         }
@@ -101,11 +101,11 @@ namespace GoodBuy.ViewModels
             profileUserContact = user;
         }
 
-        private async void ExecuteLoginWithLocalProfile()
+        private async void ExecuteLoginWithLocalProfileAsync()
         {
             var currentUser = Transform();
             await azureService.LoginAsync(MobileServiceAuthenticationProvider.Google, currentUser);
-            await PushAsync<MainMenuViewModel>(resetNavigation: true);
+            await PushAsync<MainMenuPageViewModel>(resetNavigation: true);
         }
 
         private bool CanLoginWithLocalProfile()

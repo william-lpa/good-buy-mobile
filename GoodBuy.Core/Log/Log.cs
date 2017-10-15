@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GoodBuy.Log
 {
@@ -13,20 +9,20 @@ namespace GoodBuy.Log
 
         private Log() { }
 
-        private async void ShowLog(string text)
+        private async void ShowLogAsync(string text)
         {
-            System.Diagnostics.Debug.WriteLine(text);
-            //await MessageDisplayer.Instance.ShowMessage("Error!", text, "OK");
+            //System.Diagnostics.Debug.WriteLine(text);
+            await MessageDisplayer.Instance.ShowMessageAsync("Error!", text, "OK");
         }
 
         public void AddLog(string text)
         {
-            ShowLog(text);
+            ShowLogAsync(text);
         }
 
         public void AddLog(Exception e)
         {
-            ShowLog(e.Message);
+            ShowLogAsync(e.Message);
         }
     }
 }

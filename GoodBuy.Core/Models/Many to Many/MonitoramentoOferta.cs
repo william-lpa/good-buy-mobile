@@ -2,7 +2,7 @@
 using Microsoft.WindowsAzure.MobileServices;
 using Newtonsoft.Json;
 
-namespace GoodBuy.Models
+namespace GoodBuy.Models.Many_to_Many
 {
     [DataTable(nameof(MonitoramentoOferta))]
     public class MonitoramentoOferta : BaseEntity

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace GoodBuy.Log
@@ -16,17 +12,17 @@ namespace GoodBuy.Log
 
         private NavigationPage Navigation => (Application.Current.MainPage as NavigationPage);
 
-        public async Task ShowMessage(string title, string message, string button)
+        public async Task ShowMessageAsync(string title, string message, string button)
         {
             await Navigation.DisplayAlert(title, message, button);
         }
 
-        public async Task<bool> ShowAsk(string title, string message, string buttonYes, string buttonNo)
+        public async Task<bool> ShowAskAsync(string title, string message, string buttonYes, string buttonNo)
         {
             return await Navigation.DisplayAlert(title, message, buttonYes, buttonNo);
         }
 
-        public async Task<string> ShowOptions(string title, string cancel, string destruction, string[] buttons)
+        public async Task<string> ShowOptionsAsync(string title, string cancel, string destruction, string[] buttons)
         {
             return await Navigation.DisplayActionSheet(title, cancel, destruction, buttons);
         }

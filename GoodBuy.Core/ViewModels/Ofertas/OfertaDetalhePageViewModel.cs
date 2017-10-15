@@ -1,12 +1,8 @@
 ﻿using GoodBuy.Models;
 using GoodBuy.Service;
-using System.Windows.Input;
 using Xamarin.Forms;
 using System;
-using Microsoft.WindowsAzure.MobileServices.Sync;
 using System.Threading.Tasks;
-using System.Linq;
-using GoodBuy.Model;
 using GoodBuy.Models.Many_to_Many;
 using System.Collections.Generic;
 
@@ -125,7 +121,7 @@ namespace GoodBuy.ViewModels
         {
             this.ofertasService = ofertasService;
             this.azureService = azure;
-            PrimaryAction = new Command(ExecutePersistOferta, VerificarCamposObrigatorios);
+            PrimaryAction = new Command(ExecutePersistOfertaAsync, VerificarCamposObrigatorios);
         }
 
         protected async override void Init(Dictionary<string, string> parameters = null)
@@ -159,17 +155,17 @@ namespace GoodBuy.ViewModels
         private async void Initialize()
         {
             await UpdateOfertasAsync();
-            await CarregarDadosPreenchidos();
+            await CarregarDadosPreenchidosAsync();
         }
 
-        private async Task CarregarDadosPreenchidos()
+        private async Task CarregarDadosPreenchidosAsync()
         {
             await ofertasService.LoadAutoCompleteAsync();
         }
 
         private async Task UpdateOfertasAsync()
         {
-            await ofertasService.SyncronizeBaseDeOfertas();
+            await ofertasService.SyncronizeBaseDeOfertasAsync();
         }
 
         private bool VerificarCamposObrigatorios()
@@ -181,15 +177,10 @@ namespace GoodBuy.ViewModels
             return retrr;
         }
 
-        private async void ExecutePersistOferta()
+        private async void ExecutePersistOfertaAsync()
         {
             try
             {
-                var ofertaTeste = (await azureService.GetTable<Oferta>().LookupAsync("379724d7-fdff-4b8f-a510-205459ab6ce0"));
-                await ofertasService.CriarHistoricoAPartirDeOferta(ofertaTeste, 2.20M);
-                await azureService.Client.SyncContext.PushAsync(new System.Threading.CancellationToken());
-                return;
-
                 if (NotEditingOferta)
                 {
                     var oferta = new Oferta()
@@ -210,7 +201,7 @@ namespace GoodBuy.ViewModels
                         Estabelecimento = new Models.Estabelecimento(Estabelecimento),
                     };
 
-                    ofertasService.CriarNovaOferta(oferta);
+                    ofertasService.CriarNovaOfertaAsync(oferta);
                     await PopModalAsync();
                 }
                 else

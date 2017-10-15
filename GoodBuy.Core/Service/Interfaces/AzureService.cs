@@ -50,7 +50,7 @@ namespace GoodBuy.Service
                 if (provider == MobileServiceAuthenticationProvider.Google)
                 {
                     CurrentUser = new LoginResultContent(profileUser, "local user") { Token = profileUser.Id };
-                    await CreateUser(CurrentUser.User, initializingSyncContext);
+                    await CreateUserAsync(CurrentUser.User, initializingSyncContext);
                     StoreTokenInSecureStore(CurrentUser.User.Id, "localUser", CurrentUser.Token);
                 }
             }
@@ -64,9 +64,9 @@ namespace GoodBuy.Service
         {
             using (var scope = App.Container.BeginLifetimeScope())
                 UserService = scope.Resolve<UserService>();
-            UserService.LogarUsuario(user);
+            UserService.LogarUsuarioAsync(user);
         }
-        private async Task CreateUser(User user, Task initializingSyncContext)
+        private async Task CreateUserAsync(User user, Task initializingSyncContext)
         {
             if (initializingSyncContext != null)
                 await initializingSyncContext;
@@ -80,7 +80,7 @@ namespace GoodBuy.Service
             Client.CurrentUser = result.azureUser;
             CurrentUser = result.appUser.Merge(profileUser);
 
-            await CreateUser(CurrentUser.User, initializingSyncContext);
+            await CreateUserAsync(CurrentUser.User, initializingSyncContext);
 
             if (Client.CurrentUser != null)
             {
@@ -158,7 +158,7 @@ namespace GoodBuy.Service
                 DefineTables(Store);
 
                 Tables = new Dictionary<string, object>();
-                Task.Run(() => DoSSOLogin());
+                Task.Run(() => DoSSOLoginAsync());
             }
             catch (Exception err)
             {
@@ -166,19 +166,19 @@ namespace GoodBuy.Service
             }
         }
 
-        public async void DoSSOLogin()
+        public async void DoSSOLoginAsync()
         {
             LoginIn = true;
             Client.CurrentUser = RetrieveAzureTokenFromSecureStore("azure");
             if (Client.CurrentUser != null && !IsTokenExpired(Client.CurrentUser.MobileServiceAuthenticationToken))
             {
                 await Client.SyncContext.InitializeAsync(Store, new MobileServiceSyncHandler());
-                CurrentUser = await RetrieveUserFromSecureStore("facebook");
+                CurrentUser = await RetrieveUserFromSecureStoreAsync("facebook");
             }
             else
             {
                 await Client.SyncContext.InitializeAsync(Store, new MobileServiceSyncHandler());
-                CurrentUser = await RetrieveUserFromSecureStore("localUser");
+                CurrentUser = await RetrieveUserFromSecureStoreAsync("localUser");
             }
             if (CurrentUser != null)
             {
@@ -236,7 +236,7 @@ namespace GoodBuy.Service
             storeAccount.Save(account, key);
         }
 
-        public async Task<LoginResultContent> RetrieveUserFromSecureStore(string key)
+        public async Task<LoginResultContent> RetrieveUserFromSecureStoreAsync(string key)
         {
             if (storeAccount == null)
                 storeAccount = AccountStore.Create();

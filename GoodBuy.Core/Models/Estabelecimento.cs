@@ -2,7 +2,6 @@
 using GoodBuy.Service;
 using Microsoft.WindowsAzure.MobileServices;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace GoodBuy.Models
 {

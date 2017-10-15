@@ -55,14 +55,14 @@ namespace GoodBuy.ViewModels
             OnPropertyChanged(nameof(NotRunning));
             azureService = azure;
             UltimasOfertas = new ObservableCollection<OfertaDto>();
-            FacebookLoginCommand = new Command(ExecuteFacebookLogin, CanExecuteLogin);
-            ContactListLoginCommand = new Command(ExecuteLocalProfileLogin, CanExecuteLogin);
+            FacebookLoginCommand = new Command(ExecuteFacebookLoginAsync, CanExecuteLogin);
+            ContactListLoginCommand = new Command(ExecuteLocalProfileLoginAsync, CanExecuteLogin);
             ContactListCommand = new Command(ExecuteOpenContactList);
         }
 
-        private async Task InitializeCollection(OfertasService service)
+        private async Task InitializeCollectionAsync(OfertasService service)
         {
-            var ofertas = await service.ObterUltimasTresOfertasFromServer();
+            var ofertas = await service.ObterUltimasTresOfertasFromServerAsync();
 
             if (ofertas != null)
             {
@@ -88,13 +88,13 @@ namespace GoodBuy.ViewModels
 
         public bool CanExecuteLogin() => !string.IsNullOrEmpty(PhoneNumber) && PhoneNumber.Length >= 8;
 
-        public async void TrySSO(string param)
+        public async void TrySSOAsync(string param)
         {
             while (azureService.LoginIn) await Task.Delay(200);
 
             if (azureService.CurrentUser != null)
             {
-                await this.PushAsync<MainMenuViewModel>(resetNavigation: true);
+                await this.PushAsync<MainMenuPageViewModel>(resetNavigation: true);
                 if (param == "grupos")
                     await this.PushAsync<GruposOfertasPageViewModel>();
                 else if (param != null)
@@ -105,7 +105,7 @@ namespace GoodBuy.ViewModels
                 using (var scope = App.Container.BeginLifetimeScope())
                 {
                     ContactPicked(profileUserContact = scope.Resolve<IContactListService>().PickProfileUser());
-                    await InitializeCollection(scope.Resolve<OfertasService>());
+                    await InitializeCollectionAsync(scope.Resolve<OfertasService>());
                     IsLoading = false;
                     OnPropertyChanged(nameof(NotRunning));
                 }
@@ -127,7 +127,7 @@ namespace GoodBuy.ViewModels
             }
         }
 
-        private async void ExecuteLocalProfileLogin()
+        private async void ExecuteLocalProfileLoginAsync()
         {
             try
             {
@@ -140,14 +140,14 @@ namespace GoodBuy.ViewModels
             }
         }
 
-        private async void ExecuteFacebookLogin()
+        private async void ExecuteFacebookLoginAsync()
         {
             try
             {
                 VerifyNumberManualChange();
                 await PushModalAsync<LoadingPageViewModel>(null, new NamedParameter("operation", Operation.Login));
                 await azureService.LoginAsync(MobileServiceAuthenticationProvider.Facebook, profileUserContact);
-                await PushAsync<MainMenuViewModel>(resetNavigation: true);
+                await PushAsync<MainMenuPageViewModel>(resetNavigation: true);
             }
             catch (Exception err)
             {

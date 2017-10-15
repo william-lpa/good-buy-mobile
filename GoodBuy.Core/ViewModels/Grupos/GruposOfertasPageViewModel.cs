@@ -2,12 +2,9 @@
 using GoodBuy.Service;
 using System.Collections.ObjectModel;
 using Xamarin.Forms;
-using System;
-using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
 using GoodBuy.Log;
-using Newtonsoft.Json.Linq;
 using GoodBuy.Core.Models.Logical;
 
 namespace GoodBuy.ViewModels
@@ -37,14 +34,14 @@ namespace GoodBuy.ViewModels
             NotSharing = true;
             this.azureService = azureService;
             grupoOfertaService = service;
-            NovoGrupoCommand = new Command(ExecuteCriarNovoGrupoOferta);
-            EditGroupCommand = new Command<GrupoOferta>(ExecuteEditarGroupoOfertas);
-            SearchPublicGroup = new Command<string>(ExecuteSearchPublicGroup);
+            NovoGrupoCommand = new Command(ExecuteCriarNovoGrupoOfertaAsync);
+            EditGroupCommand = new Command<GrupoOferta>(ExecuteEditarGroupoOfertasAsync);
+            SearchPublicGroup = new Command<string>(ExecuteSearchPublicGroupAsync);
             GruposOfertasUsuario = new ObservableCollection<GrupoOferta>();
             CachedList = new ObservableCollection<GrupoOferta>();
         }
 
-        private async void ExecuteSearchPublicGroup(string expression)
+        private async void ExecuteSearchPublicGroupAsync(string expression)
         {
             if (expression?.Length == 1 && CachedList.Count == 0)
             {
@@ -62,14 +59,14 @@ namespace GoodBuy.ViewModels
                 return;
             }
 
-            var result = await grupoOfertaService.LocalizarGruposOfertaPublicos(expression);
+            var result = await grupoOfertaService.LocalizarGruposOfertaPublicosAsync(expression);
             foreach (var item in result)
             {
                 GruposOfertasUsuario.Add(item);
             }
         }
 
-        private async void ExecuteEditarGroupoOfertas(GrupoOferta grupoOferta)
+        private async void ExecuteEditarGroupoOfertasAsync(GrupoOferta grupoOferta)
         {
             if (NotSharing)
             {
@@ -79,7 +76,7 @@ namespace GoodBuy.ViewModels
             }
             else
             {
-                if (await MessageDisplayer.Instance.ShowAsk("Compartilhar Oferta", $"Você tem certeza que deseja compartilhar a oferta selecionada com o grupo {grupoOferta.Name} ?", "Sim", "Não"))
+                if (await MessageDisplayer.Instance.ShowAskAsync("Compartilhar Oferta", $"Você tem certeza que deseja compartilhar a oferta selecionada com o grupo {grupoOferta.Name} ?", "Sim", "Não"))
                 {
                     var body = new CompartilhamentoOfertaGrupo()
                     {
@@ -98,7 +95,7 @@ namespace GoodBuy.ViewModels
         protected async override void Init(Dictionary<string, string> parameters = null)
         {
             GruposOfertasUsuario.Clear();
-            var grupos = await grupoOfertaService.CarregarGrupoDeOfertasUsuarioLogado();
+            var grupos = await grupoOfertaService.CarregarGrupoDeOfertasUsuarioLogadoAsync();
             foreach (var grupo in grupos)
             {
                 GruposOfertasUsuario.Add(grupo);
@@ -113,7 +110,7 @@ namespace GoodBuy.ViewModels
             }
         }
 
-        private async void ExecuteCriarNovoGrupoOferta()
+        private async void ExecuteCriarNovoGrupoOfertaAsync()
         {
             await PushAsync<NovoGrupoOfertaPageViewModel>();
         }

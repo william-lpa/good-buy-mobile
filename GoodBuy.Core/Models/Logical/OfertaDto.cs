@@ -3,8 +3,6 @@ using GoodBuy.Service;
 using GoodBuy.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
@@ -45,44 +43,44 @@ namespace GoodBuy.Models.Logical
             Confiabilidade = ofertasService.CalculateConfiabilidade(oferta);
             Estabelecimento = estabelecimento.Nome;
             DescricaoOferta = $"{produto.Nome} - {sabor?.Nome}, {marca.Nome}, {produto.QuantidadeMensuravel} {unidade.Nome}";
-            AumentarConfiabilidadeCommand = new Command(ExecuteAplicarLike);
-            DiminuirConfiabilidadeCommand = new Command(ExecuteAplicarDislike);
-            ShareOfertaCommand = new Command(ExecuteCompartilharOferta);
-            OfertaDetailCommand = new Command(ExecuteMonitorarOferta);
+            AumentarConfiabilidadeCommand = new Command(ExecuteAplicarLikeAsync);
+            DiminuirConfiabilidadeCommand = new Command(ExecuteAplicarDislikeAsync);
+            ShareOfertaCommand = new Command(ExecuteCompartilharOfertaAsync);
+            OfertaDetailCommand = new Command(ExecuteMonitorarOfertaAsync);
         }
 
-        private async void ExecuteCompartilharOferta()
+        private async void ExecuteCompartilharOfertaAsync()
         {
             var parameters = new Dictionary<string, string>();
             parameters.Add("ID", idOFerta);
             await PushAsync<CompartilharOfertasPageViewModel>(false, parameters);
         }
-        public async void ExecuteMonitorarOferta()
+        public async void ExecuteMonitorarOfertaAsync()
         {
             var parameters = new Dictionary<string, string>();
             parameters.Add("ID", idOFerta);
             await PushAsync<OfertasTabDetailPageViewModel>(false, parameters);
         }
 
-        private async Task NeedsReversal()
+        private async Task NeedsReversionAsync()
         {
             if (LikePerformed != null) //ja foi realizado anteriormente
             {
-                Confiabilidade = await ofertasService.RevertConfiabilidade(idOFerta, LikePerformed.Value);
+                Confiabilidade = await ofertasService.RevertConfiabilidadeAsync(idOFerta, LikePerformed.Value);
             }
         }
-        private async void ExecuteAplicarDislike()
+        private async void ExecuteAplicarDislikeAsync()
         {
-            await NeedsReversal();
+            await NeedsReversionAsync();
             LikePerformed = false;
-            Confiabilidade = await ofertasService.ApplyDislike(idOFerta);
+            Confiabilidade = await ofertasService.ApplyDislikeAsync(idOFerta);
         }
 
-        private async void ExecuteAplicarLike()
+        private async void ExecuteAplicarLikeAsync()
         {
-            await NeedsReversal();
+            await NeedsReversionAsync();
             LikePerformed = true;
-            Confiabilidade = await ofertasService.ApplyLike(idOFerta);
+            Confiabilidade = await ofertasService.ApplyLikeAsync(idOFerta);
         }
     }
 }

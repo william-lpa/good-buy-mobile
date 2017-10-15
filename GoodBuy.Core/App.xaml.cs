@@ -27,7 +27,7 @@ namespace GoodBuy
         {
             container.RegisterType<AzureService>().SingleInstance();
             container.RegisterType<LoginPageViewModel>().SingleInstance();
-            container.RegisterType<MainMenuViewModel>();
+            container.RegisterType<MainMenuPageViewModel>();
             container.RegisterType<OfertaDetalhePageViewModel>();
             container.RegisterType<OfertasPageViewModel>();
             container.RegisterType<LoadingPageViewModel>().SingleInstance();

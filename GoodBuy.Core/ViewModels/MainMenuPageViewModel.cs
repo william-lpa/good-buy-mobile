@@ -2,15 +2,13 @@
 using GoodBuy.Service;
 using System;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
 
 namespace GoodBuy.ViewModels
 {
-    public class MainMenuViewModel : BaseViewModel
+    public class MainMenuPageViewModel : BaseViewModel
     {
-
         public ICommand NovaOfertaCommand { get; }
         public ICommand SignOutCommand { get; }
         public ICommand ListarOfertasCommand { get; }
@@ -31,45 +29,45 @@ namespace GoodBuy.ViewModels
         }
         public string UserName => azure.CurrentUser?.User?.FullName;
 
-        public MainMenuViewModel(AzureService azureService, SyncronizedAccessService syncronizeAccessService)
+        public MainMenuPageViewModel(AzureService azureService, SyncronizedAccessService syncronizeAccessService)
         {
             azure = azureService;
             this.syncronizeAccessService = syncronizeAccessService;
-            NovaOfertaCommand = new Command(ExecuteCadastrarNovaOferta);
-            ListarOfertasCommand = new Command(ExecuteListarOfertasCadastradas);
-            ListarGrupoOfertasCommand = new Command(ExecuteListarGrupoOfertas);
-            SignOutCommand = new Command(ExecuteSignOut);
+            NovaOfertaCommand = new Command(ExecuteCadastrarNovaOfertaAsync);
+            ListarOfertasCommand = new Command(ExecuteListarOfertasCadastradasAsync);
+            ListarGrupoOfertasCommand = new Command(ExecuteListarGrupoOfertasAsync);
+            SignOutCommand = new Command(ExecuteSignOutAsync);
 
-            InitilizeDatabase();
+            InitilizeDatabaseAsync();
         }
 
-        private async void InitilizeDatabase()
+        private async void InitilizeDatabaseAsync()
         {
-            if (await syncronizeAccessService.FirstUsage())
+            if (await syncronizeAccessService.FirstUsageAsync())
             {
-                await Log.MessageDisplayer.Instance.ShowMessage("Sincronizar base de dados", "O aplicativo irá sincronizar a base de dados para um primeiro uso. Isto pode levar alguns segundos", "OK");
+                await Log.MessageDisplayer.Instance.ShowMessageAsync("Sincronizar base de dados", "O aplicativo irá sincronizar a base de dados para um primeiro uso. Isto pode levar alguns segundos", "OK");
                 await PushModalAsync<LoadingPageViewModel>(null,new NamedParameter("operation", Operation.SyncInitalDataBase));
-                syncronizeAccessService.SyncronizeFirstUse();
+                syncronizeAccessService.SyncronizeFirstUseAsync();
                 await PopModalAsync();
             }
         }
 
-        private async void ExecuteListarGrupoOfertas()
+        private async void ExecuteListarGrupoOfertasAsync()
         {
             await PushAsync<GruposOfertasPageViewModel>();
         }
 
-        private async void ExecuteListarOfertasCadastradas()
+        private async void ExecuteListarOfertasCadastradasAsync()
         {
             await PushAsync<OfertasPageViewModel>();
         }
-        private async void ExecuteSignOut()
+        private async void ExecuteSignOutAsync()
         {
             await azure.LogoutAsync();
             await PushAsync<LoginPageViewModel>(resetNavigation: true);
         }
 
-        private async void ExecuteCadastrarNovaOferta()
+        private async void ExecuteCadastrarNovaOfertaAsync()
         {
             await PushModalAsync<OfertaDetalhePageViewModel>();
         }

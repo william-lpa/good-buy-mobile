@@ -1,5 +1,4 @@
-﻿
-using Autofac;
+﻿using Autofac;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 

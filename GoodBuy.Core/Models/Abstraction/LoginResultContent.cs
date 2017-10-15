@@ -1,7 +1,4 @@
-﻿
-using System;
-
-namespace GoodBuy.Models.Abstraction
+﻿namespace GoodBuy.Models.Abstraction
 {
     public enum Result { OK = 1, Canceled = 2, Error = 3 }
     public class LoginResultContent
