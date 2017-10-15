@@ -150,7 +150,7 @@ namespace GoodBuy.Service
         {
             try
             {
-                RemoveTokenFromSecureStore();
+                //RemoveTokenFromSecureStore();
                 //Client = new MobileServiceClient(appURL, new ExpiredAzureRequestInterceptors(this));
                 Client = new MobileServiceClient(appURL);
                 var dbName = "goodBuy229.db";

@@ -1,19 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:GoodBuy.Views"
+             xmlns:microcharts="clr-namespace:Microcharts.Forms;assembly=Microcharts.Forms"
              x:Class="GoodBuy.Views.HistoricosOfertaPage">
     <ContentPage.Content>
-        <StackLayout Spacing="10">
-            <Label Text="Monitorar ofertas" Style="{StaticResource label}" FontSize="Large" HorizontalOptions="StartAndExpand"/>
-            <StackLayout Orientation="Vertical">
-                <Label Text="Monitorar quando atingir preço"  HorizontalOptions="Start"/>
-                <StackLayout Orientation="Horizontal">
-                    <Switch IsToggled="{Binding ExistsAlert}" Toggled="Switch_Toggled" />
-                    <Entry x:Name="campoMonitore" Keyboard="Numeric" IsEnabled="False" Text="{Binding MonitorarOfertaValor}" Placeholder="Informe o preço do alerta" HorizontalOptions="FillAndExpand"/>
+        <ScrollView>
+            <StackLayout Spacing="5">
+                <Label Text="Monitorar ofertas" Style="{StaticResource label}" FontSize="Large" HorizontalOptions="StartAndExpand"/>
+                <StackLayout Orientation="Vertical">
+                    <Label Text="Monitorar quando atingir preço"  HorizontalOptions="Start"/>
+                    <StackLayout Orientation="Horizontal">
+                        <Switch IsToggled="{Binding ExistsAlert}" Toggled="Switch_Toggled" />
+                        <Entry x:Name="campoMonitore" Keyboard="Numeric" IsEnabled="False" Text="{Binding MonitorarOfertaValor}" Placeholder="Informe o preço do alerta" HorizontalOptions="FillAndExpand"/>
+                    </StackLayout>
                 </StackLayout>
+                <Button Text="Salvar Alteracoes" Command="{Binding PrimaryAction}"/>
+                <AbsoluteLayout VerticalOptions="FillAndExpand" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1">
+                    <Label Text="Variação de Preço" Style="{StaticResource label}" FontSize="Large" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,.5,.2" />
+                    <!--<BoxView AbsoluteLayout.LayoutFlags="All"
+                    AbsoluteLayout.LayoutBounds="0,.2,1,.8" BackgroundColor="Yellow"/>-->
+                    <microcharts:ChartView
+                    Chart="{Binding HistoricoOfertaChart}"
+                    BackgroundColor="Transparent"
+                    AbsoluteLayout.LayoutFlags="All"
+                    AbsoluteLayout.LayoutBounds="0,.3,1,.8"                    
+                    x:Name="chartView"/>
+                </AbsoluteLayout>
             </StackLayout>
-            <Button Text="Salvar Alteracoes" Command="{Binding PrimaryAction}"/>
-            <Label Text="Variação Preço" Style="{StaticResource label}" FontSize="Large" HorizontalOptions="StartAndExpand"/>
-        </StackLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

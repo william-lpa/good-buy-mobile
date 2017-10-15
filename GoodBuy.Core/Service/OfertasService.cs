@@ -113,7 +113,7 @@ namespace GoodBuy.Service
             var idProdutos = new List<Produto>();
             var idSabor = new List<Sabor>();
             var idUnidadeMedida = new List<UnidadeMedida>();
-            var idEstabelecimento = new List<Estabelecimento>();            
+            var idEstabelecimento = new List<Estabelecimento>();
 
             try
             {
@@ -172,10 +172,12 @@ namespace GoodBuy.Service
         {
             var oferta = await ofertaRepository.GetById(id);
             oferta.Estabelecimento = await estabelecimentoRepository.GetById(oferta.IdEstabelecimento);
-            var tasks = new Task[2];
+            var tasks = new Task[3];
             tasks[0] = Task.Run(async () => oferta.Estabelecimento = await estabelecimentoRepository.GetById(oferta.IdEstabelecimento));
             tasks[1] = Task.Run(async () => oferta.CarteiraProduto = await carteiraProdutoRepository.GetById(oferta.IdCarteiraProduto));
+            tasks[2] = Task.Run(async () => oferta.OfertasAnteriores = await CarregarHistoricoDeOFerta(oferta.Id));
             Task.WaitAll(tasks);
+            tasks = new Task[2];
             tasks[0] = Task.Run(async () => oferta.CarteiraProduto.Marca = await marcaRepository.GetById(oferta.CarteiraProduto.IdMarca));
             tasks[1] = Task.Run(async () => oferta.CarteiraProduto.Produto = await produtoRepository.GetById(oferta.CarteiraProduto.IdProduto));
             Task.WaitAll(tasks);
@@ -186,6 +188,16 @@ namespace GoodBuy.Service
             Task.WaitAll(tasks);
             return oferta;
         }
+
+        private async Task<IEnumerable<HistoricoOferta>> CarregarHistoricoDeOFerta(string idOferta)
+        {
+            return (await historicoOfertaRepository.SyncTableModel.Where(x => x.IdOferta == idOferta)
+                .OrderByDescending(x => x.UpdatedAt)
+                .ToListAsync())
+                    .Take(10)
+                    .OrderBy(x => x.UpdatedAt);
+        }
+
         public async void CriarNovaOferta(Oferta oferta)
         {
             try

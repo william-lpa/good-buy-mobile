@@ -4,6 +4,9 @@ using Xamarin.Forms;
 using System.Collections.Generic;
 using GoodBuy.Models;
 using GoodBuy.Log;
+using Microcharts;
+using SkiaSharp;
+using System.Linq;
 
 namespace GoodBuy.ViewModels
 {
@@ -33,6 +36,64 @@ namespace GoodBuy.ViewModels
             alerta = await ofertasService.TryLoadAlerta(OfertasTabDetailPageViewModel.Oferta.Id);
             MonitorarOfertaValor = Math.Round(OfertasTabDetailPageViewModel.Oferta.PrecoAtual * 0.9M, 2);
             Adapter();
+            var chart = HistoricoOfertaChart;
+            OnPropertyChanged(nameof(HistoricoOfertaChart));
+        }
+        public Chart HistoricoOfertaChart => OfertasTabDetailPageViewModel.Oferta != null ? new LineChart()
+        {
+            Entries = GetEntries(),
+            LineSize = 20,
+            PointSize = 35,
+            LineAreaAlpha = 10,
+            PointAreaAlpha = 5,
+            LineMode = LineMode.Straight,
+            PointMode = PointMode.Circle,
+            LabelTextSize = 20,
+            BackgroundColor = SKColors.Transparent
+        } : null;
+
+        private IEnumerable<Microcharts.Entry> GetEntries()
+        {
+            var currentTime = DateTime.Now;
+
+            var entries = OfertasTabDetailPageViewModel.Oferta?.OfertasAnteriores?
+                .Select(x =>
+                {
+                    return new Microcharts.Entry((float)x.Preco)
+                    {
+                        Label = ObterDescriptionDateTime(x.UpdatedAt), // "January",
+                        ValueLabel = $"R$ {x.Preco}",//"102",
+                        Color = SKColor.Parse("#4e6cab"),
+                        TextColor = SKColor.Parse("#4e6cab"),
+                    };
+                });
+            return entries;
+
+            string ObterDescriptionDateTime(DateTime date)
+            {
+                var difference = (currentTime - date);
+                if (difference.TotalDays < 1)
+                {
+                    if (difference.TotalHours < 1)
+                    {
+                        var minutos = Math.Round(difference.TotalMinutes, 0);
+                        var minutoString = minutos > 1 ? "minutos" : "minuto";
+                        return $"Há {minutos} {minutoString}";
+                    }
+                    else
+                    {
+                        var horas = Math.Round(difference.TotalHours, 0);
+                        var horasString = horas > 1 ? "horas" : "hora";
+                        return $"Há {horas} {horasString}";
+                    }
+                }
+                else
+                {
+                    var dias = Math.Round(difference.TotalDays, 0);
+                    var diasString = dias > 1 ? "dias" : "dia";
+                    return $"Há {dias} {diasString}";
+                }
+            }
         }
 
         private void Adapter()

@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.1" />
+    <PackageReference Include="Microcharts" Version="0.7.1" />
+    <PackageReference Include="Microcharts.Forms" Version="0.7.1" />
     <PackageReference Include="Microsoft.Azure.Mobile.Client" Version="4.0.1" />
     <PackageReference Include="Microsoft.Azure.Mobile.Client.SQLiteStore" Version="4.0.1" />
     <PackageReference Include="Microsoft.Bcl" Version="1.1.10" />
