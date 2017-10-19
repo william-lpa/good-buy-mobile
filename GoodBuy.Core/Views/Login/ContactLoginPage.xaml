@@ -28,12 +28,12 @@
         </StackLayout>
         <StackLayout Spacing="10">
             <Label Text="Data de Nascimento" Style="{StaticResource label}" HorizontalOptions="StartAndExpand"/>
-            <DatePicker MinimumDate="01/01/1950" Date="{Binding Birth}" MaximumDate="01/01/2012"/>
+            <DatePicker MinimumDate="01/01/1950" Format="dd/MM/yyyy" Date="{Binding Birth}" MaximumDate="01/01/2012"/>
         </StackLayout>
         <StackLayout Spacing="10">
             <Label Text="Cidade Atual" Style="{StaticResource label}" HorizontalOptions="StartAndExpand"/>
             <Entry Placeholder="Cidade/Município atual" Text="{Binding City}"  HorizontalOptions="FillAndExpand"/>
         </StackLayout>
-        <Button Text="Logar com o perfil do dispositivo" Command="{Binding ProfileDeviceLoginCommand}" HorizontalOptions="FillAndExpand" BackgroundColor="#4e6cab" TextColor="#FFF"/>
+        <Button Text="Logar com o perfil do dispositivo" Command="{Binding ProfileDeviceLoginCommand}" HorizontalOptions="FillAndExpand" Style="{StaticResource primaryButton}"/>
     </StackLayout>
 </ContentPage>

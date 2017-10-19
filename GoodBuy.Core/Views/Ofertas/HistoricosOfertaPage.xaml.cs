@@ -1,4 +1,5 @@
-﻿using Xamarin.Forms;
+﻿using System;
+using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace GoodBuy.Views
@@ -16,10 +17,15 @@ namespace GoodBuy.Views
             if (campoMonitore.IsEnabled)
             {
                 campoMonitore.IsEnabled = e.Value;
-                campoMonitore.Text= string.Empty;
+                slider.IsEnabled = e.Value;
+                campoMonitore.Text = string.Empty;
             }
             else
+            {
                 campoMonitore.IsEnabled = e.Value;
+                slider.IsEnabled = e.Value;
+                slider.Value = Convert.ToDouble(campoMonitore.Text);
+            }
         }
     }
 }

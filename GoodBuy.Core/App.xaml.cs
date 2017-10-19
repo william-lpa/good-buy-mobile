@@ -42,6 +42,8 @@ namespace GoodBuy
             container.RegisterType<ListagemUsuariosPageViewModel>();
             container.RegisterType<OfertasTabDetailPageViewModel>();
             container.RegisterType<HistoricosOfertaPageViewModel>();
+            container.RegisterType<ListaDeComprasPageViewModel>();
+            container.RegisterType<ListaCompraService>();
             container.RegisterType<SyncronizedAccessService>().SingleInstance();
             container.RegisterType<GenericRepository<Model.IEntity>>();
             return container;
@@ -50,11 +52,26 @@ namespace GoodBuy
         protected override void OnSleep()
         {
             // Handle when your app sleeps
+
+            using (var scope = App.Container?.BeginLifetimeScope())
+            {
+                var azure = scope?.Resolve<AzureService>();
+                if (azure.LoginIn) return;
+                scope?.Resolve<SyncronizedAccessService>()?.SyncronizeFirstUseAsync();
+            }
         }
 
         protected override void OnResume()
         {
+
             // Handle when your app resumes
+            using (var scope = App.Container?.BeginLifetimeScope())
+            {
+                var azure = scope?.Resolve<AzureService>();
+                if (azure.LoginIn) return;
+                scope?.Resolve<SyncronizedAccessService>()?.SyncronizeFirstUseAsync();
+                azure.CreateOrRefreshPushRegistration();
+            }
         }
     }
 }

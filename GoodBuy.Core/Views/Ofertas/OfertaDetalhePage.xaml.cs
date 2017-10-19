@@ -10,10 +10,19 @@ namespace GoodBuy.Views
         {
             InitializeComponent();
         }
-        
+
         private void Switch_Toggled(object sender, ToggledEventArgs e)
         {
-            sabor.IsEnabled = e.Value;
+            tipo.IsEnabled = e.Value;
+            if (!tipo.IsEnabled)
+                tipo.Text = "";
+        }
+
+        private void SwitchMarca_Toggled(object sender, ToggledEventArgs e)
+        {
+            marca.IsEnabled =!e.Value;
+            if (marca.IsEnabled)
+                marca.Text = "";
         }
     }
 }

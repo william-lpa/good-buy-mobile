@@ -8,22 +8,22 @@ namespace GoodBuy.Service
 {
     public class SyncronizedAccessService
     {
+        private readonly AzureService azureService;
         public IGenericRepository<Oferta> OfertaRepository { get; }
         public IGenericRepository<HistoricoOferta> HistoricoOfertaRepository { get; }
         public IGenericRepository<CarteiraProduto> CarteiraProdutoRepository { get; }
         public IGenericRepository<Estabelecimento> EstabelecimentoRepository { get; }
         public IGenericRepository<Marca> MarcaRepository { get; }
         public IGenericRepository<UnidadeMedida> UnidadeMedidaRepository { get; }
-        public IGenericRepository<Sabor> SaborRepository { get; }
+        public IGenericRepository<Tipo> TipoRepository { get; }
         public IGenericRepository<Produto> ProdutoRepository { get; }
         public IGenericRepository<GrupoOferta> GrupoOfertaRepository { get; }
         public IGenericRepository<ParticipanteGrupo> ParticipanteGrupoRepository { get; }
         public IGenericRepository<User> UserRepository { get; }
         public IGenericRepository<Categoria> CategoriaRepository { get; set; }
         public IGenericRepository<MonitoramentoOferta> MonitoramentoOfertaRepository { get; set; }
-
-
-        private readonly AzureService azureService;
+        public IGenericRepository<ListaCompra> ListaCompraRepository { get; set; }
+        public IGenericRepository<ParticipanteListaCompra> ParticipanteListaCompraRepository { get; set; }
 
         public SyncronizedAccessService(AzureService azureService)
         {
@@ -34,13 +34,15 @@ namespace GoodBuy.Service
             MarcaRepository = new GenericRepository<Marca>(azureService);
             UnidadeMedidaRepository = new GenericRepository<UnidadeMedida>(azureService);
             ProdutoRepository = new GenericRepository<Produto>(azureService);
-            SaborRepository = new GenericRepository<Sabor>(azureService);
+            TipoRepository = new GenericRepository<Tipo>(azureService);
             GrupoOfertaRepository = new GenericRepository<GrupoOferta>(azureService);
             HistoricoOfertaRepository = new GenericRepository<HistoricoOferta>(azureService);
             ParticipanteGrupoRepository = new GenericRepository<ParticipanteGrupo>(azureService);
             CategoriaRepository = new GenericRepository<Categoria>(azureService);
             UserRepository = new GenericRepository<User>(azureService);
             MonitoramentoOfertaRepository = new GenericRepository<MonitoramentoOferta>(azureService);
+            ListaCompraRepository = new GenericRepository<ListaCompra>(azureService);
+            ParticipanteListaCompraRepository = new GenericRepository<ParticipanteListaCompra>(azureService);
         }
 
         public async Task<bool> FirstUsageAsync() => (await OfertaRepository.GetEntitiesAsync(0, 1)).Count == 0;
@@ -62,7 +64,7 @@ namespace GoodBuy.Service
                      Task.Run(() => OfertaRepository.SyncDataBaseAsync(date)),
                      Task.Run(() => CarteiraProdutoRepository.SyncDataBaseAsync(date)),
                      Task.Run(() => ProdutoRepository.SyncDataBaseAsync(date)),
-                     Task.Run(() => SaborRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => TipoRepository.SyncDataBaseAsync(date)),
                      Task.Run(() => MarcaRepository.SyncDataBaseAsync(date)),
                      Task.Run(() => EstabelecimentoRepository.SyncDataBaseAsync(date)),
                      Task.Run(() => UnidadeMedidaRepository.SyncDataBaseAsync(date)),
@@ -72,6 +74,8 @@ namespace GoodBuy.Service
                      Task.Run(() => UserRepository.SyncDataBaseAsync(date)),
                      Task.Run(() => CategoriaRepository.SyncDataBaseAsync(date)),
                      Task.Run(() => MonitoramentoOfertaRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => ListaCompraRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => ParticipanteListaCompraRepository.SyncDataBaseAsync(date)),
            });
         }
     }

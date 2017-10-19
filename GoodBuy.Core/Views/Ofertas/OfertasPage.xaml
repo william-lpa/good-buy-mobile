@@ -80,7 +80,7 @@
                                 </StackLayout>
                                 <StackLayout Orientation="Horizontal" Spacing="5">
                                     <Label x:Name="lbAtualizadoEm" Text="Última atualização em:" FontSize="Small" HorizontalOptions="Start"/>
-                                    <Label x:Name="lbAtualizadoEmValue" Text="{Binding CreatedAt, StringFormat='{0:dd/MM/yyyy, HH:mm}' }" FontSize="Small" HorizontalOptions="StartAndExpand"/>
+                                    <Label x:Name="lbAtualizadoEmValue" Text="{Binding UpdatedAt, StringFormat='{0:dd/MM/yyyy, HH:mm}' }" FontSize="Small" HorizontalOptions="StartAndExpand"/>
                                 </StackLayout>
                                 <StackLayout Orientation="Horizontal">
                                     <Button Text="Adicionar a Lista" Style="{StaticResource ofertaOption}" HorizontalOptions="StartAndExpand"/>

@@ -7,6 +7,7 @@ using Microcharts;
 using SkiaSharp;
 using System.Linq;
 using GoodBuy.Models.Many_to_Many;
+using System.Threading.Tasks;
 
 namespace GoodBuy.ViewModels
 {
@@ -15,17 +16,58 @@ namespace GoodBuy.ViewModels
         private readonly AzureService azureService;
         private readonly OfertasService ofertasService;
         private decimal monitorarOfertaValor;
-        private MonitoramentoOferta alerta;
-        public Command PrimaryAction { get; }
-        public bool ExistsAlert { get; set; }
+        private DateTime fromDate;
+        private DateTime untilDate;
+        private LineChart chart;
+        public DateTime FromDate
+        {
+            get { return fromDate; }
+            set
+            {
+                if (value > UntilDate)
+                {
+                    new Action(async () => await MessageDisplayer.Instance.ShowMessageAsync("Filtro incorreto", "Data inicial não pode ser maior que a data final", "OK")).Invoke();                    
+                }
+                SetProperty(ref fromDate, value);
+                GetChart();
+            }
+        }
+        public DateTime UntilDate
+        {
+            get { return untilDate; }
+            set
+            {
+                if (value < FromDate)
+                {
+                    new Action(async () => await MessageDisplayer.Instance.ShowMessageAsync("Filtro incorreto", "Data final não pode ser menor que data inicial", "OK")).Invoke();
+                    SetProperty(ref untilDate, untilDate);
+                }
+                SetProperty(ref untilDate, value);
+                GetChart();
+            }
+        }
+
 
         public decimal MonitorarOfertaValor
         {
             get { return monitorarOfertaValor; }
-            set { SetProperty(ref monitorarOfertaValor, value); }
+            set { SetProperty(ref monitorarOfertaValor, Math.Round(value, 2)); }
         }
+
+        public decimal MinimumPrice => OfertasTabDetailPageViewModel.Oferta != null ? Math.Round((OfertasTabDetailPageViewModel.Oferta.PrecoAtual) * 0.01M, 2) : 0;
+        public decimal MaximumPrice => OfertasTabDetailPageViewModel.Oferta != null ? Math.Round(OfertasTabDetailPageViewModel.Oferta.PrecoAtual, 2) : 100;
+
+        private MonitoramentoOferta alerta;
+
+
+        public Command PrimaryAction { get; }
+        public bool ExistsAlert { get; set; }
+        public string ExistsAlertDescription => ExistsAlert ? "Monitorando Oferta" : "Selecione para monitorar ofertas";
+
+
         public HistoricosOfertaPageViewModel(AzureService azureService, OfertasService ofertasService)
         {
+            this.azureService = azureService;
             this.ofertasService = ofertasService;
             PrimaryAction = new Command(ExecuteCriarOfertaAsync);
             Init();
@@ -37,38 +79,68 @@ namespace GoodBuy.ViewModels
             MonitorarOfertaValor = Math.Round(OfertasTabDetailPageViewModel.Oferta.PrecoAtual * 0.9M, 2);
             Adapter();
             var chart = HistoricoOfertaChart;
+            var min = MinimumPrice;
+            var max = MaximumPrice;
+            fromDate = DateTime.Today.AddDays(-7);
+            untilDate = DateTime.Now;
+            GetChart();
+            OnPropertyChanged(nameof(HistoricoOfertaChart));
+            OnPropertyChanged(nameof(MinimumPrice));
+            OnPropertyChanged(nameof(MaximumPrice));
+            OnPropertyChanged(nameof(FromDate));
+            OnPropertyChanged(nameof(UntilDate));
+        }
+        public Chart HistoricoOfertaChart => chart ?? null;
+
+        public async void GetChart()
+        {
+            chart = new LineChart()
+            {
+                LineSize = 20,
+                PointSize = 35,
+                LineAreaAlpha = 10,
+                PointAreaAlpha = 5,
+                LineMode = LineMode.Straight,
+                PointMode = PointMode.Circle,
+                LabelTextSize = 20,
+                BackgroundColor = SKColors.Transparent
+            };
+            chart.Entries = await GetEntriesAsync();
             OnPropertyChanged(nameof(HistoricoOfertaChart));
         }
-        public Chart HistoricoOfertaChart => OfertasTabDetailPageViewModel.Oferta != null ? new LineChart()
-        {
-            Entries = GetEntries(),
-            LineSize = 20,
-            PointSize = 35,
-            LineAreaAlpha = 10,
-            PointAreaAlpha = 5,
-            LineMode = LineMode.Straight,
-            PointMode = PointMode.Circle,
-            LabelTextSize = 20,
-            BackgroundColor = SKColors.Transparent
-        } : null;
 
-        private IEnumerable<Microcharts.Entry> GetEntries()
+        private async Task<IEnumerable<Microcharts.Entry>> GetEntriesAsync()
         {
             var currentTime = DateTime.Now;
+            List<Microcharts.Entry> entries = new List<Microcharts.Entry>();
+            if (OfertasTabDetailPageViewModel.Oferta != null)
+            {
+                var index = 1;
+                var historico = await ofertasService.CarregarHistoricoDeOFertaAsync(OfertasTabDetailPageViewModel.Oferta.Id, FromDate, UntilDate);
 
-            var entries = OfertasTabDetailPageViewModel.Oferta?.OfertasAnteriores?
-                .Select(x =>
+                historico.Select(x =>
                 {
-                    return new Microcharts.Entry((float)x.Preco)
-                    {
-                        Label = ObterDescriptionDateTime(x.UpdatedAt), // "January",
-                        ValueLabel = $"R$ {x.Preco}",//"102",
-                        Color = SKColor.Parse("#4e6cab"),
-                        TextColor = SKColor.Parse("#4e6cab"),
-                    };
-                });
-            return entries;
-
+                    if (index == 1 || index == Math.Round(historico.Count() / 2M, 0, MidpointRounding.ToEven) || index == historico.Count())
+                        entries.Add(new Microcharts.Entry((float)x.Preco)
+                        {
+                            Label = ObterDescriptionDateTime(x.UpdatedAt), // "January",
+                            ValueLabel = $"R$ {x.Preco}",//"102",
+                            Color = SKColor.Parse("#4e6cab"),
+                            TextColor = SKColor.Parse("#4e6cab"),
+                        });
+                    else
+                        entries.Add(new Microcharts.Entry((float)x.Preco)
+                        {
+                            Color = SKColor.Parse("#4e6cab"),
+                            TextColor = SKColor.Parse("#4e6cab"),
+                            Label = null,
+                        });
+                    index++;
+                    return x;
+                }).ToArray();
+                return entries;
+            }
+            return null;
             string ObterDescriptionDateTime(DateTime date)
             {
                 var difference = (currentTime - date);
@@ -102,6 +174,7 @@ namespace GoodBuy.ViewModels
             {
                 ExistsAlert = true;
                 OnPropertyChanged(nameof(ExistsAlert));
+                OnPropertyChanged(nameof(ExistsAlertDescription));
                 MonitorarOfertaValor = alerta.PrecoAlvo;
             }
             else

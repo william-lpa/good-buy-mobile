@@ -52,6 +52,7 @@ namespace GoodBuy.Service
                     CurrentUser = new LoginResultContent(profileUser, "local user") { Token = profileUser.Id };
                     await CreateUserAsync(CurrentUser.User, initializingSyncContext);
                     StoreTokenInSecureStore(CurrentUser.User.Id, "localUser", CurrentUser.Token);
+                    CreateOrRefreshPushRegistration();
                 }
             }
             catch (Exception err)
@@ -73,9 +74,15 @@ namespace GoodBuy.Service
 
             LoginUser(user);
         }
+        public void CreateOrRefreshPushRegistration()
+        {
+            using (var scope = App.Container.BeginLifetimeScope())
+                scope.Resolve<IAuthentication>().RegisterForPushNotificaton(Client);
+        }
 
         private async Task LoginWithFacebookAsync(Task initializingSyncContext, IAuthentication auth, User profileUser)
         {
+            LoginIn = true;
             var result = await auth.LoginClientFlowAsync(Client, MobileServiceAuthenticationProvider.Facebook);
             Client.CurrentUser = result.azureUser;
             CurrentUser = result.appUser.Merge(profileUser);
@@ -87,6 +94,7 @@ namespace GoodBuy.Service
                 StoreTokenInSecureStore(Client.CurrentUser.UserId, "azure", Client.CurrentUser.MobileServiceAuthenticationToken);
                 StoreTokenInSecureStore(CurrentUser.User.Id, "facebook", CurrentUser.Token);
             }
+            LoginIn = false;
         }
 
         bool IsTokenExpired(string token)
@@ -153,7 +161,7 @@ namespace GoodBuy.Service
                 //RemoveTokenFromSecureStore();
                 //Client = new MobileServiceClient(appURL, new ExpiredAzureRequestInterceptors(this));
                 Client = new MobileServiceClient(appURL);
-                var dbName = "goodBuy229.db";
+                var dbName = "goodBuy241.db";
                 Store = new MobileServiceSQLiteStore(Path.Combine(MobileServiceClient.DefaultDatabasePath, dbName));
                 DefineTables(Store);
 
@@ -185,6 +193,7 @@ namespace GoodBuy.Service
                 using (var scope = App.Container.BeginLifetimeScope())
                     // scope.Resolve<IAuthentication>().RegisterForPushNotificaton(Client);
                     LoginUser(CurrentUser.User);
+                CreateOrRefreshPushRegistration();
             }
 
             LoginIn = false;
@@ -217,7 +226,7 @@ namespace GoodBuy.Service
             store.DefineTable<Person>();
             store.DefineTable<Produto>();
             store.DefineTable<Marca>();
-            store.DefineTable<Sabor>();
+            store.DefineTable<Tipo>();
             store.DefineTable<UnidadeMedida>();
             store.DefineTable<CarteiraProduto>();
             store.DefineTable<Oferta>();

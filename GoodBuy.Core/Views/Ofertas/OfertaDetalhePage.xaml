@@ -12,14 +12,15 @@
                     <Label Text="Nome do Produto*" Style="{StaticResource label}"/>
                     <controls:AutoComplete Name="Produtos" Keyboard="Text" Placeholder="Suco Integral" Text="{Binding Produto}"/>
                     <StackLayout Orientation="Horizontal" >
-                        <Label Text="Tem um sabor?" />
-                        <Switch  IsToggled="false" Toggled="Switch_Toggled"  />
+                        <Label Text="Tipo?" VerticalTextAlignment="Center" IsVisible="{Binding NotEditingOferta}" />
+                        <Switch  IsToggled="false" Toggled="Switch_Toggled" IsVisible="{Binding NotEditingOferta}" />
                         <controls:AutoComplete 
-                            x:Name="sabor"
+                            x:Name="tipo"
                             IsEnabled="False"
-                            Name="Sabores"
-                            Text="{Binding Sabor}"
-                            Placeholder="Morango, Chocolate, Uva..."
+                            HorizontalOptions="FillAndExpand"
+                            Name="Tipos"
+                            Text="{Binding Tipo}"
+                            Placeholder="Morango, Integral, Uva..."
                         />
                     </StackLayout>
                     <StackLayout Orientation="Horizontal"  Spacing="15" >
@@ -32,8 +33,18 @@
                             <controls:AutoComplete Name="UnidadesMedidas" Placeholder="gr, kg, unidade, pacote" Text="{Binding UnidadeMedida}" />
                         </StackLayout>
                     </StackLayout>
-                    <Label Text="Marca do produto*" Style="{StaticResource label}"/>
-                    <controls:AutoComplete Name="Marcas" Placeholder="Pepsi, Nestlé" Text="{Binding Marca}" />
+
+                    <StackLayout Orientation="Horizontal" Spacing="15" >
+                        <StackLayout HorizontalOptions="Start" IsVisible="{Binding NotEditingOferta}">
+                            <Label Text="Sem Marca" VerticalTextAlignment="Center" />
+                            <Switch  IsToggled="False" Toggled="SwitchMarca_Toggled" HorizontalOptions="Center" VerticalOptions="CenterAndExpand" />
+                        </StackLayout>
+                        <StackLayout HorizontalOptions="FillAndExpand">
+                            <Label Text="Marca do produto" Style="{StaticResource label}"/>
+                            <controls:AutoComplete x:Name="marca" Name="Marcas" Placeholder="Pepsi, Nestlé" Text="{Binding Marca}" />
+                        </StackLayout>
+                    </StackLayout>
+
 
                     <Label Text="Categoria" Style="{StaticResource label}"/>
                     <controls:AutoComplete Name="Categorias" Placeholder="Mercearia, Confeitaria, Eletrônicos" Text="{Binding Categoria}" />
@@ -47,7 +58,7 @@
                     <Label  Margin="10,5,10,5" IsVisible="{Binding NotEditingOferta}" Text="campos marcados com '*' são de preenchimento obrigatório" FontSize="13" TextColor="Red"/>
 
                 </StackLayout>
-                <Button Text="{Binding PrimaryActionText}" Command="{Binding PrimaryAction}"/>
+                <Button Text="{Binding PrimaryActionText}" Command="{Binding PrimaryAction}" Style="{StaticResource primaryButton}"/>
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>

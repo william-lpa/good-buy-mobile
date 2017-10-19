@@ -8,6 +8,10 @@ using Microsoft.WindowsAzure.MobileServices;
 using System.Diagnostics;
 using goodBuy.Droid.Push;
 using System.Net.Http;
+using GoodBuy.Service;
+using GoodBuy;
+using Autofac;
+using System.Linq;
 
 [assembly: Permission(Name = "@PACKAGE_NAME@.permission.C2D_MESSAGE")]
 [assembly: UsesPermission(Name = "@PACKAGE_NAME@.permission.C2D_MESSAGE")]
@@ -52,6 +56,13 @@ namespace goodBuy.Droid
                     PushChannel = RegistrationID
                 };
 
+
+                using (var scope = App.Container?.BeginLifetimeScope())
+                {
+                    (await scope?.Resolve<GrupoOfertaService>()?.CarregarGrupoDeOfertasUsuarioLogadoAsync()).Select(x => { installation.Tags.Add(x.Id); return x; }).ToArray();
+                    installation.Tags.Add("user:" + scope?.Resolve<AzureService>()?.CurrentUser.User.Id);
+                }
+
                 // Set up templates to request
                 PushTemplate genericTemplate = new PushTemplate
                 {
@@ -66,11 +77,12 @@ namespace goodBuy.Droid
                 installation.Templates.Add("ofertaTemplate", ofertaTemplate);
 
                 // Register with NH
-                var response = await Client.InvokeApiAsync<DeviceInstallation, DeviceInstallation>(
+                await Client.InvokeApiAsync<DeviceInstallation, DeviceInstallation>(
                     $"/push/installations/{Client.InstallationId}",
                     installation,
                     HttpMethod.Put,
                     new Dictionary<string, string>());
+                await Client.InvokeApiAsync<string[], object>("refreshPushRegistration", installation.Tags.ToArray());
 
                 //await push. RegisterAsync(RegistrationID, templates);
             }

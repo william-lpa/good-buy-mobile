@@ -11,20 +11,46 @@
                 <StackLayout Orientation="Vertical">
                     <Label Text="Monitorar quando atingir preço"  HorizontalOptions="Start"/>
                     <StackLayout Orientation="Horizontal">
-                        <Switch IsToggled="{Binding ExistsAlert}" Toggled="Switch_Toggled" />
-                        <Entry x:Name="campoMonitore" Keyboard="Numeric" IsEnabled="False" Text="{Binding MonitorarOfertaValor}" Placeholder="Informe o preço do alerta" HorizontalOptions="FillAndExpand"/>
+                        <Switch IsToggled="{Binding ExistsAlert}" Toggled="Switch_Toggled" HorizontalOptions="Start" Margin="5,0" />
+                        <Label Text="{Binding ExistsAlertDescription}" VerticalOptions="Center" Margin="5,0"/>
                     </StackLayout>
+                    <AbsoluteLayout AbsoluteLayout.LayoutFlags="All">
+                        <Slider
+                            x:Name="slider"
+                            IsEnabled="False"
+                            AbsoluteLayout.LayoutFlags="All"
+                            AbsoluteLayout.LayoutBounds="0,0,.8,1"
+                            Minimum="{Binding MinimumPrice}"
+                            Value="{Binding MonitorarOfertaValor}"
+                            Maximum="{Binding MaximumPrice}"                            
+                            />
+                        <Entry 
+                            x:Name="campoMonitore"
+                            AbsoluteLayout.LayoutFlags="All"
+                            AbsoluteLayout.LayoutBounds="1,0,.2,1"
+                            HorizontalTextAlignment="Center"
+                            Keyboard="Numeric"
+                            IsEnabled="False"
+                            Text="{Binding MonitorarOfertaValor}"                            
+                            />
+                    </AbsoluteLayout>
                 </StackLayout>
-                <Button Text="Salvar Alteracoes" Command="{Binding PrimaryAction}"/>
-                <AbsoluteLayout VerticalOptions="FillAndExpand" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1">
-                    <Label Text="Variação de Preço" Style="{StaticResource label}" FontSize="Large" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,.5,.2" />
-                    <!--<BoxView AbsoluteLayout.LayoutFlags="All"
-                    AbsoluteLayout.LayoutBounds="0,.2,1,.8" BackgroundColor="Yellow"/>-->
+                <Button Text="Salvar Alteracoes" Command="{Binding PrimaryAction}" Style="{StaticResource primaryButton}"/>
+                <AbsoluteLayout VerticalOptions="FillAndExpand" AbsoluteLayout.LayoutFlags="All">
+                    <Label Text="Variação de Preço" Style="{StaticResource label}" FontSize="Large" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,.5,.1" />
+                    <Label Text="De:" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,.16,.2,.1" />
+                    <DatePicker Date="{Binding FromDate,Mode=TwoWay}" Format="dd/MM/yyyy"  MinimumDate="01/10/2017"  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds=".13,.1,.4,0.15" />
+                    <Label Text="Até:" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds=".63,.16,.2,.1"/>
+                    <DatePicker Date="{Binding UntilDate}" Format="dd/MM/yyyy" MinimumDate="02/10/2017" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds=".98,.1,.4,.15" />
+                    <!--<BoxView 
+                    AbsoluteLayout.LayoutFlags="All"                    
+                    AbsoluteLayout.LayoutBounds="0,.6,1,.7"                    
+                    BackgroundColor="Yellow"/>-->
                     <microcharts:ChartView
                     Chart="{Binding HistoricoOfertaChart}"
                     BackgroundColor="Transparent"
                     AbsoluteLayout.LayoutFlags="All"
-                    AbsoluteLayout.LayoutBounds="0,.3,1,.8"                    
+                    AbsoluteLayout.LayoutBounds="0,.8,1,.7"                    
                     x:Name="chartView"/>
                 </AbsoluteLayout>
             </StackLayout>

@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GoodBuy.Views.ListaDeComprasPage"
+             xmlns:controls="clr-namespace:GoodBuy.Core.Controls"
+             Title="Seus grupos de compartilhamento">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="participantes" TargetType="Button">
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="WidthRequest" Value="120"/>
+                <Setter Property="HeightRequest" Value="30"/>
+                <Setter Property="BackgroundColor" Value="LightGray"/>
+                <Setter Property="Margin" Value="0,0,0,5"/>
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <StackLayout>
+            <controls:CustomSearchBar x:Name="search" Placeholder="Filtrar suas listas de compras" SearchCommand="{Binding SearchList}" TextChangedCommand="{Binding  SearchList}" />
+            <Button Text="Nova lista" HorizontalOptions="EndAndExpand" Command="{Binding NovaListaCommand}" Style="{StaticResource primaryButton}"/>
+            <controls:CustomListView  
+                x:Name="lvwListasCompras"
+                ItemsSource="{Binding Path=ListasUsuario}"
+                HasUnevenRows="True"
+                ItemTappedCommand="{Binding EditListCommand}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextCell Text="{Binding Nome}" Detail="{Binding FirstItems}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </controls:CustomListView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

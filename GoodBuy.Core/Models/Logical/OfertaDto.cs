@@ -26,7 +26,7 @@ namespace GoodBuy.Models.Logical
         }
         public float ConfiabilidadeNegativa => 100 - Confiabilidade;
         public string Picture { get; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public string Estabelecimento { get; set; }
         public Command AumentarConfiabilidadeCommand { get; }
         public Command DiminuirConfiabilidadeCommand { get; }
@@ -34,15 +34,15 @@ namespace GoodBuy.Models.Logical
         public Command OfertaDetailCommand { get; }
         public bool? LikePerformed { get; set; } = null;
 
-        public OfertaDto(Estabelecimento estabelecimento, Oferta oferta, Produto produto, UnidadeMedida unidade, Sabor sabor, Marca marca, OfertasService ofertasService)
+        public OfertaDto(Estabelecimento estabelecimento, Oferta oferta, Produto produto, UnidadeMedida unidade, Tipo tipo, Marca marca, OfertasService ofertasService)
         {
             idOFerta = oferta.Id;
             this.ofertasService = ofertasService;
-            CreatedAt = oferta.CreatedAt;
+            UpdatedAt = oferta.UpdatedAt;
             ValorOferta = oferta.PrecoAtual;
             Confiabilidade = ofertasService.CalculateConfiabilidade(oferta);
             Estabelecimento = estabelecimento.Nome;
-            DescricaoOferta = $"{produto.Nome} - {sabor?.Nome}, {marca.Nome}, {produto.QuantidadeMensuravel} {unidade.Nome}";
+            DescricaoOferta = $"{produto.Nome} - {tipo?.Nome}, {marca.Nome}, {produto.QuantidadeMensuravel} {unidade.Nome}";
             AumentarConfiabilidadeCommand = new Command(ExecuteAplicarLikeAsync);
             DiminuirConfiabilidadeCommand = new Command(ExecuteAplicarDislikeAsync);
             ShareOfertaCommand = new Command(ExecuteCompartilharOfertaAsync);

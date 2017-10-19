@@ -14,8 +14,6 @@ namespace GoodBuy.Models
         [JsonIgnore]
         public Oferta Oferta { get; set; }
 
-        [JsonProperty("dataOferta")]
-        public DateTime DataOferta { get; set; }
         [JsonProperty("preco")]
         public decimal Preco { get; set; }
 

@@ -4,28 +4,15 @@
              x:Class="GoodBuy.Views.GruposOfertasPage"
              xmlns:controls="clr-namespace:GoodBuy.Core.Controls"
              Title="Seus grupos de compartilhamento">
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <Style x:Key="participantes" TargetType="Button">
-                <Setter Property="FontSize" Value="10"/>
-                <Setter Property="TextColor" Value="Black"/>
-                <Setter Property="WidthRequest" Value="120"/>
-                <Setter Property="HeightRequest" Value="30"/>
-                <Setter Property="BackgroundColor" Value="LightGray"/>
-                <Setter Property="Margin" Value="0,0,0,5"/>
-            </Style>
-            <Style x:Key="novoGrupo" TargetType="Button">
-                <Setter Property="FontSize" Value="14"/>
-                <Setter Property="TextColor" Value="White"/>
-                <Setter Property="BackgroundColor" Value="#4e6cab"/>
-                <Setter Property="Margin" Value="0,0,0,5"/>
-            </Style>
-        </ResourceDictionary>
-    </ContentPage.Resources>
     <ContentPage.Content>
         <StackLayout>
             <controls:CustomSearchBar IsVisible="{Binding NotSharing}" x:Name="search" Placeholder="Pesquisar grupos na rede de ofertas" SearchCommand="{Binding SearchPublicGroup}" TextChangedCommand="{Binding  SearchPublicGroup}" />
-            <Button Text="Novo Grupo" IsVisible="{Binding NotSharing}" HorizontalOptions="EndAndExpand" Command="{Binding NovoGrupoCommand}" Style="{StaticResource novoGrupo}"/>
+            <Button Text="Novo Grupo"
+                    IsVisible="{Binding NotSharing}"
+                    HorizontalOptions="EndAndExpand"
+                    Command="{Binding NovoGrupoCommand}"
+                    Margin ="0,0,0,5"
+                    Style="{StaticResource primaryButton}"/>
             <controls:CustomListView  
                 x:Name="lvwGruposUsuarios"
                 ItemsSource="{Binding Path=GruposOfertasUsuario}"

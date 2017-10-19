@@ -13,7 +13,7 @@ namespace GoodBuy.ViewModels
         private readonly OfertasService ofertasService;
         private readonly AzureService azureService;
         private string produto;
-        private string sabor;
+        private string tipo;
         private float quantidade;
         private string unidadeMedida;
         private string marca;
@@ -30,12 +30,12 @@ namespace GoodBuy.ViewModels
                 AtualizarStatus();
             }
         }
-        public string Sabor
+        public string Tipo
         {
-            get => sabor;
+            get => tipo;
             set
             {
-                SetProperty(ref sabor, value);
+                SetProperty(ref tipo, value);
                 AtualizarStatus();
             }
         }
@@ -143,9 +143,9 @@ namespace GoodBuy.ViewModels
         private void Adapter()
         {
             Produto = editOferta?.CarteiraProduto?.Produto?.Nome;
-            Sabor = editOferta?.CarteiraProduto?.Produto?.Sabor?.Nome ?? "Sabor não informado";
+            Tipo = editOferta?.CarteiraProduto?.Produto?.Tipo?.Nome ?? "Sabor não informado";
             Quantidade = editOferta?.CarteiraProduto?.Produto?.QuantidadeMensuravel ?? 0;
-            Marca = editOferta?.CarteiraProduto?.Marca?.Nome;
+            Marca = editOferta?.CarteiraProduto?.Marca?.Nome ?? "Sem marca";
             UnidadeMedida = editOferta?.CarteiraProduto?.Produto?.UnidadeMedida?.Nome;
             Categoria = editOferta?.CarteiraProduto?.Produto?.Categoria?.Nome ?? "Categoria não informada";
             Preco = editOferta?.PrecoAtual ?? 0;
@@ -170,11 +170,9 @@ namespace GoodBuy.ViewModels
 
         private bool VerificarCamposObrigatorios()
         {
-            return true;
-            var retrr = !string.IsNullOrEmpty(Produto) && !string.IsNullOrEmpty(Marca) && Preco > 0 &&
-                   !string.IsNullOrEmpty(Estabelecimento) && !string.IsNullOrEmpty(UnidadeMedida) &&
-                   Quantidade > 0;
-            return retrr;
+            return !string.IsNullOrEmpty(Produto) && Preco > 0 &&
+                        !string.IsNullOrEmpty(Estabelecimento) && !string.IsNullOrEmpty(UnidadeMedida)
+                        && Quantidade > 0;
         }
 
         private async void ExecutePersistOfertaAsync()
@@ -194,7 +192,7 @@ namespace GoodBuy.ViewModels
                                 Nome = Produto,
                                 Categoria = new Categoria(Categoria),
                                 UnidadeMedida = new UnidadeMedida(UnidadeMedida),
-                                Sabor = new Sabor(Sabor),
+                                Tipo = new Tipo(Tipo),
                                 QuantidadeMensuravel = Quantidade,
                             }
                         },

@@ -110,7 +110,7 @@ namespace GoodBuy.Service
             try
             {
                 await SyncTableModel.PullAsync(typeof(TModel).Name, SyncTableModel.CreateQuery());
-                MergeDictionaries(Cache, (await SyncTableModel.ToEnumerableAsync()).ToDictionary((key) => key.Id, (value) => value));
+                MergeDictionaries(Cache, (await SyncTableModel.ToListAsync()).ToDictionary((key) => key.Id, (value) => value));
             }
             catch (Exception err)
             {
@@ -131,7 +131,8 @@ namespace GoodBuy.Service
                 else
                     await SyncTableModel.PullAsync(typeof(TModel).Name, SyncTableModel.CreateQuery());
 
-                MergeDictionaries(Cache, (await SyncTableModel.ToEnumerableAsync()).ToDictionary((key) => key.Id, (value) => value));
+                var list = (await SyncTableModel.ToListAsync());
+                MergeDictionaries(Cache, (list.Count > 0 ? list.ToDictionary((key) => key.Id, (value) => value) : null));
             }
             catch (Exception err)
             {

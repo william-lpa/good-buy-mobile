@@ -5,17 +5,17 @@ using Newtonsoft.Json;
 
 namespace GoodBuy.Models
 {
-    [DataTable(nameof(Sabor))]
-    public class Sabor : BaseEntity, IName
+    [DataTable(nameof(Tipo))]
+    public class Tipo : BaseEntity, IName
     {
         [JsonProperty("nome")]
         public string Nome { get; set; }
 
-        public Sabor(string nome)
+        public Tipo(string nome)
         {
             Nome = nome;
         }
-        public Sabor()
+        public Tipo()
         {
 
         }

@@ -11,10 +11,10 @@ namespace GoodBuy.Models
         [JsonProperty("nome")]
         public string Nome { get; set; }
 
-        [JsonProperty("idSabor")]
-        public string IdSabor { get; private set; }
+        [JsonProperty("idTipo")]
+        public string IdTipo { get; private set; }
         [JsonIgnore]
-        public Sabor Sabor { get; set; }
+        public Tipo Tipo { get; set; }
 
         [JsonProperty("idCategoria")]
         public string IdCategoria { get; private set; }
@@ -29,10 +29,10 @@ namespace GoodBuy.Models
         [JsonProperty("quantidadeMensuravel")]
         public float QuantidadeMensuravel { get;  set; }
 
-        public Produto(string nome, string idSabor, string idUnidadeMedida, string idCategoria, float quantidadeMensuravel)
+        public Produto(string nome, string idTipo, string idUnidadeMedida, string idCategoria, float quantidadeMensuravel)
         {
             Nome = nome;
-            IdSabor = idSabor;
+            IdTipo = idTipo;
             IdUnidadeMedida = idUnidadeMedida;
             IdCategoria = idCategoria;
             QuantidadeMensuravel = quantidadeMensuravel;
