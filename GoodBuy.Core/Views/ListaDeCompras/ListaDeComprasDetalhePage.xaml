@@ -13,7 +13,7 @@
                 <Setter Property="FontSize" Value="10"/>
                 <Setter Property="TextColor" Value="Black"/>
                 <Setter Property="HeightRequest" Value="30"/>
-                <Setter Property="Image" Value="monitore.png"/>
+                <Setter Property="Image" Value="marca.png"/>
                 <Setter Property="BackgroundColor" Value="LightGray"/>
                 <Setter Property="Margin" Value="0,0,0,5"/>
             </Style>
