@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:GoodBuy.Core.Controls"
+             x:Class="GoodBuy.Views.ListaDeComprasPageParticipantes">
+    <ContentPage.Content>
+        <StackLayout>
+            <Label Text="Localizar participantes" HorizontalOptions="StartAndExpand" VerticalOptions="Center" Style="{StaticResource label}"/>
+            <controls:CustomSearchBar Placeholder=" Nome, telefone ou e-mail" HorizontalOptions="Fill" Text="{Binding SearchText}" SearchCommand="{Binding SearchUser}" TextChangedCommand="{Binding  SearchUser}" />
+            <StackLayout Orientation="Horizontal">
+                <Button Text="Buscar contato na agenda" HorizontalOptions="CenterAndExpand" FontSize="Micro" BackgroundColor="LightGray" TextColor="Black" Command="{Binding SearchContact}"/>
+                <Button Text="Remover participante selecionado" Command="{Binding RemoverParticipanteSelecionadoCommand}" FontAttributes="Italic, Bold" BackgroundColor="Red" TextColor="White" FontSize="10" />
+            </StackLayout>
+            <Label Text="Participantes:" HorizontalOptions="StartAndExpand" VerticalOptions="Center" Style="{StaticResource label}"/>
+            <controls:CustomListView ItemTappedCommand="{Binding UserSelectedCommand}" ResetSelected="{Binding ResetSelection}" ItemsSource="{Binding Members}" >
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ImageCell Text="{Binding User.FullName}" Detail="{Binding User.UserDescription}" ImageSource="{Binding User.AvatarDisplay}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </controls:CustomListView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

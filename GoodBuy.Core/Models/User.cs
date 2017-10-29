@@ -26,6 +26,8 @@ namespace GoodBuy.Models
         public string Locale { get; set; }
         [JsonProperty("location")]
         public string Location { get; set; }
+        [JsonProperty("installationId")]
+        public string InstallationId { get; set; }
 
         public void Deconstruct(out string fullName, out string id, out DateTime birthday, out string email, out bool male, out string location)
         {

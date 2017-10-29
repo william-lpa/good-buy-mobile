@@ -1,6 +1,8 @@
 ﻿using Autofac;
 using GoodBuy.Service;
+using GoodBuy.Service.Interfaces;
 using GoodBuy.ViewModels;
+using GoodBuy.ViewModels.ListaDeCompras;
 using GoodBuy.Views;
 using Xamarin.Forms;
 
@@ -43,8 +45,13 @@ namespace GoodBuy
             container.RegisterType<OfertasTabDetailPageViewModel>();
             container.RegisterType<HistoricosOfertaPageViewModel>();
             container.RegisterType<ListaDeComprasPageViewModel>();
+            container.RegisterType<ListaDeComprasDetalhePageViewModel>();
+            container.RegisterType<ListaDeComprasPageParticipantesViewModel>();
+            container.RegisterType<SimulacaoCompraPageViewModel>();
+            container.RegisterType<SimulacaoCompraDetalhePageViewModel>();
             container.RegisterType<ListaCompraService>();
             container.RegisterType<SyncronizedAccessService>().SingleInstance();
+            container.RegisterType<FiltroSimulacaoCompraService>().As<IFilterSimulacaoCompra>().SingleInstance();
             container.RegisterType<GenericRepository<Model.IEntity>>();
             return container;
         }

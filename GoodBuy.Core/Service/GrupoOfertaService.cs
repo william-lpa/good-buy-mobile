@@ -77,11 +77,10 @@ namespace GoodBuy.Service
                     participante.IdGrupoOferta = grupoOferta.Id;
                     participante.NomeGrupo = grupoOferta.Name;
                     await participantesRepository.CreateEntityAsync(participante);
-                    if (sync)
-                        await participantesRepository.SyncDataBaseAsync();
-
                 }
             }
+            if (sync)
+                await participantesRepository.SyncDataBaseAsync();
         }
 
         public async Task ExcluirGrupoOfertaAsync(GrupoOferta grupoOferta)

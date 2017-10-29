@@ -50,6 +50,7 @@ namespace GoodBuy.Service
                 if (provider == MobileServiceAuthenticationProvider.Google)
                 {
                     CurrentUser = new LoginResultContent(profileUser, "local user") { Token = profileUser.Id };
+                    CurrentUser.User.InstallationId = Client.InstallationId;
                     await CreateUserAsync(CurrentUser.User, initializingSyncContext);
                     StoreTokenInSecureStore(CurrentUser.User.Id, "localUser", CurrentUser.Token);
                     CreateOrRefreshPushRegistration();
@@ -86,7 +87,7 @@ namespace GoodBuy.Service
             var result = await auth.LoginClientFlowAsync(Client, MobileServiceAuthenticationProvider.Facebook);
             Client.CurrentUser = result.azureUser;
             CurrentUser = result.appUser.Merge(profileUser);
-
+            CurrentUser.User.InstallationId = Client.InstallationId;
             await CreateUserAsync(CurrentUser.User, initializingSyncContext);
 
             if (Client.CurrentUser != null)
@@ -158,10 +159,10 @@ namespace GoodBuy.Service
         {
             try
             {
-                //RemoveTokenFromSecureStore();
+                RemoveTokenFromSecureStore();
                 //Client = new MobileServiceClient(appURL, new ExpiredAzureRequestInterceptors(this));
                 Client = new MobileServiceClient(appURL);
-                var dbName = "goodBuy241.db";
+                var dbName = "goodBuy313.db";
                 Store = new MobileServiceSQLiteStore(Path.Combine(MobileServiceClient.DefaultDatabasePath, dbName));
                 DefineTables(Store);
 
@@ -234,6 +235,9 @@ namespace GoodBuy.Service
             store.DefineTable<GrupoOferta>();
             store.DefineTable<ParticipanteGrupo>();
             store.DefineTable<MonitoramentoOferta>();
+            store.DefineTable<ListaCompra>();
+            store.DefineTable<ParticipanteLista>();
+            store.DefineTable<ProdutoListaCompra>();
         }
 
         public void StoreTokenInSecureStore(string userId, string key, string token = "")

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GoodBuy.Views.SimulacaoCompraPage"
+             xmlns:controls="clr-namespace:GoodBuy.Core.Controls"
+             Title="Simulação de Compra">
+    <ContentPage.Content>
+        <controls:CustomListView  
+                ItemsSource="{Binding Estabelecimentos}"
+                ItemTappedCommand="{Binding DetailedEstabelecimentoCommand}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell TextColor="#4e6cab" Text="{Binding NomeEstabelecimento}" Detail="{Binding TotalSimulacao, StringFormat='R$ {0:F2}'}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </controls:CustomListView>
+    </ContentPage.Content>
+</ContentPage>

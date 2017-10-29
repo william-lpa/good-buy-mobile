@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GoodBuy.Views.ListaDeComprasPage"
              xmlns:controls="clr-namespace:GoodBuy.Core.Controls"
-             Title="Seus grupos de compartilhamento">
+             Title="Suas listas de compras">
     <ContentPage.Resources>
         <ResourceDictionary>
             <Style x:Key="participantes" TargetType="Button">
@@ -28,7 +28,7 @@
                 ItemTappedCommand="{Binding EditListCommand}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <TextCell Text="{Binding Nome}" Detail="{Binding FirstItems}" />
+                        <TextCell TextColor="#4e6cab" Text="{Binding Nome}" Detail="{Binding FirstItems}" />
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </controls:CustomListView>

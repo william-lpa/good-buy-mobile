@@ -12,7 +12,14 @@ namespace GoodBuy.Log
         private async void ShowLogAsync(string text)
         {
             //System.Diagnostics.Debug.WriteLine(text);
-            await MessageDisplayer.Instance.ShowMessageAsync("Error!", text, "OK");
+            try
+            {
+                await MessageDisplayer.Instance.ShowMessageAsync("Error!", text, "OK");
+            }
+            catch (Exception err)
+            {
+                
+            }
         }
 
         public void AddLog(string text)

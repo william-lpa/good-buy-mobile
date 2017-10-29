@@ -196,7 +196,7 @@ namespace GoodBuy.ViewModels
 
         private async void ExecuteRemoverParticipanteSelecionadoAsync()
         {
-            if (Members.Count >= 1)
+            if (Members.Count > 1)
             {
                 Members.Remove(participanteGrupoOferta);
                 await grupoOfertaService.ExcluirParticipanteGrupoOfertaAsync(participanteGrupoOferta);

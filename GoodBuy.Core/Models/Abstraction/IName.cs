@@ -1,6 +1,6 @@
 ﻿namespace GoodBuy.Service
 {
-    internal interface IName
+    public interface IName
     {
         string Nome { get; set; }
     }

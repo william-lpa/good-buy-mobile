@@ -4,8 +4,7 @@ using System.Collections.ObjectModel;
 using Xamarin.Forms;
 using System.Linq;
 using System.Collections.Generic;
-using GoodBuy.Log;
-using GoodBuy.Core.Models.Logical;
+using GoodBuy.ViewModels.ListaDeCompras;
 
 namespace GoodBuy.ViewModels
 {
@@ -22,15 +21,15 @@ namespace GoodBuy.ViewModels
         public ListaDeComprasPageViewModel(AzureService azureService, ListaCompraService service)
         {
             this.azureService = azureService;
-            //grupoOfertaService = service;
-            NovaListaCommand = new Command(ExecuteCriarNovoGrupoOfertaAsync);
+            listaCompraService = service;
+            NovaListaCommand = new Command(ExecuteCriarNovaListaCompraAsync);
             EditListCommand = new Command<ListaCompra>(ExecuteEditarGroupoOfertasAsync);
             SearchList = new Command<string>(ExecuteSearchList);
             ListasUsuario = new ObservableCollection<ListaCompra>();
             CachedList = new ObservableCollection<ListaCompra>();
         }
 
-        private async void ExecuteSearchList(string expression)
+        private void ExecuteSearchList(string expression)
         {
             if (expression?.Length == 1 && CachedList.Count == 0)
             {
@@ -47,42 +46,40 @@ namespace GoodBuy.ViewModels
                 CachedList.Clear();
                 return;
             }
-
-            //var result = await listaCompraService.loca (expression);
-            //foreach (var item in result)
-            //{
-            //    ListasUsuario.Add(item);
-            //}
+            foreach (var item in CachedList.Where(x => x.Nome.ToLower().Contains(expression.ToLower())).ToArray())
+            {
+                ListasUsuario.Add(item);
+            }
         }
 
         private async void ExecuteEditarGroupoOfertasAsync(ListaCompra listaCompra)
         {
-                var parameters = new Dictionary<string, string>();
-                parameters.Add("ID", listaCompra.Id);
-                await PushAsync<NovoGrupoOfertaPageViewModel>(false, parameters);
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("ID", listaCompra.Id);
+            await PushAsync<ListaDeComprasDetalhePageViewModel>(false, parameters);
         }
 
         protected async override void Init(Dictionary<string, string> parameters = null)
         {
             ListasUsuario.Clear();
-            var grupos = await listaCompraService.CarregarGrupoDeOfertasUsuarioLogadoAsync();
-            foreach (var grupo in grupos)
+            var listas = await listaCompraService.CarregarListasDeComprasUsuarioLogadoAsync();
+            foreach (var lista in listas)
             {
-                ListasUsuario.Add(grupo);
+                ListasUsuario.Add(lista);
             }
-            var newGroups = await listaCompraService.CarregarGrupoDeOfertasUsuarioLogadoSync(grupos.Select(x => x.Id));
-            if (newGroups != null)
+            var novasListas = await listaCompraService.CarregarListasDeComprasUsuarioLogadoSync(listas.Select(x => x.Id));
+            if (novasListas != null)
             {
-                foreach (var grupo in grupos)
+                foreach (var lista in listas)
                 {
-                    ListasUsuario.Add(grupo);
+                    ListasUsuario.Add(lista);
                 }
             }
         }
 
-        private async void ExecuteCriarNovoGrupoOfertaAsync()
+        private async void ExecuteCriarNovaListaCompraAsync()
         {
-            await PushAsync<NovoGrupoOfertaPageViewModel>();
+            await PushAsync<ListaDeComprasDetalhePageViewModel>();
         }
     }
 }

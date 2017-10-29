@@ -2,7 +2,7 @@
 
 namespace GoodBuy.ViewModels
 {
-    public enum Operation { Login, SyncInitalDataBase, }
+    public enum Operation { Login, SyncInitalDataBase, SimulatingList }
     public class LoadingPageViewModel : BaseViewModel
     {
         private string operation;
@@ -22,6 +22,9 @@ namespace GoodBuy.ViewModels
                     break;
                 case ViewModels.Operation.SyncInitalDataBase:
                     Operation = "Sincronizando dados para primeiro uso";
+                    break;
+                case ViewModels.Operation.SimulatingList:
+                    Operation = "Simulando compras";
                     break;
                 default:
                     break;

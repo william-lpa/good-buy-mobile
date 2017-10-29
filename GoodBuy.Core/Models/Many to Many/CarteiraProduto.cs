@@ -22,6 +22,10 @@ namespace GoodBuy.Models.Many_to_Many
             IdProduto = idProduto;
             IdMarca = idMarca;
         }
+        public CarteiraProduto(string idProduto)
+        {
+            IdProduto = idProduto;
+        }
         public CarteiraProduto()
         {
 

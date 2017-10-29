@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GoodBuy.Core.Models.Logical;
 
 namespace GoodBuy.Service
 {
@@ -22,6 +23,96 @@ namespace GoodBuy.Service
         private readonly IGenericRepository<Produto> produtoRepository;
         private readonly IGenericRepository<MonitoramentoOferta> monitoramentoOfertaRepository;
         private readonly IGenericRepository<Categoria> categoriaRepository;
+
+        internal async Task<IEnumerable<Estabelecimento>> ObterEstabelecimentosDaMarca(IEnumerable<string> idsMarcas, IEnumerable<string> idsEstabelecimentos)
+        {
+            if (!idsMarcas.Any())
+                return null;
+
+            var carteirasProdutos = (await carteiraProdutoRepository.GetEntitiesAsync()).Where(x => idsMarcas.Contains(x.IdMarca)).Select(x => x.Id).ToArray();
+
+            return (await ofertaRepository.GetEntitiesAsync())
+                .Where(x => carteirasProdutos.Contains(x.IdCarteiraProduto) && idsEstabelecimentos.Contains(x.IdEstabelecimento))
+                .Select(async x => (await estabelecimentoRepository.GetByIdAsync(x.IdEstabelecimento))).Select(x => x.Result).Distinct().ToArray();
+        }
+
+        internal async Task<IEnumerable<ProdutoDto>> ObterMelhoresEstabelecimentos(string idEstabelecimento, IEnumerable<ProdutoListaCompra> initialValue)
+        {
+            var ids = await ofertaRepository.SyncTableModel.Select(x => new { x.Id, x.IdEstabelecimento }).ToListAsync().ConfigureAwait(false);
+            var idsOfertas = ids.Where(x => x.IdEstabelecimento == idEstabelecimento).ToArray();
+            List<Oferta> ofertas = new List<Oferta>();
+            foreach (var idOferta in idsOfertas)
+            {
+                var retorno = await ObterOfertaCompletaAsync(idOferta.Id);
+                ofertas.Add(retorno);
+            }
+
+
+            List<ProdutoDto> produtos = new List<ProdutoDto>();
+
+            foreach (var produtoLista in initialValue)
+            {
+                var melhorOferta = ofertas.Where(x => 
+                x.CarteiraProduto.Produto.Nome.ToLower() == produtoLista.Produto?.Nome?.ToLower() &&
+                                   (produtoLista.Produto.IdTipo == null || x.CarteiraProduto.Produto.IdTipo == produtoLista.Produto.IdTipo) &&
+                                   (produtoLista.IdMarca == null || x.CarteiraProduto.IdMarca == produtoLista.IdMarca) &&
+                                   (produtoLista.IdUnidadeMedida == null || x.CarteiraProduto.Produto?.UnidadeMedida?.Nome?.ToLower() == produtoLista.UnidadeMedida?.Nome?.ToLower()) &&
+                                   (produtoLista.QuantidadeMensuravel == 0 || x.CarteiraProduto.Produto.QuantidadeMensuravel == produtoLista.QuantidadeMensuravel)
+                ).OrderBy(x => x.PrecoAtual).ToArray().FirstOrDefault();
+                if (melhorOferta != null)
+                    produtos.Add(new ProdutoDto(melhorOferta));
+            };
+            return produtos;
+        }
+
+        internal async Task<IEnumerable<Estabelecimento>> ObterEstabelecimentosComQuantidadesEMedidas(IEnumerable<(float quantidadeMensuaravel, string IdUnidadeMedida)> quantidades, IEnumerable<string> idsEstabelecimentos)
+        {
+            var carteiras = (await ofertaRepository.GetEntitiesAsync())
+                .Where(x => idsEstabelecimentos.Contains(x.IdEstabelecimento))
+                .Select(x => x.IdCarteiraProduto).Distinct();
+
+            Dictionary<string, Produto> produtos = (await produtoRepository.GetEntitiesAsync()).ToDictionary(key => key.Id, value => value);
+
+            var unidadesQuantidades = (await carteiraProdutoRepository.GetEntitiesAsync()).Where(x => carteiras.Contains(x.Id))
+                          .Select(x => new { x.IdProduto, produtos[x.IdProduto].IdUnidadeMedida, produtos[x.IdProduto].QuantidadeMensuravel });
+
+            var quantidadesMedidas = quantidades.SelectMany(x =>
+            {
+                var unidadesQuantidadesFiltro = unidadesQuantidades;
+                if (x.quantidadeMensuaravel > 0)
+                {
+                    unidadesQuantidadesFiltro.Where(y => x.quantidadeMensuaravel == y.QuantidadeMensuravel);
+                    if (x.IdUnidadeMedida != null)
+                    {
+                        unidadesQuantidadesFiltro.Where(y => x.quantidadeMensuaravel == y.QuantidadeMensuravel);
+                    }
+                }
+                return unidadesQuantidadesFiltro.ToArray();
+            });
+
+            var idsProdutosMatch = quantidadesMedidas.Select(x => x.IdProduto);
+
+            Dictionary<string, CarteiraProduto> todasCarteiras = (await carteiraProdutoRepository.GetEntitiesAsync()).ToDictionary(key => key.Id, value => value);
+
+            return (await ofertaRepository.GetEntitiesAsync())
+               .Where(x => idsEstabelecimentos.Contains(x.IdEstabelecimento) && idsProdutosMatch.Contains(todasCarteiras[x.IdCarteiraProduto].IdProduto))
+               .Select(async x => (await estabelecimentoRepository.GetByIdAsync(x.IdEstabelecimento))).Select(x => x.Result).Distinct().ToArray();
+        }
+
+        internal async Task<Estabelecimento[]> ObterEstabelecimentosDoProduto(IEnumerable<(string idProduto, string idTipo)> idProdutos)
+        {
+            Dictionary<string, Produto> produtos = (await produtoRepository.GetEntitiesAsync()).ToDictionary(key => key.Id, value => value);
+
+            var idsProdutos = idProdutos.Select(x => x.idProduto).Distinct();
+            var carteirasProdutos = (await carteiraProdutoRepository.GetEntitiesAsync());
+            var step1 = carteirasProdutos.Where(x => idProdutos.Contains((x.IdProduto, produtos[x.IdProduto].IdTipo))).Select(x => x.Id).ToArray();
+
+            return (await ofertaRepository.GetEntitiesAsync())
+                .Where(x => step1.Contains(x.IdCarteiraProduto))
+                .Select(async x => (await estabelecimentoRepository.GetByIdAsync(x.IdEstabelecimento))).Select(x => x.Result).Distinct().ToArray();
+
+        }
+
         private readonly IGenericRepository<HistoricoOferta> historicoOfertaRepository;
         private const int BASE_PERCENTUAL = 100;
         public static event Action<string, List<string>> OnCollectionLoaded;
@@ -46,6 +137,16 @@ namespace GoodBuy.Service
                 return 0;
             return (oferta.Likes * BASE_PERCENTUAL) / oferta.Avaliacoes;
         }
+
+        internal async Task<string[]> ObterMarcasPorProdutoAsync(string idProduto)
+        {
+            Dictionary<string, Marca> marcaProduto = (await marcaRepository.GetEntitiesAsync()).ToDictionary(key => key.Id, value => value);
+
+            var retorno = (await carteiraProdutoRepository.GetEntitiesAsync()).Where(x => x.IdProduto == idProduto)
+                          .Select(x => marcaProduto[x.IdMarca].Nome).OrderBy(x => x);
+            return retorno.ToArray();
+        }
+
         public async Task SyncronizeBaseDeOfertasAsync()
         {
             var t1 = Task.Run(async () => await (tipoRepository.PullUpdatesAsync()));
@@ -58,6 +159,38 @@ namespace GoodBuy.Service
             await (ofertaRepository.PullUpdatesAsync());
             await (historicoOfertaRepository.PullUpdatesAsync());
             Task.WaitAll(new Task[] { t1, t2, t3, t4 });
+        }
+
+        internal async Task<string> GetIdMarcaPorNome(string nomeMarca)
+        {
+            if (string.IsNullOrEmpty(nomeMarca))
+                return null;
+
+            return (await marcaRepository.SyncTableModel.Where(x => x.Nome == nomeMarca).ToListAsync()).First().Id;
+        }
+        internal async Task<string> GetIdUnidadeMedidaPorNome(string nomeUnidadeMedida)
+        {
+            if (string.IsNullOrEmpty(nomeUnidadeMedida))
+                return null;
+
+            return (await unidadeMedidaRepository.SyncTableModel.Where(x => x.Nome == nomeUnidadeMedida).ToListAsync()).First().Id;
+        }
+
+        internal async Task<string> GetIdProdutoPorNome(string nomeProduto)
+        {
+            if (string.IsNullOrEmpty(nomeProduto))
+                return null;
+
+            return (await produtoRepository.SyncTableModel.Where(x => x.Nome == nomeProduto).ToListAsync()).First().Id;
+        }
+
+        internal async Task<List<Produto>> ObterProdutoPorNome(string expression)
+        {
+            Dictionary<string, Tipo> tipos = (await tipoRepository.GetEntitiesAsync()).ToDictionary(key => key.Id, value => value);
+
+            var produtos = await produtoRepository.SyncTableModel.Where(x => x.Nome.ToLower().Contains(expression.ToLower())).ToListAsync();
+            produtos.ForEach(x => { if (x.IdTipo != null) x.Tipo = tipos[x.IdTipo]; });
+            return produtos;
         }
 
         internal async Task LoadAutoCompleteAsync()
@@ -74,6 +207,22 @@ namespace GoodBuy.Service
             OnCollectionLoaded(nameof(Categorias), Categorias);
             var Estabelecimentos = new List<string>((await estabelecimentoRepository.GetEntitiesAsync()).Select(x => x.Nome).Distinct());
             OnCollectionLoaded(nameof(Estabelecimentos), Estabelecimentos);
+        }
+
+        internal async Task LoadUnidadeMedidaAutoCompleteAsync(string idProduto)
+        {
+            if (string.IsNullOrEmpty(idProduto))
+                return;
+
+            var produto = await produtoRepository.GetByIdAsync(idProduto);
+            var retorno = (await produtoRepository.GetEntitiesAsync()).Where(x => x.Nome == produto.Nome)
+                          .Select(x => x.IdUnidadeMedida);
+
+            Dictionary<string, UnidadeMedida> unidadeMedidas = (await unidadeMedidaRepository.GetEntitiesAsync()).ToDictionary(key => key.Id, value => value);
+
+            var result = retorno.Where(x => unidadeMedidas.ContainsKey(x)).Select(x => unidadeMedidas[x].Nome).OrderBy(x => x).Distinct().ToList();
+            while (OnCollectionLoaded == null) { await Task.Delay(20); }
+            OnCollectionLoaded?.Invoke(idProduto, result);
         }
 
         internal async Task<float> ApplyLikeAsync(string idOFerta)
@@ -149,6 +298,20 @@ namespace GoodBuy.Service
             return null;
         }
 
+        internal IEnumerable<ProdutoListaCompra> PreencherInformacoesDeOfertaNoProdutoLista(List<ProdutoListaCompra> produtoListaCompra)
+        {
+            produtoListaCompra.ForEach(async
+                x =>
+            {
+                x.Marca = await marcaRepository.GetByIdAsync(x.IdMarca);
+                x.UnidadeMedida = await unidadeMedidaRepository.GetByIdAsync(x.IdUnidadeMedida);
+                x.Produto = await produtoRepository.GetByIdAsync(x.IdProduto);
+                x.Produto.Tipo = await tipoRepository.GetByIdAsync(x.Produto.IdTipo);
+            });
+
+            return produtoListaCompra;
+        }
+
         public async Task<IList<OfertaDto>> ObterOfertasAsync(int count = 500)
         {
             var ofertas = (await ofertaRepository.GetEntitiesAsync(0, count));
@@ -219,10 +382,10 @@ namespace GoodBuy.Service
             }
         }
 
-        private async Task<string> CreateOrRetrieveEntityByNameAsync<TEntity>(TEntity entity) where TEntity : class, IEntity, IName, new()
+        public async Task<string> CreateOrRetrieveEntityByNameAsync<TEntity>(TEntity entity) where TEntity : class, IEntity, IName, new()
         {
             var repository = await GetEntityService<TEntity>();
-            if (entity?.Nome == null)
+            if (string.IsNullOrEmpty(entity?.Nome))
                 return null;
             return
                 ((await repository?.SyncTableModel.Where(x => x.Nome.ToLower() == entity.Nome.ToLower()).Select(x => x.Id).ToEnumerableAsync()).FirstOrDefault()) ??
@@ -235,6 +398,8 @@ namespace GoodBuy.Service
             return ((await repository?.SyncTableModel.Where(x => x.IdTipo == idTipo && x.IdUnidadeMedida == idUnidadeMedida && nome.ToLower() == x.Nome.ToLower() && x.IdCategoria == idCategoria).Select(x => x.Id).ToEnumerableAsync()).FirstOrDefault()) ??
                        await repository?.CreateEntityAsync(new Produto(nome, idTipo, idUnidadeMedida, idCategoria, quantidadeMensuravel));
         }
+
+
 
         private async Task<string> CriarCarteiraProdutoAsync(string idProduto, string idMarca)
         {

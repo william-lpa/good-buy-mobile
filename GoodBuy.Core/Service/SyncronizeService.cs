@@ -23,7 +23,8 @@ namespace GoodBuy.Service
         public IGenericRepository<Categoria> CategoriaRepository { get; set; }
         public IGenericRepository<MonitoramentoOferta> MonitoramentoOfertaRepository { get; set; }
         public IGenericRepository<ListaCompra> ListaCompraRepository { get; set; }
-        public IGenericRepository<ParticipanteListaCompra> ParticipanteListaCompraRepository { get; set; }
+        public IGenericRepository<ParticipanteLista> ParticipanteListaCompraRepository { get; set; }
+        public IGenericRepository<ProdutoListaCompra> ProdutoListaCompraRepository { get; set; }
 
         public SyncronizedAccessService(AzureService azureService)
         {
@@ -42,7 +43,8 @@ namespace GoodBuy.Service
             UserRepository = new GenericRepository<User>(azureService);
             MonitoramentoOfertaRepository = new GenericRepository<MonitoramentoOferta>(azureService);
             ListaCompraRepository = new GenericRepository<ListaCompra>(azureService);
-            ParticipanteListaCompraRepository = new GenericRepository<ParticipanteListaCompra>(azureService);
+            ParticipanteListaCompraRepository = new GenericRepository<ParticipanteLista>(azureService);
+            ProdutoListaCompraRepository = new GenericRepository<ProdutoListaCompra>(azureService);
         }
 
         public async Task<bool> FirstUsageAsync() => (await OfertaRepository.GetEntitiesAsync(0, 1)).Count == 0;
@@ -76,6 +78,8 @@ namespace GoodBuy.Service
                      Task.Run(() => MonitoramentoOfertaRepository.SyncDataBaseAsync(date)),
                      Task.Run(() => ListaCompraRepository.SyncDataBaseAsync(date)),
                      Task.Run(() => ParticipanteListaCompraRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => ParticipanteListaCompraRepository.SyncDataBaseAsync(date)),
+                     Task.Run(() => ProdutoListaCompraRepository.SyncDataBaseAsync(date)),
            });
         }
     }

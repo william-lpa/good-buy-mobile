@@ -82,10 +82,9 @@
                                     <Label x:Name="lbAtualizadoEm" Text="Última atualização em:" FontSize="Small" HorizontalOptions="Start"/>
                                     <Label x:Name="lbAtualizadoEmValue" Text="{Binding UpdatedAt, StringFormat='{0:dd/MM/yyyy, HH:mm}' }" FontSize="Small" HorizontalOptions="StartAndExpand"/>
                                 </StackLayout>
-                                <StackLayout Orientation="Horizontal">
-                                    <Button Text="Adicionar a Lista" Style="{StaticResource ofertaOption}" HorizontalOptions="StartAndExpand"/>
-                                    <Button Text="Compartilhar" Style="{StaticResource shareOption}" Command="{Binding ShareOfertaCommand}" HorizontalOptions="CenterAndExpand"/>
-                                    <Button Text="Monitorar oferta" Style="{StaticResource monitoreOferta}" Command="{Binding OfertaDetailCommand}" HorizontalOptions="EndAndExpand" />
+                                <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                                    <Button HorizontalOptions="FillAndExpand" Text="Compartilhar" Style="{StaticResource shareOption}" Command="{Binding ShareOfertaCommand}" />
+                                    <Button HorizontalOptions="FillAndExpand" Text="Monitorar oferta" Style="{StaticResource monitoreOferta}" Command="{Binding OfertaDetailCommand}" />
                                 </StackLayout>
                             </StackLayout>
                         </ViewCell>

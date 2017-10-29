@@ -89,6 +89,7 @@ namespace GoodBuy.Service
                 await NeedsRefreshAsync();
 
                 List<TModel> entites = new List<TModel>();
+
                 if (createdOrChangedAfter != null)
                     entites = await SyncTableModel.OrderByDescending(x => x.UpdatedAt).Where(x => x.UpdatedAt >= createdOrChangedAfter)
                                  .Skip(currentPage * pageSize).Take(pageSize).ToListAsync();

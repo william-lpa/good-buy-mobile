@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:GoodBuy.Core.Controls"
+             x:Class="GoodBuy.Views.SimulacaoCompraDetalhePage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <StackLayout>
+            <Label Text="Estabelecimento" Style="{StaticResource label}" />
+            <Entry IsEnabled="False" Text="{Binding Estabelecimento.NomeEstabelecimento}" />
+            <Label Text="Preço Total da Simulação" Style="{StaticResource label}" />
+            <Entry IsEnabled="False" Text="{Binding Estabelecimento.TotalSimulacao, StringFormat='R$ {0:F2}'}" />
+            <controls:CustomListView ItemTappedCommand="{Binding DetailedEstabelecimentoCommand}" HasUnevenRows="True" SeparatorColor="Black" SeparatorVisibility="Default" ItemsSource="{Binding ProdutosCompra}">                
+                <!--<ListView.ItemsSource>
+                    1,2
+                </ListView.ItemsSource>-->
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Margin="2,15">
+                                <Label Text="{Binding ProdutoDescricao }" Style="{StaticResource label}" />                                
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="Preço: R$" />
+                                    <Label Text="{Binding Valor}" />
+                                </StackLayout>
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="Menor Oferta em"  FontSize="Small" TextColor="#1e6833" />
+                                    <Label Text="{Binding EstabelecimentoMaisBarato, StringFormat='{0}, R$ '}" TextColor="#1e6833"  FontSize="Small" />
+                                    <Label Text="{Binding EstabelecimentoMaisBaratoValor}"  FontSize="Small" TextColor="#1e6833" />
+                                </StackLayout>
+                                <StackLayout Orientation="Horizontal" >
+                                    <Label Text="Maior Oferta em"  FontSize="Small" TextColor="#ec1c24" />
+                                    <Label Text="{Binding EstabelecimentoMaisCaro, StringFormat='{0}, R$ '}"  FontSize="Small" TextColor="#ec1c24" />
+                                    <Label Text="{Binding EstabelecimentoMaisCaroValor}"  FontSize="Small" TextColor="#ec1c24" />
+                                </StackLayout>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </controls:CustomListView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

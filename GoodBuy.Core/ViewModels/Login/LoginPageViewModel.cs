@@ -8,6 +8,7 @@ using GoodBuy.Models;
 using System.Collections.ObjectModel;
 using GoodBuy.Models.Logical;
 using System.Collections.Generic;
+using GoodBuy.ViewModels.ListaDeCompras;
 
 namespace GoodBuy.ViewModels
 {
@@ -97,6 +98,8 @@ namespace GoodBuy.ViewModels
                 await this.PushAsync<MainMenuPageViewModel>(resetNavigation: true);
                 if (param == "grupos")
                     await this.PushAsync<GruposOfertasPageViewModel>();
+                if (param != null && param.Contains("+"))
+                    await this.PushAsync<ListaDeComprasDetalhePageViewModel>(false, new Dictionary<string, string>() { ["ID"] = param.Replace("+", "") });
                 else if (param != null)
                     await this.PushAsync<OfertasTabDetailPageViewModel>(false, new Dictionary<string, string>() { ["ID"] = param });
             }

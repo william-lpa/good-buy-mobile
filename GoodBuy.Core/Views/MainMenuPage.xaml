@@ -6,8 +6,8 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <Style x:Key="menuButton" TargetType="Button">
-                <Setter Property="BackgroundColor" Value="#FFF"/>
-                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="BackgroundColor" Value="#4e6cab"/>
+                <Setter Property="TextColor" Value="White"/>
                 <Setter Property="FontAttributes" Value="Bold"/>
                 <Setter Property="FontSize" Value="14"/>
                 <Setter Property="HeightRequest" Value="100"/>
@@ -28,14 +28,14 @@
                HorizontalTextAlignment="Center"/>
         <Image Source="{Binding Profile}" WidthRequest="180" HeightRequest="180" />
         <StackLayout Orientation="Vertical">
-            <StackLayout Orientation="Horizontal" VerticalOptions="Start"  HorizontalOptions="Start" Grid.Row="3" Grid.Column="3">
-                <Button Text="Informar Oferta" Command="{Binding NovaOfertaCommand}" Style="{StaticResource menuButton}"/>
-                <Button x:Name="batata" Text="Suas Listas"  Style="{StaticResource menuButton}" Image =".\..\Resources\Menu\product.png"/>
-                <Button Text="Ofertas do Dia" Command="{Binding ListarOfertasCommand}"  Style="{StaticResource menuButton}"/>
+            <Image  />
+            <StackLayout Orientation="Horizontal" VerticalOptions="Start"  HorizontalOptions="FillAndExpand">
+                <Button Image="nova_oferta.png"  Text="Informar Oferta" HorizontalOptions="FillAndExpand"  Command="{Binding NovaOfertaCommand}" Style="{StaticResource menuButton}"/>
+                <Button Image="lista.png" Text="Suas Listas" HorizontalOptions="FillAndExpand" Command="{Binding ListasDeComprasCommand}" Style="{StaticResource menuButton}" />
             </StackLayout>
-            <StackLayout Orientation="Horizontal" VerticalOptions="Start"  HorizontalOptions="Start" Grid.Row="3" Grid.Column="3">
-                <Button Text="Espaço Fornecedor"  Style="{StaticResource menuButton}"/>
-                <Button Text="Grupos de Ofertas" Command="{Binding ListarGrupoOfertasCommand}"  Style="{StaticResource menuButton}"/>
+            <StackLayout Orientation="Horizontal" VerticalOptions="Start"  HorizontalOptions="FillAndExpand">
+                <Button  Image="ofertas.png" Text="Ofertas do Dia" HorizontalOptions="FillAndExpand" Command="{Binding ListarOfertasCommand}"  Style="{StaticResource menuButton}"/>
+                <Button  Image="grupo_ofertas" Text="Grupos de Ofertas" HorizontalOptions="FillAndExpand" Command="{Binding ListarGrupoOfertasCommand}"  Style="{StaticResource menuButton}"/>
             </StackLayout>
         </StackLayout>
     </StackLayout>

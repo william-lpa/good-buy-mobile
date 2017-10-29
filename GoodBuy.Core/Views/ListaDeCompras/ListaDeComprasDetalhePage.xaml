@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:GoodBuy.Core.Controls"
+             x:Class="GoodBuy.Views.ListaDeComprasDetalhePage"
+             Title="Lista de compra">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Participantes" Command="{Binding ListarParticipantesListaCommand}"/>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="vincularMarca" TargetType="Button">
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="HeightRequest" Value="30"/>
+                <Setter Property="Image" Value="monitore.png"/>
+                <Setter Property="BackgroundColor" Value="LightGray"/>
+                <Setter Property="Margin" Value="0,0,0,5"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <!--<ScrollView>-->
+    <StackLayout Spacing="10">
+        <StackLayout IsVisible="{Binding IsNotSearching}">
+            <StackLayout Spacing="0">
+                <Label Text="Nome da Lista a ser criada" Style="{StaticResource label}" HorizontalOptions="StartAndExpand"/>
+                <Entry Placeholder="Nome da lista de compras" Text="{Binding Name}"/>
+            </StackLayout>
+            <StackLayout Spacing="10">
+                <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                    <Button 
+                            Text="Simular Compra"
+                            Command="{Binding SimularComprasCommand}"
+                            IsVisible="{Binding EditingList}"
+                            HorizontalOptions="StartAndExpand"
+                            BackgroundColor="#1e6833"
+                            TextColor="#FFF"/>
+                    <Button Text="Desvincular"
+                                    Command="{Binding SairListaComprasCommand}"
+                                    IsVisible="{Binding EditingList}"
+                                    HorizontalOptions="CenterAndExpand"
+                                    BackgroundColor="#ec1c24"
+                                    TextColor="#FFF"/>
+                    <Button Text="{Binding PrimaryAction}"
+                                    Command="{Binding PersistListaCompra}"
+                                    HorizontalOptions="EndAndExpand"
+                                    BackgroundColor="#4e6cab"
+                                    TextColor="#FFF"/>
+                </StackLayout>
+            </StackLayout>
+        </StackLayout>
+        <Label Text="Produtos:" HorizontalOptions="StartAndExpand" VerticalOptions="Center" Style="{StaticResource label}"/>
+        <controls:CustomSearchBar x:Name="searchBar" Placeholder="Arroz, batata, sabão em pó" HorizontalOptions="FillAndExpand" Text="{Binding SearchText}" SearchCommand="{Binding SearchProduct}" TextChangedCommand="{Binding SearchProduct}" />
+        <controls:CustomListView
+                x:Name="sd"
+                HasUnevenRows="True" 
+                ItemTappedCommand="{Binding ProdutoListaCompraTappedCommand}"
+                ResetSelected="{Binding ResetSelection}"
+                HorizontalOptions="FillAndExpand"
+                ItemsSource="{Binding ProdutosListaCompra}"
+                IsGroupingEnabled="true" 
+		        GroupDisplayBinding="{Binding Key}"
+                >
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout Spacing="5">
+                            <StackLayout Orientation="Horizontal">
+                                <BoxView BackgroundColor="Gray" WidthRequest="80" HeightRequest="80" VerticalOptions="Start" HorizontalOptions="Start"/>
+                                <StackLayout HorizontalOptions="FillAndExpand" Spacing="0">
+                                    <StackLayout Orientation="Horizontal" Spacing="0">
+                                        <Label
+                                            x:Name="lbProduto"
+                                            HorizontalOptions="FillAndExpand"
+                                            Text="{Binding ProdutoTipoDescription}"
+                                            FontSize="22"
+                                            FontAttributes="Bold"
+                                            TextColor="#4e6cab"/>
+                                        <Button IsVisible="{Binding IsNotSearching}" Command="{Binding ExcluirProdutoListaCommand}" Text="X" BackgroundColor="LightGray" TextColor="Black" HorizontalOptions="End" FontSize="Micro" HeightRequest="30" WidthRequest="30" VerticalOptions="Start"/>
+                                    </StackLayout>
+                                    <Label IsVisible="{Binding MarcaHasValue}" x:Name="lbProdutoDescricao" Text="{Binding Marca}" FontSize="Small" HorizontalOptions="StartAndExpand"/>
+                                    <StackLayout IsVisible="{Binding IsNotSearching}" Orientation="Horizontal" Spacing="25">
+                                        <controls:AutoComplete Name="{Binding ProdutoListaCompra.Produto.Id}"  Placeholder="Unidade de Medida" Text="{Binding UnidadeMedida}" FontSize="Small" HorizontalOptions="FillAndExpand"/>
+                                        <Entry Placeholder="Quantidade"  Keyboard="Numeric" Text="{Binding Quantidade}" FontSize="Small" HorizontalOptions="FillAndExpand"/>
+                                    </StackLayout>
+                                    <Button  IsVisible="{Binding IsNotSearching}" Text="Vincular marca"  Style="{StaticResource vincularMarca}" Command="{Binding VincularMarcaAoProdutoCommand}"  HorizontalOptions="EndAndExpand"/>
+                                </StackLayout>
+                            </StackLayout>
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </controls:CustomListView>
+    </StackLayout>
+    <!--</ScrollView>-->
+</ContentPage>

@@ -6,7 +6,7 @@
     <ContentPage.Content>
         <StackLayout VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
             <ActivityIndicator Color="#4e6cab" IsRunning="true" />
-            <Label Text="{Binding Operation}"/>
+            <Label Text="{Binding Operation, Mode=TwoWay}"/>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

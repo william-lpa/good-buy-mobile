@@ -60,6 +60,7 @@ namespace goodBuy.Droid
                 using (var scope = App.Container?.BeginLifetimeScope())
                 {
                     (await scope?.Resolve<GrupoOfertaService>()?.CarregarGrupoDeOfertasUsuarioLogadoAsync()).Select(x => { installation.Tags.Add(x.Id); return x; }).ToArray();
+                    (await scope?.Resolve<ListaCompraService>()?.CarregarListasDeComprasUsuarioLogadoAsync()).Select(x => { installation.Tags.Add(x.Id); return x; }).ToArray();
                     installation.Tags.Add("user:" + scope?.Resolve<AzureService>()?.CurrentUser.User.Id);
                 }
 
@@ -105,6 +106,9 @@ namespace goodBuy.Droid
             AlertUpdated = 708,
             AlertedDeleted = 709,
             PriceReached = 710,
+            ListEdited = 711,
+            NewListMember = 712,
+            ExcludedListMember = 713,
         }
         protected override void OnMessage(Context context, Intent intent)
         {
@@ -133,7 +137,15 @@ namespace goodBuy.Droid
                 case MessageKind.ExcludedMember:
                     title = "Alteração nos grupos";
                     description = intent.Extras.GetString("message");
-                    CreateNotification(title, description, "grupos");
+                    CreateDefaultNotification(title, description, "Grupo com alteração", "Ver grupos", "grupos");
+                    break;
+                case MessageKind.ListEdited:
+                case MessageKind.ExcludedListMember:
+                case MessageKind.NewListMember:
+                    title = "Alteração de lista";
+                    description = intent.Extras.GetString("message");
+                    var idListaCompra = intent.Extras.GetString("idListaCompra");
+                    CreateDefaultNotification(title, description, "Lista alterada", "Ver listas", "+" + idListaCompra);
                     break;
                 case MessageKind.SharedMember:
                 case MessageKind.SharedGroup:
@@ -141,7 +153,7 @@ namespace goodBuy.Droid
                     title = intent.Extras.GetString("ofertaTitle");
                     description = intent.Extras.GetString("ofertaDescription");
                     idOferta = intent.Extras.GetString("idOferta");
-                    CreateNotification(title, description, idOferta);
+                    CreateDefaultNotification(title, description, "Oferta compartilhada", "Ir para a oferta", idOferta);
                     break;
                 case MessageKind.AlertCreated:
                 case MessageKind.AlertedDeleted:
@@ -151,7 +163,7 @@ namespace goodBuy.Droid
                     CreateAlertNotification(title, description);
                     break;
                 default:
-                    CreateNotification("Unknown message details", msg.ToString());
+                    CreateDefaultNotification("Unknown message details", msg.ToString(), "Error", "Action error");
                     break;
             }
         }
@@ -174,7 +186,12 @@ namespace goodBuy.Droid
             notificationManager.Notify(0, notification);
         }
 
-        private void CreateNotification(string title, string desc, string parameter = null)
+        private void CreateDefaultNotification(string title, string desc, string contentText, string actionName, string parameter = null)
+        {
+            CreateNotification(title, desc, contentText, actionName, parameter);
+        }
+
+        private void CreateNotification(string title, string desc, string contentText, string actionName, string parameter = null)
         {
             //Create notification
             var notificationManager = GetSystemService(Context.NotificationService) as NotificationManager;
@@ -184,10 +201,10 @@ namespace goodBuy.Droid
 
             var builder = new Notification.Builder(this)
               .SetContentTitle(title)
-              .SetContentText(parameter == "grupos" ? "Grupo com alteração" : "Oferta compartilhada")
+              .SetContentText(contentText)
               .SetSmallIcon(Android.Resource.Drawable.IcMenuShare)
               .SetContentIntent(PendingIntent.GetActivity(this, 0, startupIntent, PendingIntentFlags.UpdateCurrent))
-              .AddAction(Android.Resource.Drawable.IcMenuSend, parameter == "grupos" ? "Ver grupos" : "Ir para a oferta", PendingIntent.GetActivity(this, 0, startupIntent, PendingIntentFlags.UpdateCurrent));
+              .AddAction(Android.Resource.Drawable.IcMenuSend, parameter == "grupos" ? "Ver grupos" : (parameter.Contains("+") ? "Ver Lista" : "Ir para a oferta"), PendingIntent.GetActivity(this, 0, startupIntent, PendingIntentFlags.UpdateCurrent));
 
             Notification notification = new Notification.BigTextStyle(builder)
               .BigText(desc)

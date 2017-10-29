@@ -13,6 +13,8 @@ namespace GoodBuy.ViewModels
         public ICommand SignOutCommand { get; }
         public ICommand ListarOfertasCommand { get; }
         public ICommand ListarGrupoOfertasCommand { get; }
+        public ICommand ListasDeComprasCommand { get; }
+
         private readonly AzureService azure;
         private readonly SyncronizedAccessService syncronizeAccessService;
         public ImageSource Profile
@@ -36,9 +38,15 @@ namespace GoodBuy.ViewModels
             NovaOfertaCommand = new Command(ExecuteCadastrarNovaOfertaAsync);
             ListarOfertasCommand = new Command(ExecuteListarOfertasCadastradasAsync);
             ListarGrupoOfertasCommand = new Command(ExecuteListarGrupoOfertasAsync);
+            ListasDeComprasCommand = new Command(ExecuteListasDeComprasAsync);
             SignOutCommand = new Command(ExecuteSignOutAsync);
 
             InitilizeDatabaseAsync();
+        }
+
+        private async void ExecuteListasDeComprasAsync()
+        {
+            await PushAsync<ListaDeComprasPageViewModel>();
         }
 
         private async void InitilizeDatabaseAsync()
@@ -46,7 +54,7 @@ namespace GoodBuy.ViewModels
             if (await syncronizeAccessService.FirstUsageAsync())
             {
                 await Log.MessageDisplayer.Instance.ShowMessageAsync("Sincronizar base de dados", "O aplicativo irá sincronizar a base de dados para um primeiro uso. Isto pode levar alguns segundos", "OK");
-                await PushModalAsync<LoadingPageViewModel>(null,new NamedParameter("operation", Operation.SyncInitalDataBase));
+                await PushModalAsync<LoadingPageViewModel>(null, new NamedParameter("operation", Operation.SyncInitalDataBase));
                 syncronizeAccessService.SyncronizeFirstUseAsync();
                 await PopModalAsync();
             }
