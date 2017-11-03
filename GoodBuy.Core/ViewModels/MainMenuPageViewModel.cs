@@ -26,7 +26,8 @@ namespace GoodBuy.ViewModels
 
                 if (azure?.CurrentUser?.User?.Avatar != null)
                     return ImageSource.FromStream(() => new MemoryStream(Convert.FromBase64String(azure?.CurrentUser?.User?.Avatar)));
-                return null;
+                else
+                    return ImageSource.FromFile("perfil.png");
             }
         }
         public string UserName => azure.CurrentUser?.User?.FullName;

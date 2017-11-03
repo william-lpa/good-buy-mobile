@@ -121,7 +121,7 @@ namespace GoodBuy.ViewModels
             user.FullName = Name;
             user.Email = Email;
             user.Birthday = Birth;
-            user.Id = PhoneNumber;
+            user.Id = PhoneNumber.Replace("-","").Replace("+","");
             user.Male = Male;
             user.Location = city;
             return user;

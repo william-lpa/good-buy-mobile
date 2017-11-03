@@ -27,8 +27,7 @@
                HorizontalOptions="CenterAndExpand"
                HorizontalTextAlignment="Center"/>
         <Image Source="{Binding Profile}" WidthRequest="180" HeightRequest="180" />
-        <StackLayout Orientation="Vertical">
-            <Image  />
+        <StackLayout Orientation="Vertical">            
             <StackLayout Orientation="Horizontal" VerticalOptions="Start"  HorizontalOptions="FillAndExpand">
                 <Button Image="nova_oferta.png"  Text="Informar Oferta" HorizontalOptions="FillAndExpand"  Command="{Binding NovaOfertaCommand}" Style="{StaticResource menuButton}"/>
                 <Button Image="lista.png" Text="Suas Listas" HorizontalOptions="FillAndExpand" Command="{Binding ListasDeComprasCommand}" Style="{StaticResource menuButton}" />

@@ -56,7 +56,7 @@ insert into Oferta (IdCarteiraProduto,IdEstabelecimento,PrecoAtual) values ('1A6
 insert into Oferta (IdCarteiraProduto,IdEstabelecimento,PrecoAtual) values ('1A6595F0-3F91-4EB4-B02E-1D856AA162F1','25b71d17-549b-4336-9f0e-2c3721eaf11c',3)-- Leite Integral 1L - Tirol - Bistek					R$: 3.00
 
 insert into Oferta (IdCarteiraProduto,IdEstabelecimento,PrecoAtual) values ('DFF57768-1002-4DB3-A7DE-1A50225E1282','1c55534e-25a6-4152-86ab-736d8268d2e0',1.77)-- Leite Integral 1L - Parmatat - BIG				R$: 1.77
-insert into Oferta (IdCarteiraProduto,IdEstabelecimento,PrecoAtual) values ('DFF57768-1002-4DB3-A7DE-1A50225E1282','c1d25de5-b531-4a1a-a40f-672e934ef75c',1.55)-- Leite Integral 1L - Parmatat - Angeloni			R$: 1.55
+insert into Oferta (IdCarteiraProduto,I0dEstabelecimento,PrecoAtual) values ('DFF57768-1002-4DB3-A7DE-1A50225E1282','c1d25de5-b531-4a1a-a40f-672e934ef75c',1.55)-- Leite Integral 1L - Parmatat - Angeloni			R$: 1.55
 insert into Oferta (IdCarteiraProduto,IdEstabelecimento,PrecoAtual) values ('DFF57768-1002-4DB3-A7DE-1A50225E1282','25b71d17-549b-4336-9f0e-2c3721eaf11c',1.92)-- Leite Integral 1L - Parmatat - Bistek				R$: 1.92
 
 insert into Oferta (IdCarteiraProduto,IdEstabelecimento,PrecoAtual) values ('47C8B088-4C46-49D8-959F-E3CBA1414987','1c55534e-25a6-4152-86ab-736d8268d2e0',1.77)-- Leite Desnatado 1L - Parmatat - BIG				R$: 1.77

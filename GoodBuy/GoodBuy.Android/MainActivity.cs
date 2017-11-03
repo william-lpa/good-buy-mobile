@@ -8,6 +8,7 @@ using GoodBuy;
 using Autofac;
 using GoodBuy.Authentication;
 using GoodBuy.Service;
+using System;
 
 [assembly: Xamarin.Forms.Dependency(typeof(MainActivity))]
 namespace goodBuy.Droid
@@ -67,17 +68,19 @@ namespace goodBuy.Droid
 
             var container = BuildDependencies();
             instance = this;
-            
+
             LoadApplication(new App(container, param));
 
-            //PackageInfo info = this.PackageManager.GetPackageInfo("goodbuy.app", PackageInfoFlags.Signatures);
-            //foreach (var item in info.Signatures)
-            //{
-            //    Java.Security.MessageDigest md = Java.Security.MessageDigest.GetInstance("SHA");
-            //    md.Update(item.ToByteArray());
+            PackageInfo info = this.PackageManager.GetPackageInfo("goodbuy.app", PackageInfoFlags.Signatures);
+            foreach (var item in info.Signatures)
+            {
+                Java.Security.MessageDigest md = Java.Security.MessageDigest.GetInstance("SHA");
+                md.Update(item.ToByteArray());
 
-            //    string keyHash = Convert.ToBase64String(md.Digest());
-            //}
+                string keyHash = Convert.ToBase64String(md.Digest());
+            }
+
+
             try
             {
                 // Check to ensure everything's set up right

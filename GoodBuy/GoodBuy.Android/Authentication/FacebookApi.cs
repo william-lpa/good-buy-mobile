@@ -5,6 +5,7 @@ using Android.OS;
 using Autofac;
 using GoodBuy;
 using GoodBuy.Authentication;
+using GoodBuy.Log;
 using GoodBuy.Models;
 using GoodBuy.Models.Abstraction;
 using Newtonsoft.Json;
@@ -35,12 +36,17 @@ namespace goodBuy.Droid.Authentication
         }
         public void OnCancel()
         {
-            using (var scope = App.Container.BeginLifetimeScope())
-                scope.Resolve<SocialAuthentication>().LoginResult = new LoginResultContent(null, "User has canceled the login", GoodBuy.Models.Abstraction.Result.Canceled);
+            //using (var scope = App.Container.BeginLifetimeScope())
+            //    scope.Resolve<SocialAuthentication>().LoginResult = new LoginResultContent(null, "User has canceled the login", GoodBuy.Models.Abstraction.Result.Canceled);
         }
 
         public void OnError(FacebookException error)
         {
+            Log.Instance.AddLog(error);
+            if (error?.Cause != null)
+                Log.Instance.AddLog(error?.Cause);
+            if (error?.InnerException != null)
+                Log.Instance.AddLog(error?.InnerException);
             using (var scope = App.Container.BeginLifetimeScope())
                 scope.Resolve<SocialAuthentication>().LoginResult = new LoginResultContent(null, $"error:{error.ToString()}", GoodBuy.Models.Abstraction.Result.Error);
         }
@@ -60,13 +66,13 @@ namespace goodBuy.Droid.Authentication
             var user = new User()
             {
                 FacebookId = token.UserId,
-                FullName = userConverted.Name,
-                Birthday = DateTime.ParseExact(userConverted.Birthday, "MM/dd/yyyy", CultureInfo.InvariantCulture),
-                Email = userConverted.Email,
-                Male = userConverted.Gender == "male",
-                Avatar = userConverted.Picture.Data.Url,
-                Locale = userConverted.Locale,
-                Location = userConverted.Location.Name
+                FullName = userConverted?.Name,
+                Birthday = userConverted?.Birthday != null ? DateTime.ParseExact(userConverted.Birthday, "MM/dd/yyyy", CultureInfo.InvariantCulture) : default(DateTime),
+                Email = userConverted?.Email,
+                Male = userConverted?.Gender == "male",
+                Avatar = userConverted?.Picture?.Data?.Url,
+                Locale = userConverted?.Locale,
+                Location = userConverted?.Location?.Name
             };
             using (var scope = App.Container.BeginLifetimeScope())
                 scope.Resolve<IAuthentication>().LoginResult = new LoginResultContent(user) { Token = token.Token };

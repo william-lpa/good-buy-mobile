@@ -19,7 +19,7 @@
             if (profileUser != null)
             {
 
-                User.Id = profileUser?.Id;
+                User.Id = profileUser?.Id.Replace("-", "").Replace("+", "");
                 if (string.IsNullOrEmpty(User.Email))
                     User.Email = profileUser.Email;
 
