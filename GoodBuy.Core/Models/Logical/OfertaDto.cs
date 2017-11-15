@@ -41,7 +41,7 @@ namespace GoodBuy.Models.Logical
             UpdatedAt = oferta.UpdatedAt;
             ValorOferta = oferta.PrecoAtual;
             Confiabilidade = ofertasService.CalculateConfiabilidade(oferta);
-            Estabelecimento = estabelecimento.Nome;
+            Estabelecimento = estabelecimento?.Nome;
             DescricaoOferta = $"{produto.Nome} - {tipo?.Nome}, {marca.Nome}, {produto.QuantidadeMensuravel} {unidade.Nome}";
             AumentarConfiabilidadeCommand = new Command(ExecuteAplicarLikeAsync);
             DiminuirConfiabilidadeCommand = new Command(ExecuteAplicarDislikeAsync);

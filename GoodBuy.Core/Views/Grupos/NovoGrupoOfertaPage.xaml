@@ -25,9 +25,11 @@
                     <StackLayout Orientation="Horizontal">
                         <Label Text="Restrito"  HorizontalOptions="Start"/>
                         <Switch IsToggled="{Binding Private}" />
-                        <Button Text="Excluir" Command="{Binding RemoverGrupoCommand}" IsVisible="{Binding EditingGroup}" HorizontalOptions="EndAndExpand" FontAttributes="Italic, Bold" BackgroundColor="#ec1c24" TextColor="White" FontSize="10" />
-                        <Button Text="{Binding SecondaryAction}" Command="{Binding InteractGrupoOfertaCommand}" IsVisible="{Binding EditingGroup}" HorizontalOptions="EndAndExpand" BackgroundColor="LightGray" TextColor="Black" />
-                        <Button Text="{Binding PrimaryAction}" Command="{Binding PersistGrupoOfertaCommand}" HorizontalOptions="EndAndExpand" BackgroundColor="#4e6cab" TextColor="#FFF"/>
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal">
+                        <Button Margin="10,0,0,0" Text="Excluir" Command="{Binding RemoverGrupoCommand}" IsVisible="{Binding EditingGroup}" HorizontalOptions="StartAndExpand" FontAttributes="Italic, Bold" BackgroundColor="#ec1c24" TextColor="White" FontSize="10" />
+                        <Button Text="{Binding SecondaryAction}" Command="{Binding InteractGrupoOfertaCommand}" IsVisible="{Binding EditingGroup}" HorizontalOptions="CenterAndExpand" BackgroundColor="LightGray" TextColor="Black" />
+                        <Button Margin="0,0,10,0" Text="{Binding PrimaryAction}" Command="{Binding PersistGrupoOfertaCommand}" HorizontalOptions="EndAndExpand" BackgroundColor="#4e6cab" TextColor="#FFF"/>
                     </StackLayout>
                 </StackLayout>
             </StackLayout>

@@ -9,7 +9,7 @@
                 <Setter Property="BackgroundColor" Value="#4e6cab"/>
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="FontAttributes" Value="Bold"/>
-                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontSize" Value="13"/>
                 <Setter Property="HeightRequest" Value="100"/>
                 <Setter Property="WidthRequest" Value="100"/>
                 <Setter Property="Margin" Value="10,10"/>

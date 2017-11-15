@@ -29,7 +29,7 @@ namespace goodBuy.Droid.ContactList
                                 ContactsContract.Contacts.InterfaceConsts.Id,
                                 ContactsContract.CommonDataKinds.Phone.Number,
                                 ContactsContract.Contacts.Data.InterfaceConsts.Mimetype
-                };
+                         };
                     ContentResolver content = MainActivity.CurrentActivity.ContentResolver;
                     var cursor = content.Query(
                             // Retrieves data rows for the device user's 'profile' contact

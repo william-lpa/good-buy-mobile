@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using GoodBuy.Models.Many_to_Many;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace GoodBuy.ViewModels
 {
@@ -19,7 +20,7 @@ namespace GoodBuy.ViewModels
         private string marca;
         private string categoria;
         private string estabelecimento;
-        private decimal preco;
+        private string preco;
 
         public string Produto
         {
@@ -75,7 +76,7 @@ namespace GoodBuy.ViewModels
                 AtualizarStatus();
             }
         }
-        public decimal Preco
+        public string Preco
         {
             get => preco;
             set
@@ -84,6 +85,7 @@ namespace GoodBuy.ViewModels
                 AtualizarStatus();
             }
         }
+        public decimal PrecoDecimal => decimal.Parse(Preco ?? "0");
         public string Estabelecimento
         {
             get => estabelecimento;
@@ -143,12 +145,12 @@ namespace GoodBuy.ViewModels
         private void Adapter()
         {
             Produto = editOferta?.CarteiraProduto?.Produto?.Nome;
-            Tipo = editOferta?.CarteiraProduto?.Produto?.Tipo?.Nome ?? "Sabor não informado";
+            Tipo = editOferta?.CarteiraProduto?.Produto?.Tipo?.Nome ?? "Tipo não informado";
             Quantidade = editOferta?.CarteiraProduto?.Produto?.QuantidadeMensuravel ?? 0;
             Marca = editOferta?.CarteiraProduto?.Marca?.Nome ?? "Sem marca";
             UnidadeMedida = editOferta?.CarteiraProduto?.Produto?.UnidadeMedida?.Nome;
             Categoria = editOferta?.CarteiraProduto?.Produto?.Categoria?.Nome ?? "Categoria não informada";
-            Preco = editOferta?.PrecoAtual ?? 0;
+            Preco = (editOferta?.PrecoAtual ?? 0).ToString();
             Estabelecimento = editOferta?.Estabelecimento?.Nome;//talbez historico
         }
 
@@ -170,7 +172,7 @@ namespace GoodBuy.ViewModels
 
         private bool VerificarCamposObrigatorios()
         {
-            return !string.IsNullOrEmpty(Produto) && Preco > 0 &&
+            return !string.IsNullOrEmpty(Produto) && PrecoDecimal > 0 &&
                         !string.IsNullOrEmpty(Estabelecimento) && !string.IsNullOrEmpty(UnidadeMedida)
                         && Quantidade > 0;
         }
@@ -183,7 +185,7 @@ namespace GoodBuy.ViewModels
                 {
                     var oferta = new Oferta()
                     {
-                        PrecoAtual = Preco,
+                        PrecoAtual = PrecoDecimal,
                         CarteiraProduto = new CarteiraProduto()
                         {
                             Marca = new Marca(Marca),

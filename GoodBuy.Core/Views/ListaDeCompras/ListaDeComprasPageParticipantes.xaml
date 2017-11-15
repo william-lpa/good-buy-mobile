@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:GoodBuy.Core.Controls"
-             x:Class="GoodBuy.Views.ListaDeComprasPageParticipantes">
+             x:Class="GoodBuy.Views.ListaDeComprasPageParticipantes"
+             Title="Participantes da lista de compra">
     <ContentPage.Content>
         <StackLayout>
             <Label Text="Localizar participantes" HorizontalOptions="StartAndExpand" VerticalOptions="Center" Style="{StaticResource label}"/>
