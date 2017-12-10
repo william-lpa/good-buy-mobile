@@ -52,7 +52,7 @@ namespace GoodBuy.Service
 
             foreach (var produtoLista in initialValue)
             {
-                var melhorOferta = ofertas.Where(x => 
+                var melhorOferta = ofertas.Where(x =>
                 x.CarteiraProduto.Produto.Nome.ToLower() == produtoLista.Produto?.Nome?.ToLower() &&
                                    (produtoLista.Produto.IdTipo == null || x.CarteiraProduto.Produto.IdTipo == produtoLista.Produto.IdTipo) &&
                                    (produtoLista.IdMarca == null || x.CarteiraProduto.IdMarca == produtoLista.IdMarca) &&
@@ -322,10 +322,11 @@ namespace GoodBuy.Service
             var retorno = await Task.WhenAll(ofertas.Select(async oferta =>
             {
                 var idCarteiraProduto = await carteiraProdutoRepository.GetByIdAsync(oferta.IdCarteiraProduto);
+                if (idCarteiraProduto == null) return null;
                 var produto = await produtoRepository.GetByIdAsync(idCarteiraProduto.IdProduto);
 
-                return new OfertaDto(await estabelecimentoRepository.GetByIdAsync(oferta.IdEstabelecimento), oferta, produto, await unidadeMedidaRepository.GetByIdAsync(produto.IdUnidadeMedida),
-                                    await tipoRepository.GetByIdAsync(produto.IdTipo), await marcaRepository.GetByIdAsync(idCarteiraProduto.IdMarca), this);
+                return new OfertaDto(await estabelecimentoRepository.GetByIdAsync(oferta.IdEstabelecimento), oferta, produto, await unidadeMedidaRepository.GetByIdAsync(produto?.IdUnidadeMedida),
+                                    await tipoRepository.GetByIdAsync(produto?.IdTipo), await marcaRepository.GetByIdAsync(idCarteiraProduto.IdMarca), this);
             }));
 
             return retorno.OrderByDescending(x => x.UpdatedAt).ToArray();

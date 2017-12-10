@@ -19,6 +19,7 @@ using Xamarin.Auth;
 
 namespace GoodBuy.Service
 {
+
     public class AzureService
     {
         private const string appURL = "https://good-buy.azurewebsites.net";
@@ -162,7 +163,7 @@ namespace GoodBuy.Service
                 //RemoveTokenFromSecureStore();
                 //Client = new MobileServiceClient(appURL, new ExpiredAzureRequestInterceptors(this));
                 Client = new MobileServiceClient(appURL);
-                var dbName = "goodBuy321.db";
+                var dbName = "goodBuy331.db";
                 Store = new MobileServiceSQLiteStore(Path.Combine(MobileServiceClient.DefaultDatabasePath, dbName));
                 DefineTables(Store);
 
